@@ -13,45 +13,39 @@
       theme: {
         extend: {
           colors: {
-            // Paleta neutra (grafite) no lugar do slate azulado
+            // Neutros: preto puro + cinza #898989 do guia de estilo (Sales Dashboard)
             slate: {
-              50: '#f6f7f8', 100: '#e8eaed', 200: '#d0d4d9', 300: '#aeb4bc', 400: '#8a919b',
-              500: '#6b727c', 600: '#4d535c', 700: '#363b42', 800: '#24282d', 900: '#181b1f', 950: '#0f1114'
+              50: '#f5f6f6', 100: '#e9eaea', 200: '#d3d4d5', 300: '#b4b5b7', 400: '#898989',
+              500: '#6f7072', 600: '#4a4b4d', 700: '#2a2b2e', 800: '#1a1b1e', 900: '#0d0e10', 950: '#000000'
             },
-            // Um único acento (azul) no lugar de ciano/índigo/roxo/rosa
-            cyan:    { 50:'#eef4ff',100:'#dbe7fe',200:'#bfd3fe',300:'#93b4fd',400:'#6b97f7',500:'#4a7cf0',600:'#3563d9',700:'#2c50b3',800:'#27448f',900:'#233a72',950:'#172447' },
-            indigo:  { 50:'#eef4ff',100:'#dbe7fe',200:'#bfd3fe',300:'#93b4fd',400:'#6b97f7',500:'#4a7cf0',600:'#3563d9',700:'#2c50b3',800:'#27448f',900:'#233a72',950:'#172447' },
-            sky:     { 50:'#eef4ff',100:'#dbe7fe',200:'#bfd3fe',300:'#93b4fd',400:'#6b97f7',500:'#4a7cf0',600:'#3563d9',700:'#2c50b3',800:'#27448f',900:'#233a72',950:'#172447' },
-            violet:  { 50:'#f4f5f7',100:'#e6e8ec',200:'#cdd1d8',300:'#b3b9c3',400:'#98a0ac',500:'#7d8693',600:'#646c78',700:'#4c535d',800:'#363b43',900:'#24282e',950:'#16191d' },
-            purple:  { 50:'#f4f5f7',100:'#e6e8ec',200:'#cdd1d8',300:'#b3b9c3',400:'#98a0ac',500:'#7d8693',600:'#646c78',700:'#4c535d',800:'#363b43',900:'#24282e',950:'#16191d' },
-            fuchsia: { 50:'#f4f5f7',100:'#e6e8ec',200:'#cdd1d8',300:'#b3b9c3',400:'#98a0ac',500:'#7d8693',600:'#646c78',700:'#4c535d',800:'#363b43',900:'#24282e',950:'#16191d' },
-            pink:    { 50:'#f4f5f7',100:'#e6e8ec',200:'#cdd1d8',300:'#b3b9c3',400:'#98a0ac',500:'#7d8693',600:'#646c78',700:'#4c535d',800:'#363b43',900:'#24282e',950:'#16191d' },
+            // Acento único: gradiente menta (#92FE9D) -> ciano (#00C9FF)
+            cyan:    { 50:'#effff4',100:'#d6ffe4',200:'#b5ffd2',300:'#92fe9d',400:'#45e9c4',500:'#00c9ff',600:'#00a9db',700:'#0388ad',800:'#066a89',900:'#0a4a60',950:'#06293a' },
+            indigo:  { 50:'#effff4',100:'#d6ffe4',200:'#b5ffd2',300:'#92fe9d',400:'#45e9c4',500:'#00c9ff',600:'#00a9db',700:'#0388ad',800:'#066a89',900:'#0a4a60',950:'#06293a' },
+            sky:     { 50:'#effff4',100:'#d6ffe4',200:'#b5ffd2',300:'#92fe9d',400:'#45e9c4',500:'#00c9ff',600:'#00a9db',700:'#0388ad',800:'#066a89',900:'#0a4a60',950:'#06293a' },
+            blue:    { 50:'#effff4',100:'#d6ffe4',200:'#b5ffd2',300:'#92fe9d',400:'#45e9c4',500:'#00c9ff',600:'#00a9db',700:'#0388ad',800:'#066a89',900:'#0a4a60',950:'#06293a' },
+            violet:  { 50:'#f5f6f6',100:'#e9eaea',200:'#d3d4d5',300:'#b4b5b7',400:'#989a9d',500:'#7d7f82',600:'#5f6165',700:'#46484b',800:'#2e2f32',900:'#1a1b1e',950:'#0d0e10' },
+            purple:  { 50:'#f5f6f6',100:'#e9eaea',200:'#d3d4d5',300:'#b4b5b7',400:'#989a9d',500:'#7d7f82',600:'#5f6165',700:'#46484b',800:'#2e2f32',900:'#1a1b1e',950:'#0d0e10' },
+            fuchsia: { 50:'#f5f6f6',100:'#e9eaea',200:'#d3d4d5',300:'#b4b5b7',400:'#989a9d',500:'#7d7f82',600:'#5f6165',700:'#46484b',800:'#2e2f32',900:'#1a1b1e',950:'#0d0e10' },
+            pink:    { 50:'#f5f6f6',100:'#e9eaea',200:'#d3d4d5',300:'#b4b5b7',400:'#989a9d',500:'#7d7f82',600:'#5f6165',700:'#46484b',800:'#2e2f32',900:'#1a1b1e',950:'#0d0e10' },
             teal:    { 50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b',950:'#022c22' },
             rose:    { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d',950:'#450a0a' },
             orange:  { 50:'#fffbeb',100:'#fef3c7',200:'#fde68a',300:'#fcd34d',400:'#fbbf24',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f',950:'#451a03' },
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              400: '#4ade80',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d'
-            },
+            brand: { 50:'#f0fdf4', 100:'#dcfce7', 400:'#92fe9d', 500:'#45e9c4', 600:'#00c9ff', 700:'#0388ad' },
             cyber: {
-              bg: '#0f1114',
-              card: '#15181c',
-              border: '#262a30',
-              hover: '#1d2025',
-              accent: '#6b97f7',
-              purple: '#98a0ac',
-              pink: '#98a0ac',
+              bg: '#0b0b0e',
+              card: '#000000',
+              border: '#1f2024',
+              hover: '#141518',
+              accent: '#92fe9d',
+              purple: '#989a9d',
+              pink: '#989a9d',
               amber: '#f59e0b',
               red: '#ef4444',
               emerald: '#10b981'
             }
           },
           fontFamily: {
-            sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
             mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace']
           }
         }
@@ -59,10 +53,10 @@
     }
   </script>
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts (DM Sans: geométrica, próxima da CircularXX do guia de estilo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons -->
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
@@ -82,20 +76,63 @@
     body { background: #0f1114; letter-spacing: 0; }
     h1, h2, h3, h4 { letter-spacing: -0.005em; }
     .font-mono, code, pre, td.font-mono { font-feature-settings: "zero" 1; }
-    button { transition: background-color .12s, border-color .12s, color .12s !important; }
-    input, select, textarea { border-radius: 4px; }
-    ::selection { background: #3563d9; color: #fff; }
-    * { scrollbar-color: #2c3036 transparent; }
-
-    /* Ações do topo: neutras; só "Exportar" fica como ação primária */
-    #topActions > button, #topActions > div > button:not(#exportMenuBtn) {
-      background: #1d2025 !important; color: #d0d4d9 !important; border: 1px solid #2c3036 !important; font-weight: 500 !important;
+    /* ============================================================================
+       Design system (referência: Sales Dashboard / Pixel Mags)
+       preto #000 · cinza #898989 · branco #fff · gradiente #92FE9D -> #00C9FF
+       ============================================================================ */
+    :root {
+      --grad: linear-gradient(90deg, #92fe9d 0%, #00c9ff 100%);
+      --bg: #0b0b0e; --line: rgba(255,255,255,.07);
     }
-    #topActions > button:hover, #topActions > div > button:not(#exportMenuBtn):hover { background: #24282d !important; border-color: #3a3f46 !important; }
-    #topActions > button i, #topActions > div > button:not(#exportMenuBtn) i { color: #8a919b !important; }
-    #navTabs { background: transparent !important; border: 0 !important; border-bottom: 1px solid #262a30 !important; border-radius: 0 !important; padding: 0 !important; }
-    #navTabs > button { border-radius: 0 !important; border-bottom: 2px solid transparent; box-shadow: none !important; }
-    #navTabs > button.bg-blue-600 { background: transparent !important; color: #fff !important; border-bottom-color: #4a7cf0; }
+    body { background: var(--bg); }
+    button { transition: background-color .15s, border-color .15s, color .15s, opacity .15s !important; }
+    input, select, textarea { border-radius: 8px; }
+    ::selection { background: #00c9ff; color: #001018; }
+    * { scrollbar-color: #2a2b2e transparent; }
+    .rounded-lg { border-radius: 14px !important; }
+    .rounded-md { border-radius: 12px !important; }
+    .bg-cyber-card, .bg-slate-900 { border-color: var(--line); }
+    .border-cyber-border, .border-slate-800, .border-slate-700 { border-color: var(--line) !important; }
+
+    /* Botões primários = gradiente da marca com texto escuro */
+    .bg-cyan-600, .bg-blue-600, .bg-indigo-600,
+    .hover\:bg-cyan-500:hover, .hover\:bg-blue-500:hover, .hover\:bg-indigo-500:hover, .btn-primary {
+      background: var(--grad) !important; color: #02130e !important; border-color: transparent !important;
+    }
+    .bg-cyan-600 *, .bg-blue-600 *, .bg-indigo-600 *, .btn-primary * { color: #02130e !important; }
+    .bg-cyan-600:hover, .bg-blue-600:hover, .bg-indigo-600:hover, .btn-primary:hover { filter: brightness(1.08); }
+
+    /* Coluna principal com faixa de gradiente suave no topo, como no guia de estilo */
+    #appCol {
+      background:
+        radial-gradient(900px 230px at 18% -40px, rgba(146,254,157,.18), transparent 70%),
+        radial-gradient(800px 240px at 82% -40px, rgba(0,201,255,.16), transparent 70%),
+        var(--bg);
+      background-repeat: no-repeat;
+    }
+    #appHeader { background: transparent; border: 0; }
+
+    /* Barra lateral */
+    #sidebar { background: #090a0e; border-right: 1px solid var(--line); width: 236px; }
+    .nav-label { font-size: 11px; letter-spacing: .08em; color: #6a6b6e; text-transform: uppercase; padding: 14px 14px 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; white-space: nowrap;
+      padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #898989; background: transparent;
+    }
+    .nav-item i, .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item span[id] { margin-left: auto; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.05); }
+    .nav-item.active { background: var(--grad); color: #02130e; font-weight: 600; box-shadow: 0 6px 22px -8px rgba(0,201,255,.55); }
+    .nav-item.active i { color: #02130e; }
+
+    /* Botões do cabeçalho: vidro escuro; ação primária em gradiente */
+    .btn-ghost {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10); color: #e9eaea;
+      border-radius: 10px; padding: 7px 12px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
+    .btn-primary { border-radius: 10px; padding: 7px 14px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    #pcapFileSelector { background: rgba(255,255,255,.05) !important; border: 1px solid rgba(255,255,255,.12) !important; color: #e9eaea !important; }
 
     /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -131,13 +168,14 @@
 
     /* Layout: só a área da aba ativa rola; cabeçalho, barra de filtros e rodapé ficam fixos */
     #mainContainer > div { min-height: 0; }
-    #navTabs { scrollbar-width: thin; }
-    #navTabs::-webkit-scrollbar { height: 4px; }
-    #navTabs > button, #topActions > button, #topActions > div > button { white-space: nowrap; flex-shrink: 0; }
-    header, footer, body > section { flex-shrink: 0; }
+    #sidebar { scrollbar-width: thin; }
+    #topActions > button, #topActions > div > button { white-space: nowrap; flex-shrink: 0; }
+    #appHeader, footer, #appCol > section { flex-shrink: 0; }
     @media (max-width: 767px) {
       /* Em telas estreitas os botões de ação mostram só o ícone */
       #topActions > button > span, #topActions > div > button > span { display: none; }
+      #sidebar { width: 64px; }
+      #sidebar .nav-item span:first-of-type ~ span:not([id]), #sidebar .nav-label, #sidebar div.leading-tight { display: none; }
     }
     .packet-row.selected {
       background-color: rgba(74, 124, 240, 0.18) !important;
@@ -172,94 +210,106 @@
     }
   </style>
 </head>
-<body class="bg-cyber-bg text-slate-200 h-screen overflow-hidden flex flex-col font-sans select-none antialiased">
+<body class="bg-cyber-bg text-slate-200 h-screen overflow-hidden flex flex-row font-sans select-none antialiased">
 
-  <!-- TOP NAVBAR -->
-  <header class="bg-cyber-card border-b border-cyber-border z-40 px-4 py-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 flex-shrink-0">
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded border border-slate-700 bg-slate-900 flex items-center justify-center">
-        <i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i>
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar" class="no-print flex-shrink-0 h-screen flex flex-col z-40">
+    <div class="px-5 pt-6 pb-3 flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(90deg,#92fe9d,#00c9ff)">
+        <i data-lucide="shield-half" class="w-5 h-5" style="color:#02130e"></i>
       </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-semibold text-white flex items-center space-x-1.5"><span>PCAP Analyzer</span><span class="px-1.5 py-0.2 text-[10px] text-slate-500 border border-slate-700 rounded font-mono">v5</span></h1>
-        </div>
-        
-        <!-- Multi-PCAP Dropdown Selector -->
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
-          <div class="relative flex items-center">
-            <select id="pcapFileSelector" onchange="handlePcapSelectionChange(this.value)" 
-                    class="bg-slate-900 border border-slate-700 hover:border-cyan-500 text-cyan-300 text-xs font-mono rounded px-2 py-0.5 outline-none cursor-pointer max-w-[280px] truncate">
-              <option value="ALL">Todos os Arquivos (0 carregados)</option>
-            </select>
-          </div>
-          <span id="globalStatsSnippet" class="text-[11px] text-slate-400 font-mono">0 pacotes</span>
-          <span id="apiEnrichmentStatusBadge" onclick="openApiConfigModal()" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center space-x-1 cursor-pointer hover:bg-emerald-500/30 transition-all" title="Clique para abrir a Central de Inteligência & Diagnóstico de APIs">
-            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
-            <span id="apiEnrichmentStatusText">Threat Intel & BGP (MANRS/Pulsedive)</span>
-          </span>
-        </div>
+      <div class="leading-tight min-w-0">
+        <div class="text-[15px] font-semibold text-white flex items-center gap-1.5">PCAP Analyzer <span class="px-1.5 text-[10px] text-slate-500 border border-slate-700 rounded font-mono">v6</span></div>
+        <div class="text-[11px] text-slate-500">NetSec · Proteção DDoS</div>
       </div>
     </div>
 
-    <!-- Navigation Tabs: linha própria, largura total, rolagem horizontal quando não couber -->
-    <div id="navTabs" class="order-last w-full flex items-center bg-slate-900/90 p-1 rounded-md border border-cyber-border space-x-1 overflow-x-auto">
-      <button id="tabPacketsBtn" onclick="switchView('packets')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 bg-blue-600 text-white">
-        <i data-lucide="list" class="w-3.5 h-3.5"></i>
-        <span>Pacotes</span>
+    <nav class="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
+      <div class="nav-label">Resposta a incidente</div>
+
+      <button id="tabTriageBtn" onclick="switchView('triage')" class="nav-item" title="Nível 1: taxa (pps/bps), picos, top vítimas, fontes únicas, TTL e tamanhos">
+        <i data-lucide="gauge"></i><span>Triagem</span>
+        <span id="triageAlertBadge" class="hidden px-1.5 text-[10px] bg-orange-500/20 text-orange-300 rounded-full font-mono font-bold">!</span>
+      </button>
+      <button id="tabDdosBtn" onclick="switchView('ddos')" class="nav-item" title="Classificação de vetores DDoS: padrão do tráfego, técnica utilizada e estratégia de mitigação">
+        <i data-lucide="zap"></i><span>DDoS</span>
+        <span id="ddosVectorBadge" class="hidden px-1.5 text-[10px] bg-rose-500/20 text-rose-300 rounded-full font-mono font-bold">0</span>
+      </button>
+      <button id="tabPayloadLabBtn" onclick="switchView('payloadLab')" class="nav-item" title="Nível 3: padrão de bytes no payload, regex sugerida e teste de acerto/colateral na captura">
+        <i data-lucide="binary"></i><span>Payload Lab</span>
+      </button>
+      <button id="tabIocBtn" onclick="switchView('ioc')" class="nav-item">
+        <i data-lucide="shield-alert"></i><span>IoC & Ataques</span>
+        <span id="badgeIocCount" class="hidden px-1.5 text-[10px] bg-red-500/20 text-red-300 rounded-full font-mono font-bold">0</span>
+      </button>
+      <button id="tabBgpAuditBtn" onclick="switchView('bgpAudit')" class="nav-item" title="Auditoria de Roteamento BGP, Detecção de Prefix Leaks (LGView-NG), Loops Estáticos (LoopHunter) e Amplificação (AmpScan)">
+        <i data-lucide="network"></i><span>BGP & Mitigação</span>
+        <span id="bgpAlertBadge" class="hidden px-1.5 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold">OK</span>
       </button>
 
-      <button id="tabFlowsBtn" onclick="switchView('flows')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
-        <i data-lucide="git-merge" class="w-3.5 h-3.5"></i>
-        <span>Conversas & Fluxos</span>
-        <span id="flowsCountBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-slate-700 text-slate-200 rounded-full font-mono">0</span>
+      <div class="nav-label">Análise</div>
+
+      <button id="tabPacketsBtn" onclick="switchView('packets')" class="nav-item active">
+        <i data-lucide="list"></i><span>Pacotes</span>
+      </button>
+      <button id="tabFlowsBtn" onclick="switchView('flows')" class="nav-item">
+        <i data-lucide="git-merge"></i><span>Conversas & Fluxos</span>
+        <span id="flowsCountBadge" class="hidden px-1.5 text-[10px] bg-slate-700 text-slate-200 rounded-full font-mono">0</span>
+      </button>
+      <button id="tabCorrelationBtn" onclick="switchView('correlation')" class="nav-item">
+        <i data-lucide="building-2"></i><span>Classificação & Produtos</span>
+      </button>
+      <button id="tabStatsBtn" onclick="switchView('stats')" class="nav-item">
+        <i data-lucide="bar-chart-3"></i><span>Dashboard</span>
+        <span id="dashboardThreatsBadge" class="hidden px-1.5 text-[10px] bg-red-500/20 text-red-400 rounded-full font-mono font-bold">0</span>
+      </button>
+      <button id="tabFilesManagerBtn" onclick="switchView('filesManager')" class="nav-item">
+        <i data-lucide="folder-kanban"></i><span>Arquivos</span>
+        <span id="filesCountBadge" class="px-1.5 text-[10px] bg-cyan-500/20 text-cyan-300 rounded-full font-mono">0</span>
       </button>
 
-      <button id="tabCorrelationBtn" onclick="switchView('correlation')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
-        <i data-lucide="building-2" class="w-3.5 h-3.5"></i>
-        <span>Classificação & Produtos</span>
-      </button>
+      <div class="nav-label">Outros</div>
 
-      <button id="tabDdosBtn" onclick="switchView('ddos')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800" title="Classificação de vetores DDoS: padrão do tráfego, técnica utilizada e estratégia de mitigação">
-        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-        <span>DDoS</span>
-        <span id="ddosVectorBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-rose-500/20 text-rose-300 rounded-full font-mono font-bold">0</span>
+      <button onclick="openFirewallModalForAllThreats()" class="nav-item" title="Gerar regras de firewall automáticas">
+        <i data-lucide="shield-ban"></i><span>Regras Firewall</span>
       </button>
+      <button onclick="openApiConfigModal()" class="nav-item" title="Verificar diagnósticos, latência e status de bloqueio das APIs">
+        <i data-lucide="activity"></i><span>Status APIs</span>
+      </button>
+      <button onclick="openClientPresentationModal()" class="nav-item" title="Gerar e apresentar relatório executivo formatado para o cliente">
+        <i data-lucide="presentation"></i><span>Relatório do Cliente</span>
+      </button>
+    </nav>
 
-      <button id="tabIocBtn" onclick="switchView('ioc')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
-        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-        <span>IoC Scanner & Ataques</span>
-        <span id="badgeIocCount" class="hidden px-1.5 py-0.2 text-[10px] bg-red-500/20 text-red-300 rounded-full font-mono font-bold">0</span>
-      </button>
+    <div class="m-3 p-3 rounded-xl flex items-center gap-3" style="background:#1a1b1e">
+      <div class="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold flex-shrink-0" style="background:linear-gradient(90deg,#92fe9d,#00c9ff);color:#02130e">NS</div>
+      <div class="leading-tight min-w-0">
+        <div class="text-[13px] font-semibold text-white truncate">Analista NetSec</div>
+        <div class="text-[11px] text-slate-500 truncate">Proteção DDoS</div>
+      </div>
+    </div>
+  </aside>
 
-      <button id="tabTriageBtn" onclick="switchView('triage')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800" title="Nível 1: taxa (pps/bps), picos, top vítimas, fontes únicas, TTL e tamanhos">
-        <i data-lucide="gauge" class="w-3.5 h-3.5"></i>
-        <span>Triagem</span>
-        <span id="triageAlertBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-orange-500/20 text-orange-300 rounded-full font-mono font-bold">!</span>
-      </button>
+  <!-- COLUNA PRINCIPAL -->
+  <div id="appCol" class="flex-1 min-w-0 h-screen flex flex-col">
 
-      <button id="tabPayloadLabBtn" onclick="switchView('payloadLab')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800" title="Nível 3: padrão de bytes no payload, regex sugerida e teste de acerto/colateral na captura">
-        <i data-lucide="binary" class="w-3.5 h-3.5"></i>
-        <span>Payload Lab</span>
-      </button>
-
-      <button id="tabStatsBtn" onclick="switchView('stats')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
-        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
-        <span>Dashboard</span>
-        <span id="dashboardThreatsBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-red-500/20 text-red-400 rounded-full font-mono font-bold">0</span>
-      </button>
-
-      <button id="tabFilesManagerBtn" onclick="switchView('filesManager')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
-        <i data-lucide="folder-kanban" class="w-3.5 h-3.5"></i>
-        <span>Arquivos</span>
-        <span id="filesCountBadge" class="px-1.5 py-0.2 text-[10px] bg-cyan-500/20 text-cyan-300 rounded-full font-mono">0</span>
-      </button>
-
-      <button id="tabBgpAuditBtn" onclick="switchView('bgpAudit')" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800" title="Auditoria de Roteamento BGP, Detecção de Prefix Leaks (LGView-NG), Loops Estáticos (LoopHunter) e Amplificação (AmpScan)">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-        <span>BGP & Mitigação</span>
-        <span id="bgpAlertBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold">OK</span>
-      </button>
+  <!-- CABEÇALHO -->
+  <header id="appHeader" class="z-40 px-5 pt-5 pb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 flex-shrink-0">
+    <div class="min-w-0">
+      <h1 class="text-[20px] font-semibold text-white leading-tight">PCAP Analyzer</h1>
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+        <div class="relative flex items-center">
+          <select id="pcapFileSelector" onchange="handlePcapSelectionChange(this.value)" 
+                  class="text-xs font-mono px-2 py-1 outline-none cursor-pointer max-w-[280px] truncate">
+            <option value="ALL">Todos os Arquivos (0 carregados)</option>
+          </select>
+        </div>
+        <span id="globalStatsSnippet" class="text-[11px] text-slate-400 font-mono">0 pacotes</span>
+        <span id="apiEnrichmentStatusBadge" onclick="openApiConfigModal()" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center space-x-1 cursor-pointer hover:bg-emerald-500/30 transition-all" title="Clique para abrir a Central de Inteligência & Diagnóstico de APIs">
+          <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
+          <span id="apiEnrichmentStatusText">Threat Intel & BGP (MANRS/Pulsedive)</span>
+        </span>
+      </div>
     </div>
 
     <!-- Top Action Buttons -->
@@ -267,37 +317,19 @@
       <!-- Hidden Multi-file input -->
       <input type="file" id="fileInput" accept=".pcap,.pcapng,.cap" multiple class="hidden" onchange="handleMultipleFiles(event)">
       
-      <button onclick="document.getElementById('fileInput').click()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-cyan-500 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all">
-        <i data-lucide="folder-plus" class="w-4 h-4 text-cyan-400"></i>
-        <span>+ Adicionar PCAP</span>
+      <button onclick="document.getElementById('fileInput').click()" class="btn-primary">
+        <i data-lucide="folder-plus" class="w-4 h-4"></i>
+        <span>Adicionar PCAP</span>
       </button>
 
-      <button onclick="loadMultiSamplePcaps()" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all">
+      <button onclick="loadMultiSamplePcaps()" class="btn-ghost">
         <i data-lucide="flask-conical" class="w-4 h-4 text-slate-400"></i>
         <span>Demo Multi-PCAP</span>
       </button>
 
-      <!-- Executive Client Presentation Trigger -->
-      <button onclick="openClientPresentationModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs flex items-center space-x-1.5 transition-all" title="Gerar e apresentar relatório executivo formatado para o cliente">
-        <i data-lucide="presentation" class="w-4 h-4"></i>
-        <span>Relatório do Cliente</span>
-      </button>
-
-      <!-- Firewall Mitigation Trigger -->
-      <button onclick="openFirewallModalForAllThreats()" class="px-2.5 py-1.5 bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-500/40 hover:border-red-500 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Gerar regras de firewall automáticas">
-        <i data-lucide="shield-ban" class="w-3.5 h-3.5 text-red-400"></i>
-        <span>Regras Firewall</span>
-      </button>
-
-      <!-- API Diagnostics & Connection Status Trigger -->
-      <button onclick="openApiConfigModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 hover:border-amber-500 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Verificar diagnósticos, latência e status de bloqueio das APIs">
-        <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span>Status APIs</span>
-      </button>
-      
       <!-- Export Dropdown -->
       <div class="relative inline-block text-left">
-        <button id="exportMenuBtn" onclick="toggleExportMenu()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all">
+        <button id="exportMenuBtn" onclick="toggleExportMenu()" class="btn-ghost">
           <i data-lucide="download" class="w-4 h-4"></i>
           <span>Exportar</span>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
@@ -1834,6 +1866,8 @@
       <span id="footerApiStatus" class="text-slate-500 cursor-pointer hover:text-slate-300" onclick="openApiConfigModal()" title="Status das APIs"></span>
     </div>
   </footer>
+
+  </div> <!-- fim #appCol -->
 
   <!-- ========================================================================================= -->
   <!-- MODAL: APRESENTAÇÃO EXECUTIVA & RELATÓRIO PARA O CLIENTE (Print / PDF / Visualização HD) -->
@@ -4966,24 +5000,24 @@
         const view = document.getElementById(t.view);
         if (btn && view) {
           if (t.id.toLowerCase() === viewName.toLowerCase()) {
-            btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 bg-blue-600 text-white";
+            btn.className = "nav-item active";
             if (t.id.toLowerCase() === 'packets' && !hasFiles) {
               view.classList.add('hidden');
             } else {
               view.classList.remove('hidden');
             }
           } else {
-            btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800";
+            btn.className = "nav-item";
             view.classList.add('hidden');
           }
         }
       });
 
-      // Mantém a aba ativa visível na barra de abas (rolagem horizontal em telas estreitas)
+      // Mantém a aba ativa visível na barra lateral (rolagem vertical quando a lista não couber)
       const activeTab = tabs.find(t => t.id.toLowerCase() === viewName.toLowerCase());
-      const nav = document.getElementById('navTabs');
+      const nav = document.getElementById('sidebar')?.querySelector('nav');
       const activeBtn = activeTab ? document.getElementById(activeTab.btn) : null;
-      if (nav && activeBtn) nav.scrollLeft = activeBtn.offsetLeft - nav.offsetLeft - (nav.clientWidth - activeBtn.offsetWidth) / 2;
+      if (nav && activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
 
       if (viewName === 'stats') renderCharts();
       if (viewName === 'triage') renderTriageView();
