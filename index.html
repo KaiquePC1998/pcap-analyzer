@@ -285,6 +285,9 @@
       <button onclick="openClientPresentationModal()" class="nav-item" title="Gerar e apresentar relatório executivo formatado para o cliente">
         <i data-lucide="presentation"></i><span>Relatório do Cliente</span>
       </button>
+      <button onclick="openHelpModal()" class="nav-item" title="Manual rápido: fluxo de uso, exemplos e dicas">
+        <i data-lucide="circle-help"></i><span>Ajuda</span>
+      </button>
       <button onclick="openCollectionGuideModal()" class="nav-item" title="Guia de coleta de PCAP: comandos prontos para o cliente copiar, onde posicionar a coleta e quanto tempo capturar">
         <i data-lucide="clipboard-list"></i><span>Checklist de Coleta</span>
       </button>
@@ -1949,6 +1952,23 @@
   </footer>
 
   </div> <!-- fim #appCol -->
+
+  <!-- MODAL AJUDA / MANUAL RÁPIDO -->
+  <div id="helpModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl w-[780px] max-w-full max-h-[88vh] overflow-y-auto">
+      <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between sticky top-0 bg-cyber-card z-10">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="circle-help" class="w-5 h-5 text-cyan-300"></i>
+          <div>
+            <div class="text-sm font-semibold text-white">Como usar — manual rápido</div>
+            <div class="text-[11px] text-slate-400">Do PCAP ao relatório em 6 passos</div>
+          </div>
+        </div>
+        <button onclick="closeHelpModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="helpBody" class="p-5 space-y-4 text-xs leading-relaxed text-slate-300"></div>
+    </div>
+  </div>
 
   <!-- MODAL HISTÓRICO DE INCIDENTES -->
   <div id="incidentsModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
@@ -5214,6 +5234,34 @@
         box.innerHTML = `<div class="text-[11px] text-red-300">Falha na consulta (${escapeHtml(e.message)}). Verifique a conexão ou consulte manualmente no RIPEstat.</div>`;
       }
     }
+
+    // =========================================================================================
+    // AJUDA / MANUAL RÁPIDO
+    // =========================================================================================
+    const HELP_STEPS = [
+      { n: 1, t: 'Carregar as capturas', d: 'Clique em <strong>Adicionar PCAP</strong> (canto superior direito) e escolha um ou vários arquivos .pcap/.pcapng/.cap. Sem arquivo? <strong>Demo Multi-PCAP</strong> carrega exemplos. O seletor ao lado do título escolhe qual captura analisar — Triagem e DDoS passam a considerar só aquela.' },
+      { n: 2, t: 'Triagem — "tem algo estranho?"', d: 'Menu → <strong>Triagem</strong>. Mostra pico de pps/bps, alvo mais atingido, origens e sinais com nível (crítico/alerta/info). Ex.: "pico 3,1k pps, 1040× acima da mediana" = sinal de ataque; "pico 2× a mediana, dentro do baseline" = provável demanda legítima. <strong>Copiar resumo</strong> vai para o ticket; <strong>Classificar & mitigar →</strong> leva o alvo para a aba DDoS.' },
+      { n: 3, t: 'DDoS — classificação e parecer', d: 'Menu → <strong>DDoS</strong>. Identifica o vetor (SYN Flood, UDP Flood, amplificação DNS/NTP/memcached…) e dá o <strong>Parecer com contexto</strong>: compatível com tráfego normal, suspeito (colete mais contexto antes de mitigar) ou ataque consistente (prossiga). O parecer usa o Perfil de Rede — serviços expostos e baseline evitam falso positivo.' },
+      { n: 4, t: 'BGP — onde mitigar', d: 'Menu → <strong>BGP & Mitigação</strong> → <strong>Origem do Prefixo</strong>. Digite o IP do alvo e consulte: se o bloco é <strong>anunciado pelo seu AS</strong>, mitigue localmente (AED/FlowSpec/RTBH). Se é <strong>anunciado por terceiros</strong>, sua mitigação não afeta o caminho — acione a operadora que anuncia (Sightline/FlowSpec). Ex.: alvo na faixa da NIC.BR (AS22548) não é protegido pelo seu AS26250.' },
+      { n: 5, t: 'Perfil de Rede — contexto do cliente', d: 'Menu → <strong>Perfil de Rede</strong>: ASN da sua operadora, blocos do cliente e quem anuncia cada um, serviços expostos ("53 DNS, 443 HTTPS"), baseline de pps (use "Aprender baseline da captura selecionada" com uma captura de dia normal) e os caminhos disponíveis (AED, Sightline, TMS). Preencha uma vez por cliente.' },
+      { n: 6, t: 'Relatórios e histórico', d: '<strong>Relatório do Cliente</strong>: resumo executivo com Triagem, DDoS e Parecer — copie ou baixe .MD/.PDF. <strong>Dashboard</strong>: KPIs e Comparação Baseline × Evento (ex.: "pico 623× maior no evento"). <strong>Histórico</strong>: salve cada caso ("Salvar caso" na Triagem/DDoS) para reconhecer padrões recorrentes. <strong>Regras Firewall</strong> gera bloqueios; <strong>Checklist de Coleta</strong> manda o guia (comandos tcpdump) ao cliente.' }
+    ];
+    function openHelpModal() {
+      const box = document.getElementById('helpBody');
+      box.innerHTML = `
+        <div class="p-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-[11px]">Seus arquivos <strong>não saem do navegador</strong>. O fluxo: carregar → Triagem → DDoS (parecer) → Origem do prefixo (onde mitigar) → salvar no Histórico → relatório.</div>
+        ${HELP_STEPS.map(st => `
+          <div class="flex gap-3">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold flex-shrink-0 text-[13px]" style="background:linear-gradient(90deg,#92fe9d,#00c9ff);color:#02130e">${st.n}</div>
+            <div class="min-w-0"><div class="text-[13px] font-semibold text-white">${st.t}</div><div class="mt-0.5 text-[11px] text-slate-400">${st.d}</div></div>
+          </div>`).join('')}
+        <div class="pt-2 border-t border-cyber-border text-[11px] text-slate-400">
+          <strong class="text-slate-200">Dicas rápidas:</strong> a análise funciona offline (só enriquecimento usa internet, e é cacheado — repetir a consulta não gera chamada nova). Captura "parecida com ataque" pode ser artefato de coleta: compare com um baseline do mesmo ponto. Aba Pacotes vazia? Carregue um PCAP ou use a demo.
+        </div>`;
+      document.getElementById('helpModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); }
 
     // =========================================================================================
     // HISTÓRICO DE INCIDENTES (localStorage) — casos anteriores para reconhecer padrões
