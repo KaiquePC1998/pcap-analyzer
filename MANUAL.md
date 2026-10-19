@@ -53,21 +53,24 @@ Digite o IP/prefixo do alvo e clique **Consultar RIPEstat**:
 
 | Resultado | O que fazer |
 |---|---|
-| **Anunciado pelo SEU AS** (verde) | Mitigação local funciona: AED na borda, FlowSpec ou RTBH do /32. |
-| **Anunciado por TERCEIROS** (amarelo) | Sua mitigação **não afeta o caminho** — o tráfego entra pelo AS anunciante. Acione a operadora que anuncia (Sightline/FlowSpec) ou corrija a rota na origem. |
+| **Anunciado pela SUA operadora** (verde) | O transbordo passa por vocês: atue no **TMS/Sightline** — filtro do vetor por características do tráfego; FlowSpec/RTBH conforme política. |
+| **Anunciado por TERCEIROS** (amarelo) | Sua mitigação **não afeta o caminho** — o tráfego entra pelo AS anunciante. Acione a operadora que anuncia ou corrija a rota na origem. |
 
-> **Exemplo:** alvo 200.160.0.20 anunciado pela NIC.BR (AS22548) e você opera o AS26250 → não adianta blackholer no seu AS; o chamado é para a operadora anunciante.
+> **Exemplo:** alvo 200.160.0.20 anunciado pela NIC.BR (AS22548) e você opera o AS26250 → não adianta filtrar no seu TMS; o chamado é para a operadora anunciante.
 
 ## 5. Perfil de Rede — contexto do cliente
 
 Menu → **Perfil de Rede**. Preencha **uma vez por cliente**:
 
-- **ASN da sua operadora** e os **blocos do cliente + quem anuncia cada um**;
+- **ASN da sua operadora** (onde você opera o TMS) e os **blocos do cliente + quem anuncia cada um**;
 - **Serviços expostos** (ex.: `53 DNS, 443 HTTPS`) — evita chamar serviço legítimo de ataque;
 - **Baseline** (pps médio e pico) — use **"Aprender baseline da captura selecionada"** com uma captura de dia normal;
-- **Caminhos disponíveis:** AED, Sightline, TMS próprio.
+- **Cenário do cliente:**
+  - *AS direcionado à operadora* — cliente com link e proteção DDoS; o transbordo passa por vocês e a atuação é no **TMS**;
+  - *Usa bloco da operadora (sem AS)* — a atuação é **apenas a mitigação no TMS**, sem dependência do cliente;
+- **AED gerenciado por você** (quando houver): o AED faz o primeiro scrub na borda e, ao **estourar a banda de mitigação**, o **Cloud Signaling manda o transbordo para o TMS** da operadora.
 
-É esse contexto que produz o parecer "ataque ou não" e a conduta correta.
+É esse contexto que produz o parecer "ataque ou não" e a conduta correta no TMS.
 
 ## 6. Relatórios e histórico
 
@@ -83,8 +86,8 @@ Menu → **Perfil de Rede**. Preencha **uma vez por cliente**:
 
 1. Cliente reclama de lentidão às 14h. Peça uma captura (use o **Checklist de Coleta**).
 2. **Adicionar PCAP** → seletor no arquivo do evento → **Triagem**: pico 3,1k pps, 1040× a mediana, 99% dos pacotes com 42 bytes → sinal de alerta.
-3. **Classificar & mitigar →** → aba **DDoS**: vetor UDP Flood (porta fixa) + parecer **"Ataque consistente"**, conduta: scrub AED na borda.
-4. **BGP & Mitigação** → Origem do Prefixo: "anunciado pelo SEU AS" → mitigação local é eficaz.
+3. **Classificar & mitigar →** → aba **DDoS**: vetor UDP Flood (porta fixa) + parecer **"Ataque consistente"**, conduta: AED faz o primeiro scrub e, estourando a banda, Cloud Signaling manda o transbordo ao TMS — prepare o filtro do vetor lá.
+4. **BGP & Mitigação** → Origem do Prefixo: "anunciado pela SUA operadora" → atuação direta no TMS.
 5. **Salvar caso** no Histórico → **Relatório do Cliente** → **Baixar PDF** e anexar ao chamado.
 
 ---

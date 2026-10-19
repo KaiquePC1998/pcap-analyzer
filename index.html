@@ -2028,7 +2028,7 @@
       <div class="p-5 space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-4">
           <label class="block space-y-1.5">
-            <span class="text-slate-300 font-semibold">ASN da sua operadora (onde você mitiga)</span>
+            <span class="text-slate-300 font-semibold">ASN da sua operadora (onde você opera o TMS)</span>
             <input id="npAsn" type="text" placeholder="ex.: AS26250 ou 26250" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500">
           </label>
           <label class="block space-y-1.5">
@@ -2059,12 +2059,25 @@
           <i data-lucide="graduation-cap" class="w-4 h-4 text-cyan-300"></i>
           <span>Aprender baseline da captura selecionada no cabeçalho (tráfego normal de referência)</span>
         </button>
-        <div>
-          <div class="text-slate-300 font-semibold mb-2">Caminhos de mitigação disponíveis</div>
-          <div class="grid grid-cols-3 gap-2">
-            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathAed" type="checkbox" class="accent-cyan-500"><span><strong>AED</strong><br><span class="text-[10px] text-slate-500">scrub na borda</span></span></label>
-            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathSightline" type="checkbox" class="accent-cyan-500"><span><strong>Sightline</strong><br><span class="text-[10px] text-slate-500">operadora/TMS</span></span></label>
-            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathTms" type="checkbox" class="accent-cyan-500"><span><strong>TMS próprio</strong><br><span class="text-[10px] text-slate-500">filtros locais</span></span></label>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <div class="text-slate-300 font-semibold">Cenário do cliente</div>
+            <label class="flex items-start space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600">
+              <input id="npCenAs" type="radio" name="npCenario" value="as" class="mt-0.5 accent-cyan-500" checked>
+              <span><strong>AS direcionado à operadora</strong><br><span class="text-[10px] text-slate-500">cliente com link e proteção DDoS; transito passa por vocês — atuação no TMS</span></span>
+            </label>
+            <label class="flex items-start space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600">
+              <input id="npCenBloco" type="radio" name="npCenario" value="bloco" class="mt-0.5 accent-cyan-500">
+              <span><strong>Usa bloco da operadora (sem AS)</strong><br><span class="text-[10px] text-slate-500">a atuação é apenas a mitigação no TMS — sem dependência do cliente</span></span>
+            </label>
+          </div>
+          <div class="space-y-1.5">
+            <div class="text-slate-300 font-semibold">Proteção na borda</div>
+            <label class="flex items-start space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600">
+              <input id="npHasAed" type="checkbox" class="mt-0.5 accent-cyan-500">
+              <span><strong>AED gerenciado por você</strong><br><span class="text-[10px] text-slate-500">scrub na borda do cliente; ao estourar a banda, o Cloud Signaling manda o transbordo para o TMS da operadora</span></span>
+            </label>
+            <div class="p-2.5 rounded-lg border border-slate-700 bg-slate-950/60 text-[10px] text-slate-500">O TMS/Sightline da operadora é onde você atua — não precisa marcar: é o padrão de toda conduta.</div>
           </div>
         </div>
         <div class="flex items-center justify-between pt-2 border-t border-cyber-border">
@@ -5242,8 +5255,8 @@
       { n: 1, t: 'Carregar as capturas', d: 'Clique em <strong>Adicionar PCAP</strong> (canto superior direito) e escolha um ou vários arquivos .pcap/.pcapng/.cap. Sem arquivo? <strong>Demo Multi-PCAP</strong> carrega exemplos. O seletor ao lado do título escolhe qual captura analisar — Triagem e DDoS passam a considerar só aquela.' },
       { n: 2, t: 'Triagem — "tem algo estranho?"', d: 'Menu → <strong>Triagem</strong>. Mostra pico de pps/bps, alvo mais atingido, origens e sinais com nível (crítico/alerta/info). Ex.: "pico 3,1k pps, 1040× acima da mediana" = sinal de ataque; "pico 2× a mediana, dentro do baseline" = provável demanda legítima. <strong>Copiar resumo</strong> vai para o ticket; <strong>Classificar & mitigar →</strong> leva o alvo para a aba DDoS.' },
       { n: 3, t: 'DDoS — classificação e parecer', d: 'Menu → <strong>DDoS</strong>. Identifica o vetor (SYN Flood, UDP Flood, amplificação DNS/NTP/memcached…) e dá o <strong>Parecer com contexto</strong>: compatível com tráfego normal, suspeito (colete mais contexto antes de mitigar) ou ataque consistente (prossiga). O parecer usa o Perfil de Rede — serviços expostos e baseline evitam falso positivo.' },
-      { n: 4, t: 'BGP — onde mitigar', d: 'Menu → <strong>BGP & Mitigação</strong> → <strong>Origem do Prefixo</strong>. Digite o IP do alvo e consulte: se o bloco é <strong>anunciado pelo seu AS</strong>, mitigue localmente (AED/FlowSpec/RTBH). Se é <strong>anunciado por terceiros</strong>, sua mitigação não afeta o caminho — acione a operadora que anuncia (Sightline/FlowSpec). Ex.: alvo na faixa da NIC.BR (AS22548) não é protegido pelo seu AS26250.' },
-      { n: 5, t: 'Perfil de Rede — contexto do cliente', d: 'Menu → <strong>Perfil de Rede</strong>: ASN da sua operadora, blocos do cliente e quem anuncia cada um, serviços expostos ("53 DNS, 443 HTTPS"), baseline de pps (use "Aprender baseline da captura selecionada" com uma captura de dia normal) e os caminhos disponíveis (AED, Sightline, TMS). Preencha uma vez por cliente.' },
+      { n: 4, t: 'BGP — onde mitigar', d: 'Menu → <strong>BGP & Mitigação</strong> → <strong>Origem do Prefixo</strong>. Digite o IP do alvo e consulte: se o bloco é <strong>anunciado pela sua operadora</strong>, o transito passa por vocês: atue no TMS/Sightline (filtro do vetor; FlowSpec/RTBH conforme política). Se é <strong>anunciado por terceiros</strong>, sua mitigação não afeta o caminho — acione a operadora que anuncia. Ex.: alvo na faixa da NIC.BR (AS22548) não é protegido pelo seu AS26250.' },
+      { n: 5, t: 'Perfil de Rede — contexto do cliente', d: 'Menu → <strong>Perfil de Rede</strong>: ASN da sua operadora (onde você opera o TMS), blocos do cliente e quem anuncia cada um, serviços expostos ("53 DNS, 443 HTTPS"), baseline de pps (use "Aprender baseline da captura selecionada" com uma captura de dia normal), o cenário (AS direcionado à operadora, ou bloco da operadora sem AS — atuação só na mitigação) e se o cliente tem <strong>AED gerenciado</strong> (Cloud Signaling para o TMS em pico de banda). Preencha uma vez por cliente.' },
       { n: 6, t: 'Relatórios e histórico', d: '<strong>Relatório do Cliente</strong>: resumo executivo com Triagem, DDoS e Parecer — copie ou baixe .MD/.PDF. <strong>Dashboard</strong>: KPIs e Comparação Baseline × Evento (ex.: "pico 623× maior no evento"). <strong>Histórico</strong>: salve cada caso ("Salvar caso" na Triagem/DDoS) para reconhecer padrões recorrentes. <strong>Regras Firewall</strong> gera bloqueios; <strong>Checklist de Coleta</strong> manda o guia (comandos tcpdump) ao cliente.' }
     ];
     function openHelpModal() {
@@ -5472,13 +5485,16 @@
         return pre ? { prefix: pre[1], asn: parseAsn(line) } : null;
       }).filter(Boolean);
     }
-    function netProfilePaths(prof) {
+    // Conduta de mitigação no modelo de atuação: você opera o TMS/Sightline da operadora;
+    // AED (quando o cliente tem) faz o primeiro scrub e usa Cloud Signaling para o transbordo
+    function netProfileConduta(prof) {
       const P = prof || getNetProfile();
-      const paths = [];
-      if (P.pathAed) paths.push('AED');
-      if (P.pathTms) paths.push('TMS');
-      if (P.pathSightline) paths.push('Sightline');
-      return paths;
+      const base = P.cenario === 'bloco'
+        ? 'Cliente sem AS usando bloco da operadora: a atuação é apenas a mitigação — aplique o filtro do vetor no TMS/Sightline, sem dependência de ação do cliente.'
+        : P.hasAed || P.pathAed
+          ? 'AED faz o primeiro scrub na borda do cliente; ao estourar a banda de mitigação, o Cloud Signaling manda o transbordo para o TMS da operadora. Acompanhe o sinal e prepare no TMS o filtro do vetor.'
+          : 'Atue no TMS/Sightline: filtro do vetor por características do tráfego (protocolo, porta, tamanho, flags) ou blackhole seletivo conforme política.';
+      return base;
     }
     function openNetProfileModal() {
       const prof = getNetProfile();
@@ -5489,8 +5505,11 @@
       set('npServices', prof.servicesTxt || '');
       set('npBaseAvg', prof.basePpsAvg || '');
       set('npBasePeak', prof.basePpsPeak || '');
-      const chk = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
-      chk('npPathAed', prof.pathAed); chk('npPathSightline', prof.pathSightline); chk('npPathTms', prof.pathTms);
+      const cen = prof.cenario || 'as';
+      const rb = (v) => { const el = document.getElementById(v === 'bloco' ? 'npCenBloco' : 'npCenAs'); if (el) el.checked = true; };
+      rb(cen);
+      const hasAedEl = document.getElementById('npHasAed');
+      if (hasAedEl) hasAedEl.checked = !!(prof.hasAed || prof.pathAed);
       const st = document.getElementById('npSavedAt');
       if (st) st.textContent = prof.savedAt ? `Salvo em ${prof.savedAt}` : '';
       document.getElementById('netProfileModal').classList.remove('hidden');
@@ -5508,9 +5527,8 @@
         services: parseServices(document.getElementById('npServices').value),
         basePpsAvg: parseInt(document.getElementById('npBaseAvg').value, 10) || 0,
         basePpsPeak: parseInt(document.getElementById('npBasePeak').value, 10) || 0,
-        pathAed: document.getElementById('npPathAed').checked,
-        pathSightline: document.getElementById('npPathSightline').checked,
-        pathTms: document.getElementById('npPathTms').checked,
+        cenario: document.getElementById('npCenBloco').checked ? 'bloco' : 'as',
+        hasAed: document.getElementById('npHasAed').checked,
         savedAt: new Date().toLocaleString('pt-BR')
       };
       localStorage.setItem(NP_KEY, JSON.stringify(prof));
@@ -5582,17 +5600,12 @@
       if (!prof.asnCasa && !svcPorts.length && !prof.basePpsPeak) reasons.push('Perfil de rede vazio: preencha o Perfil de Rede para pareceres mais precisos.');
 
       const verdict = suspicion === 2 ? 'attack' : suspicion === 1 ? 'suspicious' : 'normal';
-      const paths = netProfilePaths(prof);
       let advice = 'Nenhuma mitigação necessária; registre a análise.';
       if (verdict !== 'normal') {
-        if (paths.includes('AED') && paths.includes('Sightline')) advice = 'Mitigue na borda com o AED (scrub imediato) e, se o volume sustentar, acione o Sightline/TMS da operadora (FlowSpec ou RTBH por /32 do alvo).';
-        else if (paths.includes('AED')) advice = 'Mitigue na borda com o AED: scrub do tráfego ao alvo e RTBH do /32 do alvo se o volume sustentar.';
-        else if (paths.includes('TMS')) advice = 'Aplique filtros no TMS local para o vetor identificado (valorize bloqueio por características do tráfego).';
-        else if (paths.includes('Sightline')) advice = 'Acione o Sightline/TMS da operadora: FlowSpec para o vetor ou RTBH do /32 do alvo.';
-        else advice = 'Sem caminho de mitigação marcado no perfil: acione a operadora de casa ou habilite AED/Sightline/TMS no Perfil de Rede.';
-        advice += ' Antes de RTBH/blackhole, confirme na aba BGP & Mitigação quem anuncia o prefixo do alvo: bloco anunciado por outra operadora não é afetado pela sua mitigação.';
+        advice = netProfileConduta(prof);
+        advice += ' Antes de RTBH/blackhole, confirme na aba BGP & Mitigação quem anuncia o prefixo do alvo: bloco anunciado por outra operadora não é afetado pela sua mitigação — acione a anunciante.';
       }
-      return { verdict, reasons, advice, paths };
+      return { verdict, reasons, advice };
     }
     function renderDdosCtxVerdict(a) {
       const el = document.getElementById('ddosCtxVerdict');
@@ -5607,7 +5620,7 @@
       el.innerHTML = `<div class="mt-2 px-3 py-2.5 rounded-lg border ${style[0]} text-[11px] leading-relaxed">
         <div class="flex items-center space-x-1.5 font-bold"><i data-lucide="${style[2]}" class="w-3.5 h-3.5"></i><span>${style[1]}</span></div>
         ${c.reasons.length ? `<div class="mt-1 text-slate-300">${escapeHtml(c.reasons.join(' '))}</div>` : ''}
-        <div class="mt-1"><strong>Caminho recomendado:</strong> ${escapeHtml(c.advice)}</div>
+        <div class="mt-1"><strong>Conduta:</strong> ${escapeHtml(c.advice)}</div>
       </div>`;
       lucide.createIcons();
     }
