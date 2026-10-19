@@ -864,7 +864,7 @@
                 <th class="p-3">Veredito & Justificativa</th>
                 <th class="p-3">Provedor / ASN (GeoIP)</th>
                 <th class="p-3 text-right">Ocorrências</th>
-                <th class="p-3 text-center">Score Abuso</th>
+                <th class="p-3 text-center">Score de abuso</th>
                 <th class="p-3 text-right">Volume</th>
                 <th class="p-3 text-center">Ações & Consultas</th>
               </tr>
@@ -904,6 +904,9 @@
           <button onclick="copyDdosReport()" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-500/40 rounded-lg font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="clipboard-copy" class="w-3.5 h-3.5"></i><span>Copiar laudo</span>
           </button>
+          <button onclick="copyDdosFingerprint()" class="px-3 py-1.5 bg-white/[.05] hover:bg-white/[.10] text-slate-200 border border-white/[.09] rounded-lg font-semibold flex items-center space-x-1.5 transition-all" title="Copia fingerprint JSON do evento (formato simplificado, inspirado no DDoS Clearing House / DDoSDB)">
+            <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i><span>Fingerprint</span>
+          </button>
         </div>
       </div>
 
@@ -929,6 +932,9 @@
       <!-- Cartões de vetores -->
       <div id="ddosVectors" class="space-y-3"></div>
 
+      <!-- Análise DNS (UDP/53): perfil do servidor, zonas, qtypes, amplificação -->
+      <div id="ddosDnsPanel" class="hidden"></div>
+
       <!-- Tráfego não classificado como ataque -->
       <div id="ddosOther" class="text-[11px]"></div>
     </div>
@@ -948,7 +954,7 @@
               <span>Central Forense de Ataques & IoCs</span>
               <span class="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold uppercase tracking-wider border border-red-500/30">Motor NETSCOUT Arbor AED & TMS</span>
             </h3>
-            <p class="text-xs text-slate-300 mt-0.5">Detecção profunda segundo a taxonomia oficial do AED 7.4 & Pocket Guide: Volumétrico, Exaustão TCP/IP, L7/HTTP, Ameaças DNS e Feeds AIF/STIX.</p>
+            <p class="text-xs text-slate-300 mt-0.5">Detecção profunda segundo a taxonomia do AED/Sightline: Volumétrico, Exaustão TCP/IP, L7/HTTP, Ameaças DNS e Feeds AIF/STIX.</p>
           </div>
         </div>
         <div class="flex items-center flex-wrap gap-2">
@@ -1215,7 +1221,7 @@
           </div>
           <div>
             <div class="text-xs font-bold text-white flex items-center space-x-2">
-              <span>Distribuição de Sentido de Tráfego:</span>
+              <span>Distribuição por sentido do tráfego:</span>
               <span id="directionTotalSummary" class="text-cyan-400 font-mono">0 KB total</span>
             </div>
             <div class="text-[11px] text-slate-400">Classificação por sentido e tipo de comunicação</div>
@@ -1748,7 +1754,7 @@
 
           <!-- Formula Alert -->
           <div class="p-2.5 bg-slate-950/80 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 space-y-1">
-            <div class="text-indigo-300 font-bold">Sequência de AS-PATH Mandatória sob Mitigação:</div>
+            <div class="text-indigo-300 font-bold">Sequência de AS-PATH obrigatória sob mitigação:</div>
             <div class="text-emerald-400 font-bold">[... any transit ...] &rarr; <span class="underline">ASN_mitigação</span> &rarr; <span class="underline">ASN_mitigado</span></div>
             <div class="text-slate-400 text-[10px]">Rotas sem o ASN de mitigação são sinalizadas como <strong>Vazamento / Bypass de Mitigação</strong>.</div>
           </div>
@@ -1756,7 +1762,7 @@
           <!-- Input Fields -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             <div>
-              <label class="block text-slate-400 text-[10px] mb-1">Prefixo Sob Mitigação:</label>
+              <label class="block text-slate-400 text-[10px] mb-1">Prefixo sob mitigação:</label>
               <input type="text" id="lgPrefixInput" value="177.11.98.0/24" placeholder="Ex: 177.11.98.0/24 ou IPv6"
                      class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-cyan-300 font-mono text-xs outline-none focus:border-cyan-500">
             </div>
@@ -2083,7 +2089,7 @@
             <div class="text-slate-300 font-semibold">Cenário do cliente</div>
             <label class="flex items-start space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600">
               <input id="npCenAs" type="radio" name="npCenario" value="as" class="mt-0.5 accent-cyan-500" checked>
-              <span><strong>AS direcionado à operadora</strong><br><span class="text-[10px] text-slate-500">cliente com link e proteção DDoS; transito passa por vocês — atuação no TMS</span></span>
+              <span><strong>AS direcionado à operadora</strong><br><span class="text-[10px] text-slate-500">cliente com link e proteção DDoS; trânsito passa por vocês — atuação no TMS</span></span>
             </label>
             <label class="flex items-start space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600">
               <input id="npCenBloco" type="radio" name="npCenario" value="bloco" class="mt-0.5 accent-cyan-500">
@@ -2238,7 +2244,7 @@
           <div class="bg-slate-900 border border-slate-800 rounded-md p-4 flex flex-col">
             <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
               <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i>
-              <span>Vazão & Throughput ao Longo do Tempo</span>
+              <span>Vazão ao longo do tempo (pps / Mbps)</span>
             </h4>
             <div class="h-48 relative">
               <canvas id="reportTimelineCanvas"></canvas>
@@ -2284,7 +2290,7 @@
           <div class="bg-slate-850 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
             <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
               <i data-lucide="building-2" class="w-4 h-4 text-emerald-400"></i>
-              <span>Classificação Consolidada por Produto, Serviço & Dono do AS</span>
+              <span>Classificação Consolidada por Produto, Serviço & Titular do AS</span>
             </h4>
             <span id="reportGroupCountSnippet" class="text-[11px] font-mono text-cyan-300">0 grupos / provedores</span>
           </div>
@@ -2357,7 +2363,7 @@
               <span>Central Detalhada de Ameaças & Anomalias Detectadas</span>
               <span id="modalThreatCountBadge" class="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded-full font-mono font-bold">0 eventos</span>
             </h3>
-            <p class="text-xs text-slate-400">Inspeção profunda de conexões resetadas, varreduras de portas, IPs suspeitos e portas sensíveis.</p>
+            <p class="text-xs text-slate-400">Inspeção profunda de conexões encerradas por RST, varreduras de portas, IPs suspeitos e portas sensíveis.</p>
           </div>
         </div>
         <button onclick="closeThreatDetailsModal()" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
@@ -2455,7 +2461,7 @@
         <div class="flex items-center space-x-2">
           <button onclick="reQueryActiveIpThreatIntel()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-            <span>Re-consultar APIs</span>
+            <span>Reconsultar APIs</span>
           </button>
         </div>
       </div>
@@ -2690,7 +2696,7 @@
         <!-- Solutions Config Cards -->
         <div class="space-y-3">
           <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-            <span>Provedores de Threat Intelligence & Cyberspace Search</span>
+            <span>Provedores de Threat Intelligence & Busca de Dispositivos Expostos</span>
             <span class="text-[10px] text-emerald-400 font-normal">Chaves salvas localmente no navegador</span>
           </div>
 
@@ -2799,7 +2805,7 @@
       <div class="mt-4 pt-3 border-t border-cyber-border flex items-center justify-between">
         <button onclick="testApiConnectivity()" class="text-xs text-cyan-400 hover:underline flex items-center space-x-1">
           <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-          <span>Re-testar Conexões</span>
+          <span>Retestar conexões</span>
         </button>
         <div class="flex items-center space-x-2">
           <button onclick="closeApiConfigModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold">Fechar</button>
@@ -5274,7 +5280,7 @@
       { n: 1, t: 'Carregar as capturas', d: 'Clique em <strong>Adicionar PCAP</strong> (canto superior direito) e escolha um ou vários arquivos .pcap/.pcapng/.cap. Sem arquivo? <strong>Demo Multi-PCAP</strong> carrega exemplos. O seletor ao lado do título escolhe qual captura analisar — Triagem e DDoS passam a considerar só aquela.' },
       { n: 2, t: 'Triagem — "tem algo estranho?"', d: 'Menu → <strong>Triagem</strong>. Mostra pico de pps/bps, alvo mais atingido, origens e sinais com nível (crítico/alerta/info). Ex.: "pico 3,1k pps, 1040× acima da mediana" = sinal de ataque; "pico 2× a mediana, dentro do baseline" = provável demanda legítima. <strong>Copiar resumo</strong> vai para o ticket; <strong>Classificar & mitigar →</strong> leva o alvo para a aba DDoS.' },
       { n: 3, t: 'DDoS — classificação e parecer', d: 'Menu → <strong>DDoS</strong>. Identifica o vetor (SYN Flood, UDP Flood, amplificação DNS/NTP/memcached…) e dá o <strong>Parecer com contexto</strong>: compatível com tráfego normal, suspeito (colete mais contexto antes de mitigar) ou ataque consistente (prossiga). O parecer usa o Perfil de Rede — serviços expostos e baseline evitam falso positivo.' },
-      { n: 4, t: 'BGP — onde mitigar', d: 'Menu → <strong>BGP & Mitigação</strong> → <strong>Origem do Prefixo</strong>. Digite o IP do alvo e consulte: se o bloco é <strong>anunciado pela sua operadora</strong>, o transito passa por vocês: atue no TMS/Sightline (filtro do vetor; FlowSpec/RTBH conforme política). Se é <strong>anunciado por terceiros</strong>, sua mitigação não afeta o caminho — acione a operadora que anuncia. Ex.: alvo na faixa da NIC.BR (AS22548) não é protegido pelo seu AS26250.' },
+      { n: 4, t: 'BGP — onde mitigar', d: 'Menu → <strong>BGP & Mitigação</strong> → <strong>Origem do Prefixo</strong>. Digite o IP do alvo e consulte: se o bloco é <strong>anunciado pela sua operadora</strong>, o trânsito passa por vocês: atue no TMS/Sightline (filtro do vetor; FlowSpec/RTBH conforme política). Se é <strong>anunciado por terceiros</strong>, sua mitigação não afeta o caminho — acione a operadora que anuncia. Ex.: alvo na faixa da NIC.BR (AS22548) não é protegido pelo seu AS26250.' },
       { n: 5, t: 'Perfil de Rede — contexto do cliente', d: 'Menu → <strong>Perfil de Rede</strong>: ASN da sua operadora (onde você opera o TMS), blocos do cliente e quem anuncia cada um, serviços expostos ("53 DNS, 443 HTTPS"), baseline de pps (use "Aprender baseline da captura selecionada" com uma captura de dia normal), o cenário (AS direcionado à operadora, ou bloco da operadora sem AS — atuação só na mitigação) e se o cliente tem <strong>AED gerenciado</strong> (Cloud Signaling para o TMS em pico de banda). Preencha uma vez por cliente.' },
       { n: 6, t: 'Relatórios e histórico', d: '<strong>Relatório do Cliente</strong>: resumo executivo com Triagem, DDoS e Parecer — copie ou baixe .MD/.PDF. <strong>Dashboard</strong>: KPIs e Comparação Baseline × Evento (ex.: "pico 623× maior no evento"). <strong>Histórico</strong>: salve cada caso ("Salvar caso" na Triagem/DDoS) para reconhecer padrões recorrentes. <strong>Regras Firewall</strong> gera bloqueios; <strong>Checklist de Coleta</strong> manda o guia (comandos tcpdump) ao cliente.' }
     ];
@@ -8603,6 +8609,9 @@ ${analystNotes}`;
       pkt.dnsQtype = qtype;
       pkt.dnsQtypeName = qtype != null ? (QTYPE_NAMES[qtype] || `TYPE${qtype}`) : null;
       pkt.dnsHasEdns = arCount > 0;
+      pkt.dnsRD = Boolean(dnsFlags & 0x0100);  // Recursion Desired: 1 = stub/resolver pedindo recursão
+      pkt.dnsAA = Boolean(dnsFlags & 0x0400);  // Authoritative Answer: 1 = resposta do autoritativo
+      pkt.dnsZone = dnsZoneOf(queryName);
       pkt.info = `DNS ${isResp ? 'Resposta' : 'Consulta'}${pkt.dnsQtypeName ? ` ${pkt.dnsQtypeName}` : ''}: ${queryName || 'N/A'}${isResp ? ` (${anCount} resp.${pkt.dnsRcode === 3 ? ', NXDOMAIN' : ''})` : ''}`;
     }
 
@@ -9583,7 +9592,7 @@ ${analystNotes}`;
       return findings;
     }
 
-    // Builder function for 3-tier authentic Netscout mitigations (conforme TMS 9.4.0.0 & AED 7.4 - sem FlowSpec e sem Blackhole)
+    // Builder function for 3-tier authentic Netscout mitigations (sem FlowSpec e sem Blackhole)
     function buildMitigationPlaybook(opts) {
       const { category, categoryName, offenderIp, targetIp, targetPort, proto, cleanIp, nowStr, fcapMedium, tmsMediumRule, phfRule, aedMediumExtra, stateMediumNote } = opts;
 
@@ -9593,27 +9602,27 @@ ${analystNotes}`;
           strategy: 'Rate-based / Desafio SYN & Monitoramento Preventivo (Zero Risco de Falso Positivo)',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 1: Rate-Based & Desafio Preventivo\n# ====================================================================\n/ services aed mode set inline\n/ services aed protection set connlimit.max_conn Generic Low 100\n/ services aed protection set idle.header_time Generic Low 30\n/ services aed protection set spoofed_syn Generic Low enable\n/ services aed protection set dns.query_rate_limit Generic Low 2000\n# Hosts confiáveis na Inbound Allow List:\n# Allow Host: ${offenderIp}/32 (Monitoramento)\n/ config write`,
           sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 1: Template de Monitor & SYN Challenge\n# ====================================================================\nservices tms template create name "TMS_LEVE_${cleanIp}"\nset sub-template tcp-syn-challenge enabled rate-limit 5000 pps\nset sub-template zombie-detection mode monitor threshold 50\nset sub-template udp-reflection-amplification enabled\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_LEVE_${cleanIp}"`,
-          fcap: `# Expressão FCAP Leve (AED Master Filter List - Permissivo/Pass - Apêndice B p. 1540)\npass src host ${offenderIp} and proto tcp and (port 80 or port 443)`,
+          fcap: `# Expressão FCAP leve (AED Master Filter List — modo permissivo/pass)\npass src host ${offenderIp} and proto tcp and (port 80 or port 443)`,
           state: `# Parâmetros de Estado e Taxa - Nível Leve\nconnlimit.max_conn = 100 conexões\nidle.header_time = 30 segundos\nspoofed_syn = enable (TCP Authentication Proxy)\ndns.query_rate_limit = 2000 qps`,
-          siem: `# Log SIEM CEF (Appendix E):\nCEF:0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|Traffic Alert|3|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=Monitor Mode cs6=${category} cs7=${categoryName}\n\n# Log SIEM LEEF (Appendix E):\nLEEF:1.0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|sev=3|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=Monitor Mode|cs7=${categoryName}`
+          siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Traffic Alert|3|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=Monitor Mode cs6=${category} cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=3|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=Monitor Mode|cs7=${categoryName}`
         },
         medium: {
           level: 'Média',
           strategy: 'Mitigação Ativa FCAP, Packet Header Filtering (PHF) & Tuning de Estado',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 2: Mitigação Ativa & Master Filter List (FCAP)\n# ====================================================================\n# 1. Regra FCAP no Master Filter List (Protect > Inbound Protection > Master Filter Lists):\n${fcapMedium}\n\n# 2. Ajuste de Parâmetros de Estado e Taxa no ArbOS CLI:\n/ services aed protection set connlimit.max_conn Generic Medium 25\n/ services aed protection set idle.header_time Generic Medium 10\n/ services aed protection set idle.rate_interval Generic Medium 5\n${aedMediumExtra}\n/ config write`,
           sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 2: Filter List, PHF & Zombie Challenge\n# Referência: Sightline & TMS User Guide 9.4 (Seção 23 p. 885-920)\n# ====================================================================\nservices tms filter-list create name "FL_${cleanIp}_MED"\nset rule 1 add src-ip ${offenderIp} action rate-limit 50 pps\n${tmsMediumRule}\nservices tms template create name "TMS_MED_${cleanIp}"\nset sub-template filter-list "FL_${cleanIp}_MED" enabled priority 1\nset sub-template zombie-detection mode challenge action reset timeout 1800\nset sub-template packet-header-filtering expression "${phfRule}"\nset sub-template udp-reflection-amplification enabled\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_MED_${cleanIp}"\n\n# Packet Header Filtering (Wireshark Display Filter Syntax - p. 887):\n${phfRule}`,
-          fcap: `# Expressões FCAP Oficiais (TMS 9.4 Apêndice B p. 1540 / Pocket Guide p. 24-26)\n${fcapMedium}`,
+          fcap: `# Expressões FCAP (no TMS/AED, ajuste conforme a versão do seu equipamento)\n${fcapMedium}`,
           state: `# Parâmetros de Estado e Taxa - Nível Médio (Server Type Tuning)\n${stateMediumNote}\nconnlimit.max_conn = 25 conexões simultâneas\nidle.header_time = 10 segundos (Anti-Slowloris)\nidle.rate_interval = 5 segundos (TCP Reset por inatividade)\nzombie-detection = challenge action reset (timeout 1800s)`,
-          siem: `# Log SIEM CEF (Appendix E):\nCEF:0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|Blocked Traffic|6|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Mitigation Active cs7=${categoryName}\n\n# Log SIEM LEEF (Appendix E):\nLEEF:1.0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|sev=6|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
+          siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Blocked Traffic|6|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Mitigation Active cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=6|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
         },
         aggressive: {
           level: 'Agressiva',
           strategy: 'Descarte Estrito na Borda (Inbound Deny List), Enforce AIF & Cloud Signaling Upstream',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 3: Descarte Estrito no Perímetro & Inbound Deny List\n# ====================================================================\n# 1. Inserir na Inbound Deny List permanente (Protect > Inbound Protection > Deny Lists):\n# Host: ${offenderIp}/32\n\n# 2. Descarte Imediato no Master Filter List (FCAP):\ndrop src host ${offenderIp}\ndrop src net ${offenderIp}/32\n\n# 3. Políticas Estritas de AIF & Proteções de Exaustão no ArbOS CLI:\n/ services aed protection set aif.threat_categories High enable\n/ services aed protection set aif.confidence_index High 100\n/ services aed protection set connlimit.max_conn Generic High 10\n/ services aed protection set idle.header_time Generic High 5\n/ services aed protection set malformed_http Web High enable\n/ services aed protection set fragment_detection Generic High enable\n\n# 4. Acionamento de Cloud Signaling Upstream (sem derrubar prefixo):\n/ services aed cloud mode set normal\n/ config write`,
           sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 3: Descarte Imediato na Borda & Blacklist Offload\n# ====================================================================\nservices tms filter-list create name "BLOCK_STRICT_${cleanIp}"\nset rule 1 add src-ip ${offenderIp} action drop log enabled priority 1\nservices tms template create name "TMS_AGG_${cleanIp}"\nset sub-template filter-list "BLOCK_STRICT_${cleanIp}" enabled priority 1\nset sub-template zombie-detection mode enforce action drop-immediate timeout 86400\nset sub-template atlas-intelligence-feed action drop\nset sub-template malformed-packet-drop enabled\nset sub-template packet-header-filtering expression "ip.src == ${offenderIp}"\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_AGG_${cleanIp}"`,
-          fcap: `# Expressão FCAP de Descarte Estrito (Pocket Guide p. 25-26 & TMS Apêndice B)\ndrop src host ${offenderIp}\ndrop src net ${offenderIp}/32\ndrop proto ${proto} and dst port ${targetPort} and tflags S/S`,
+          fcap: `# Expressão FCAP de descarte estrito\ndrop src host ${offenderIp}\ndrop src net ${offenderIp}/32\ndrop proto ${proto} and dst port ${targetPort} and tflags S/S`,
           state: `# Parâmetros de Estado e Taxa - Nível Agressivo (Proteção Máxima de Perímetro)\naif.threat_categories = High (Enforce total de feeds ASERT)\naif.confidence_index = 100 (Bloqueio estrito de reputação maliciosa)\nconnlimit.max_conn = 10 conexões por host\nidle.header_time = 5 segundos\nmalformed_packet_protection = enable (RFC 2616 e RFC 1035)\nfragment_detection = enable (drop overlapping frags)\ncloud_signaling = normal (limpeza upstream via GRE tunnel)`,
-          siem: `# Log SIEM CEF (Appendix E):\nCEF:0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|Blocked Host|9|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Strict Inbound Drop cs7=${categoryName}\n\n# Log SIEM LEEF (Appendix E):\nLEEF:1.0|NETSCOUT|Arbor Edge Defense|7.4.0|${categoryName}|sev=9|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
+          siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Blocked Host|9|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Strict Inbound Drop cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=9|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
         }
       };
     }
@@ -10861,7 +10870,7 @@ ${analystNotes}`;
         let code = `# ====================================================================\n`;
         code += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - REGRAS FCAP PURAS\n`;
         code += `# Data: ${dateStr} | Nível: ${tier.toUpperCase()}\n`;
-        code += `# Total de Alvos: ${ips.length} IPs | Sintaxe Oficial do Pocket Guide (p. 24-26)\n`;
+        code += `# Total de Alvos: ${ips.length} IPs | Sintaxe FCAP\n`;
         code += `# Instrução: Cole na GUI do AED em Protect > Inbound Protection > Master Filter Lists\n`;
         code += `# ====================================================================\n\n`;
 
@@ -12152,6 +12161,61 @@ ${analystNotes}`;
         res.groups.set(key, g);
       }
 
+      // ---- Análise DNS (UDP/53): perfil do servidor, zonas, qtypes e amplificação ----
+      // Consultas chegam em toVictim (dstPort 53); respostas saem em fromVictim (srcPort 53).
+      const d = { q: 0, r: 0, rd: 0, aa: 0, nx: 0, nodata: 0, ok: 0, axfr: 0,
+                  qtypes: new Map(), zones: new Map(), qBytes: 0, rBytes: 0 };
+      const dZone = (p) => p.dnsZone || (p.dnsQuery ? dnsZoneOf(p.dnsQuery) : '');
+      const dQt = (p) => p.dnsQtypeName || '?';
+      const dGetZone = (name) => {
+        let z = d.zones.get(name);
+        if (!z) { z = { zone: name, q: 0, r: 0, nx: 0, nodata: 0, subs: new Map(), subsEnt: 0, qtypes: new Map(), qBytes: 0, rBytes: 0, srcs: new Set() }; d.zones.set(name, z); }
+        return z;
+      };
+      const dCountR = (z, p, pl) => {
+        z.r++; z.rBytes += pl; d.r++;
+        if (p.dnsAA) d.aa++;
+        if (p.dnsRcode === 3) { z.nx++; d.nx++; }
+        else if ((p.dnsAnswerCount || 0) === 0) { z.nodata++; d.nodata++; }
+        else d.ok++;
+      };
+      const dCountQ = (z, p, pl) => {
+        z.q++; z.qBytes += pl; d.q++;
+        if (p.dnsRD) { d.rd++; z.rd = (z.rd || 0) + 1; }
+        const qt = dQt(p);
+        z.qtypes.set(qt, (z.qtypes.get(qt) || 0) + 1);
+        d.qtypes.set(qt, (d.qtypes.get(qt) || 0) + 1);
+        if (p.dnsQtype === 252 || p.dnsQtype === 250) d.axfr++;
+        const labels = (p.dnsQuery || '').toLowerCase().split('.').filter(Boolean);
+        const sub = labels.length > 2 ? labels.slice(0, -2).join('') : '';
+        if (sub && !z.subs.has(sub)) {
+          z.subs.set(sub, 1);
+          const freq = {};
+          for (const ch of sub) freq[ch] = (freq[ch] || 0) + 1;
+          z.subsEnt += Object.values(freq).reduce((h, c) => { const q = c / sub.length; return h - q * Math.log2(q); }, 0);
+        }
+      };
+      for (const p of toVictim) {
+        if (p.ipProto !== 17 || p.dstPort !== 53 || !p.dnsQuery) continue;
+        const pl = p.payload ? p.payload.length : 0;
+        const name = dZone(p);
+        if (!name) continue;
+        const z = dGetZone(name);
+        z.srcs.add(p.src);
+        if (p.dnsIsResponse) { dCountR(z, p, pl); d.rBytes += pl; }
+        else { dCountQ(z, p, pl); d.qBytes += pl; }
+      }
+      for (const p of fromVictim) {
+        if (p.ipProto !== 17 || p.srcPort !== 53 || !p.dnsIsResponse || !p.dnsQuery) continue;
+        const pl = p.payload ? p.payload.length : 0;
+        const name = dZone(p);
+        if (!name) continue;
+        const z = dGetZone(name);
+        dCountR(z, p, pl);
+        d.rBytes += pl;
+      }
+      res.dns = d;
+
       const topOf = (map) => Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
       const peakOf = (g) => {
         let pps = 0, bps = 0;
@@ -12334,6 +12398,118 @@ ${analystNotes}`;
       return list;
     }
 
+    // Zona DNS: eTLD+1 simplificado (trata SLD comuns de TLD de 2 letras, ex.: com.br)
+    const DNS_2LD = new Set(['com', 'net', 'org', 'gov', 'edu', 'co', 'ac', 'or', 'ne']);
+    function dnsZoneOf(name) {
+      const labels = (name || '').toLowerCase().split('.').filter(Boolean);
+      if (labels.length < 2) return labels.join('.') || '';
+      const tld = labels[labels.length - 1];
+      const penult = labels[labels.length - 2];
+      const take = (tld.length === 2 && DNS_2LD.has(penult) && labels.length >= 3) ? 3 : 2;
+      return labels.slice(-take).join('.');
+    }
+
+    // Painel "Análise DNS": perfil do alvo (autoritativo × recursivo), zonas sob martelada,
+    // distribuição de qtypes e fator de amplificação. Referências: RFC 1034/1035, 2308, 8482, 5936; taxonomia RFC 4732.
+    function renderDdosDns(a) {
+      const el = document.getElementById('ddosDnsPanel');
+      if (!el) return;
+      const d = a && a.dns;
+      const total = d ? (d.q + d.r) : 0;
+      if (!total) { el.classList.add('hidden'); el.innerHTML = ''; return; }
+      el.classList.remove('hidden');
+
+      const rdShare = d.q ? d.rd / d.q : 0;
+      const aaShare = d.r ? d.aa / d.r : 0;
+      let role, roleDesc, roleColor;
+      if (rdShare < 0.3) {
+        role = 'Perfil de AUTORITATIVO'; roleColor = 'text-violet-300';
+        roleDesc = `${Math.round((1 - rdShare) * 100)}% das consultas chegam sem recursão (RD=0) — resolvedores consultando a zona direto`;
+      } else if (rdShare > 0.7) {
+        role = 'Perfil de RECURSIVO'; roleColor = 'text-cyan-300';
+        roleDesc = `${Math.round(rdShare * 100)}% das consultas com RD=1 — stubs/resolvedores de terceiros usando o servidor`;
+      } else {
+        role = 'Perfil MISTO'; roleColor = 'text-slate-300';
+        roleDesc = 'combinação de consultas com e sem recursão';
+      }
+      if (aaShare >= 0.5) roleDesc += ` · ${Math.round(aaShare * 100)}% das respostas com flag AA (confirma autoritativo)`;
+      if (d.axfr) roleDesc += ` · <span class="text-rose-300 font-semibold">${d.axfr} tentativa(s) de transferência de zona (AXFR/IXFR — RFC 5936)</span>`;
+
+      const amp = d.qBytes ? d.rBytes / d.qBytes : null;
+
+      const zones = Array.from(d.zones.values()).sort((x, y) => (y.q + y.r) - (x.q + x.r)).slice(0, 6);
+      const zoneRows = zones.map(z => {
+        const nxPct = z.r ? Math.round(z.nx / z.r * 100) : 0;
+        const ndPct = z.r ? Math.round(z.nodata / z.r * 100) : 0;
+        const ent = z.subs.size ? z.subsEnt / z.subs.size : 0;
+        const uniq = z.q ? z.subs.size / z.q : 0;
+        const rand = (uniq >= 0.5 && ent >= 2.5 && z.q >= 20);
+        const topQt = Array.from(z.qtypes.entries()).sort((x, y) => y[1] - x[1])[0];
+        return `<tr class="border-t border-cyber-border">
+          <td class="py-1.5 pr-3 font-mono text-[11px] text-white">${escapeHtml(z.zone)}${rand ? ' <span class="text-rose-300" title="Muitos subdomínios únicos com alta entropia: padrão de water torture">⌁</span>' : ''}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px]">${fmtCount(z.q)}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px]">${fmtCount(z.r)}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px] ${nxPct >= 50 ? 'text-rose-300' : ''}">${z.r ? nxPct + '%' : '—'}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px]">${z.r ? ndPct + '%' : '—'}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px]" title="${fmtCount(z.subs.size)} subdomínios únicos">${fmtCount(z.subs.size)}</td>
+          <td class="py-1.5 pr-3 text-right font-mono text-[11px] ${ent >= 2.5 ? 'text-amber-300' : ''}">${z.subs.size ? ent.toFixed(2) : '—'}</td>
+          <td class="py-1.5 text-right font-mono text-[11px] text-slate-300">${topQt ? topQt[0] : '—'}</td>
+        </tr>`;
+      }).join('');
+
+      const qtTop = Array.from(d.qtypes.entries()).sort((x, y) => y[1] - x[1]).slice(0, 8);
+      const qTot = d.q || 1;
+      const QT_FLAG = {
+        'ANY': { title: 'RFC 8482: responder ANY com HINFO sintético reduz amplificação', cls: 'text-amber-300' },
+        'DNSKEY': { title: 'Offload criptográfico: respostas grandes, alto fator de amplificação', cls: 'text-rose-300' },
+        'DS': { title: 'Delegation Signer: resposta grande (DNSSEC)', cls: 'text-rose-300' },
+        'RRSIG': { title: 'Assinatura DNSSEC: resposta grande', cls: 'text-rose-300' },
+        'TXT': { title: 'Consultas TXT amplificam (SPF/DKIM/registros longos)', cls: 'text-amber-300' }
+      };
+      const qtChips = qtTop.map(([qt, n]) => {
+        const f = QT_FLAG[qt];
+        return `<span class="px-2 py-0.5 rounded-full bg-white/[.05] border border-white/[.08] font-mono text-[10px] ${f ? f.cls : 'text-slate-300'}" ${f ? `title="${f.title}"` : ''}>${qt} ${(n / qTot * 100).toFixed(0)}%</span>`;
+      }).join(' ');
+
+      const hint = role.includes('AUTORITATIVO')
+        ? 'Zona em servidor autoritativo: RRL/rate-limit de respostas no autoritativo e anycast absorvem no próprio serviço. No TMS, rate-limit de UDP/53 por origem/zona via FlowSpec preserva resolução legítima. Sem AED, toda a mitigação é no TMS — sem dependência do cliente.'
+        : 'Resolver sendo usado/atacado: restrinja recursão às redes do cliente (open resolver é amplificador). No TMS, rate-limit de consultas por origem e por QPS via FlowSpec; verifique se o alvo é o resolver do cliente ou destino externo sendo atacado pelo resolver.';
+
+      el.innerHTML = `
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-3 space-y-2.5" style="border-left: 4px solid #8b5cf6">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <i data-lucide="server" class="w-4 h-4 text-violet-300"></i>
+            <span class="text-xs font-bold text-white">Análise DNS (UDP/53)</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${roleColor} bg-white/[.06] border border-white/[.09]">${role}</span>
+            ${amp ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/[.06] border border-white/[.09] text-slate-300" title="Payload de respostas / payload de consultas (taxonomia de amplificação — RFC 4732)">amplificação ${amp.toFixed(1)}×</span>` : ''}
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/[.06] border border-white/[.09] text-slate-300">${fmtCount(d.q)} consultas · ${fmtCount(d.r)} respostas</span>
+          </div>
+          <span class="text-[10px] text-slate-500">NXDOMAIN ${d.r ? Math.round(d.nx / d.r * 100) : 0}% · NoData ${d.r ? Math.round(d.nodata / d.r * 100) : 0}%</span>
+        </div>
+        <div class="text-[11px] text-slate-400">${roleDesc}</div>
+        ${zones.length ? `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead><tr class="text-[10px] uppercase tracking-wide text-slate-500">
+              <th class="py-1 pr-3 font-medium">Zona</th>
+              <th class="py-1 pr-3 text-right font-medium">Consultas</th>
+              <th class="py-1 pr-3 text-right font-medium">Respostas</th>
+              <th class="py-1 pr-3 text-right font-medium">% NX</th>
+              <th class="py-1 pr-3 text-right font-medium">% NoData</th>
+              <th class="py-1 pr-3 text-right font-medium" title="Subdomínios únicos observados na zona">Únicos</th>
+              <th class="py-1 pr-3 text-right font-medium" title="Entropia média dos subdomínios (Shannon)">Entropia</th>
+              <th class="py-1 text-right font-medium">Qtype dom.</th>
+            </tr></thead>
+            <tbody>${zoneRows}</tbody>
+          </table>
+        </div>` : ''}
+        ${qtChips ? `<div class="flex flex-wrap items-center gap-1.5"><span class="text-[10px] uppercase tracking-wide text-slate-500 mr-1">Qtypes:</span>${qtChips}</div>` : ''}
+        <div class="text-[11px] text-slate-400 border-t border-cyber-border pt-2"><span class="text-cyan-300 font-semibold">TMS da operadora (você opera): </span>${hint}</div>
+      </div>`;
+      if (window.lucide) lucide.createIcons();
+    }
+
     function renderDdosView() {
       const prof = getDdosProfile();
       const select = document.getElementById('ddosVictimSelect');
@@ -12445,6 +12621,8 @@ ${analystNotes}`;
           </div>`;
       }).join('');
 
+      renderDdosDns(a);
+
       // Tráfego que não se caracterizou como ataque
       const other = a.nonAttack.filter(v => v.pkts > 0).slice(0, 8);
       document.getElementById('ddosOther').innerHTML = other.length ? `
@@ -12524,6 +12702,45 @@ ${analystNotes}`;
       if (a.carpetHosts >= 8) lines.push(`Observação: ${a.carpetHosts} outros hosts do mesmo /24 recebem os mesmos vetores (possível carpet bombing).`);
       navigator.clipboard.writeText(lines.join('\n'));
       showSocToast('Laudo DDoS copiado para a área de transferência.', 'success');
+    }
+
+    // Fingerprint JSON do evento (formato simplificado, inspirado no fingerprint do DDoS Clearing House — SIDN/NLADC).
+    // Compartilhável entre operadores para reconhecer ataques recorrentes; alimenta o Histórico de casos.
+    function copyDdosFingerprint() {
+      const a = g_lastDdos;
+      if (!a || !a.vectors) { showSocToast('Analise um alvo na aba DDoS primeiro.', 'error'); return; }
+      const protoOf = (key) => key.startsWith('http') ? 'TCP' : key.startsWith('tcp') ? 'TCP' : key.startsWith('icmp') ? 'ICMP' : key.startsWith('gre') ? 'GRE' : key.startsWith('quic') ? 'QUIC/UDP' : 'UDP';
+      const fp = {
+        schema: 'pcap-analyzer/ddos-fingerprint@1',
+        based_on: 'DDoS Clearing House fingerprint (SIDN/NLADC) — formato simplificado',
+        generated_at: new Date().toISOString(),
+        target: {
+          ip: a.victim,
+          packets_received: a.totalPkts,
+          bytes_received: a.totalBytes,
+          duration_s: +(a.duration || 0).toFixed(1),
+          peak_pps: Math.round(a.peakPps || 0),
+          peak_bps: Math.round(a.peakBps || 0)
+        },
+        vectors: a.vectors.map(v => ({
+          name: (v.tech ? v.tech.name : v.key) + (v.extraName || ''),
+          key: v.key,
+          mitre: v.tech ? v.tech.mitre : '-',
+          protocol: protoOf(v.key || ''),
+          share_pct: +((v.share || 0) * 100).toFixed(1),
+          packets: v.pkts,
+          bytes: v.bytes,
+          peak_pps: Math.round(v.peakPps || 0),
+          peak_bps: Math.round(v.peakBps || 0),
+          source_count: v.srcs,
+          destination_ports: (v.topDports || []).map(x => x[0]),
+          confidence_pct: v.confidence,
+          indicators: v.indicators || []
+        }))
+      };
+      navigator.clipboard.writeText(JSON.stringify(fp, null, 2))
+        .then(() => showSocToast('Fingerprint JSON copiado (formato simplificado, estilo DDoSDB).', 'success'))
+        .catch(() => showSocToast('Não foi possível copiar o fingerprint.', 'error'));
     }
 
     function formatMac(bytes) { return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(':'); }
