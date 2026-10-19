@@ -10870,7 +10870,7 @@ ${analystNotes}`;
         let code = `# ====================================================================\n`;
         code += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - REGRAS FCAP PURAS\n`;
         code += `# Data: ${dateStr} | Nível: ${tier.toUpperCase()}\n`;
-        code += `# Total de Alvos: ${ips.length} IPs | Sintaxe FCAP\n`;
+        code += `# Total de Alvos: ${ips.length} IPs | Sintaxe: NETSCOUT Arbor Pocket Guide, FCAP Traffic Filtering (p. 24)\n`;
         code += `# Instrução: Cole na GUI do AED em Protect > Inbound Protection > Master Filter Lists\n`;
         code += `# ====================================================================\n\n`;
 
@@ -10910,7 +10910,7 @@ ${analystNotes}`;
         let code = `# ====================================================================\n`;
         code += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - PARÂMETROS DE ESTADO & RATE LIMITING\n`;
         code += `# Data: ${dateStr} | Nível: ${tier.toUpperCase()}\n`;
-        code += `# Total de Alvos: ${ips.length} IPs | Referência: guia de configuração do AED (state & rate limiting)\n`;
+        code += `# Total de Alvos: ${ips.length} IPs | Referência: Pocket Guide p. 17 (/ services aed protection set opção ST nível valor)\n# Opções suportadas variam por versão/hardware — confira com: / services aps|aed protection show\n`;
         code += `# ====================================================================\n\n`;
 
         if (tier === 'light') {
@@ -12472,8 +12472,8 @@ ${analystNotes}`;
       }).join(' ');
 
       const hint = role.includes('AUTORITATIVO')
-        ? 'Zona em servidor autoritativo: RRL/rate-limit de respostas no autoritativo e anycast absorvem no próprio serviço. No TMS, rate-limit de UDP/53 por origem/zona via FlowSpec preserva resolução legítima. Sem AED, toda a mitigação é no TMS — sem dependência do cliente.'
-        : 'Resolver sendo usado/atacado: restrinja recursão às redes do cliente (open resolver é amplificador). No TMS, rate-limit de consultas por origem e por QPS via FlowSpec; verifique se o alvo é o resolver do cliente ou destino externo sendo atacado pelo resolver.';
+        ? 'Zona em servidor autoritativo: RRL/rate-limit de respostas no autoritativo e anycast absorvem no próprio serviço. No TMS, rate-limit de UDP/53 por origem/zona via FlowSpec preserva resolução legítima. FCAP de proteção para DNS autoritativo (Pocket Guide p. 25): <span class="font-mono text-[10px] text-slate-300">drop proto udp and not ((src port 53 or src port 1024..65535) and dst port 53)</span>. Sem AED, toda a mitigação é no TMS — sem dependência do cliente.'
+        : 'Resolver sendo usado/atacado: restrinja recursão às redes do cliente (open resolver é amplificador). No TMS, rate-limit de consultas por origem e por QPS via FlowSpec. FCAP de proteção para DNS recursivo (Pocket Guide p. 25): <span class="font-mono text-[10px] text-slate-300">drop proto udp and not ((src port 1024..65535 and dst port 53) or (src port 53 and dst port 1024..65535))</span> — permite somente consultas de stubs e respostas do resolver.';
 
       el.innerHTML = `
       <div class="bg-cyber-card border border-cyber-border rounded-md p-3 space-y-2.5" style="border-left: 4px solid #8b5cf6">
