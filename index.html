@@ -9601,7 +9601,7 @@ ${analystNotes}`;
           level: 'Leve',
           strategy: 'Rate-based / Desafio SYN & Monitoramento Preventivo (Zero Risco de Falso Positivo)',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 1: Rate-Based & Desafio Preventivo\n# ====================================================================\n/ services aed mode set inline\n/ services aed protection set connlimit.max_conn Generic Low 100\n/ services aed protection set idle.header_time Generic Low 30\n/ services aed protection set spoofed_syn Generic Low enable\n/ services aed protection set dns.query_rate_limit Generic Low 2000\n# Hosts confiáveis na Inbound Allow List:\n# Allow Host: ${offenderIp}/32 (Monitoramento)\n/ config write`,
-          sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 1: Template de Monitor & SYN Challenge\n# ====================================================================\nservices tms template create name "TMS_LEVE_${cleanIp}"\nset sub-template tcp-syn-challenge enabled rate-limit 5000 pps\nset sub-template zombie-detection mode monitor threshold 50\nset sub-template udp-reflection-amplification enabled\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_LEVE_${cleanIp}"`,
+          sightline: `# ====================================================================\n# Sightline / TMS 9.4 - Nível 1: Observar e preparar (sem impacto ao tráfego)\n# ====================================================================\n# TMS Mitigation Template (UI: Configuration > Mitigation Templates; UG 9.4 Seção 22):\n# - Zombie Detection em modo monitor (p. 933) para reconhecer hosts repetidores.\n# - UDP Reflection/Amplification Protection (p. 915): filtros UDP predefinidos por serviço\n#   com FCAP fixa (p. 916). Teste sempre antes em modo inactive.\n# - Packet Header Filtering (p. 886): sintaxe Wireshark, até 1024 caracteres, minúsculas, só IPv4:\n#     ${phfRule}\n# FlowSpec (p. 1001): a partir do alerta DoS, Mitigate Alert > Flow Specification, action discard.\n# Importante (p. 1003): o Sightline anuncia o filtro mas NÃO valida sua aplicação — confirme nos roteadores.`, 
           fcap: `# Expressão FCAP leve (AED Master Filter List — modo permissivo/pass)\npass src host ${offenderIp} and proto tcp and (port 80 or port 443)`,
           state: `# Parâmetros de Estado e Taxa - Nível Leve\nconnlimit.max_conn = 100 conexões\nidle.header_time = 30 segundos\nspoofed_syn = enable (TCP Authentication Proxy)\ndns.query_rate_limit = 2000 qps`,
           siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Traffic Alert|3|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=Monitor Mode cs6=${category} cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=3|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=Monitor Mode|cs7=${categoryName}`
@@ -9610,7 +9610,7 @@ ${analystNotes}`;
           level: 'Média',
           strategy: 'Mitigação Ativa FCAP, Packet Header Filtering (PHF) & Tuning de Estado',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 2: Mitigação Ativa & Master Filter List (FCAP)\n# ====================================================================\n# 1. Regra FCAP no Master Filter List (Protect > Inbound Protection > Master Filter Lists):\n${fcapMedium}\n\n# 2. Ajuste de Parâmetros de Estado e Taxa no ArbOS CLI:\n/ services aed protection set connlimit.max_conn Generic Medium 25\n/ services aed protection set idle.header_time Generic Medium 10\n/ services aed protection set idle.rate_interval Generic Medium 5\n${aedMediumExtra}\n/ config write`,
-          sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 2: Filter List, PHF & Zombie Challenge\n# Referência: Sightline & TMS User Guide 9.4 (Seção 23 p. 885-920)\n# ====================================================================\nservices tms filter-list create name "FL_${cleanIp}_MED"\nset rule 1 add src-ip ${offenderIp} action rate-limit 50 pps\n${tmsMediumRule}\nservices tms template create name "TMS_MED_${cleanIp}"\nset sub-template filter-list "FL_${cleanIp}_MED" enabled priority 1\nset sub-template zombie-detection mode challenge action reset timeout 1800\nset sub-template packet-header-filtering expression "${phfRule}"\nset sub-template udp-reflection-amplification enabled\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_MED_${cleanIp}"\n\n# Packet Header Filtering (Wireshark Display Filter Syntax - p. 887):\n${phfRule}`,
+          sightline: `# ====================================================================\n# Sightline / TMS 9.4 - Nível 2: Mitigação ativa cirúrgica\n# ====================================================================\n# TMS Mitigation Template com countermeasures (UG 9.4, Seções 23-24):\n# - DNS Rate Limiting (p. 951): DNS Query Rate Limit 100 qps (padrão) +\n#   DNS Query Object Limiting 100/s (mesmo domínio repetido — ideal contra water torture);\n#   ação recomendada: Deny List Hosts.\n# - UDP Reflection/Amplification Protection (p. 915): FCAPs predefinidas (p. 916);\n#   no filtro DNS, mantenha a criteria adicional bytes 2049..65535 (p. 917) e passe os\n#   servidores DNS confiáveis via Deny/Allow Filter Lists (p. 918, Método 1).\n# - Packet Header Filtering (p. 886, somente IPv4):\n#     ${phfRule}\n# - FlowSpec (p. 1001): dest/src prefix + protocol + portas, action discard;\n#   verifique a aplicação nos roteadores (p. 1003).`, 
           fcap: `# Expressões FCAP (no TMS/AED, ajuste conforme a versão do seu equipamento)\n${fcapMedium}`,
           state: `# Parâmetros de Estado e Taxa - Nível Médio (Server Type Tuning)\n${stateMediumNote}\nconnlimit.max_conn = 25 conexões simultâneas\nidle.header_time = 10 segundos (Anti-Slowloris)\nidle.rate_interval = 5 segundos (TCP Reset por inatividade)\nzombie-detection = challenge action reset (timeout 1800s)`,
           siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Blocked Traffic|6|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Mitigation Active cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=6|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
@@ -9619,7 +9619,7 @@ ${analystNotes}`;
           level: 'Agressiva',
           strategy: 'Descarte Estrito na Borda (Inbound Deny List), Enforce AIF & Cloud Signaling Upstream',
           aed: `# ====================================================================\n# AED (ArbOS) - Nível 3: Descarte Estrito no Perímetro & Inbound Deny List\n# ====================================================================\n# 1. Inserir na Inbound Deny List permanente (Protect > Inbound Protection > Deny Lists):\n# Host: ${offenderIp}/32\n\n# 2. Descarte Imediato no Master Filter List (FCAP):\ndrop src host ${offenderIp}\ndrop src net ${offenderIp}/32\n\n# 3. Políticas Estritas de AIF & Proteções de Exaustão no ArbOS CLI:\n/ services aed protection set aif.threat_categories High enable\n/ services aed protection set aif.confidence_index High 100\n/ services aed protection set connlimit.max_conn Generic High 10\n/ services aed protection set idle.header_time Generic High 5\n/ services aed protection set malformed_http Web High enable\n/ services aed protection set fragment_detection Generic High enable\n\n# 4. Acionamento de Cloud Signaling Upstream (sem derrubar prefixo):\n/ services aed cloud mode set normal\n/ config write`,
-          sightline: `# ====================================================================\n# Arbor Sightline / TMS 9.4 - Nível 3: Descarte Imediato na Borda & Blacklist Offload\n# ====================================================================\nservices tms filter-list create name "BLOCK_STRICT_${cleanIp}"\nset rule 1 add src-ip ${offenderIp} action drop log enabled priority 1\nservices tms template create name "TMS_AGG_${cleanIp}"\nset sub-template filter-list "BLOCK_STRICT_${cleanIp}" enabled priority 1\nset sub-template zombie-detection mode enforce action drop-immediate timeout 86400\nset sub-template atlas-intelligence-feed action drop\nset sub-template malformed-packet-drop enabled\nset sub-template packet-header-filtering expression "ip.src == ${offenderIp}"\nservices tms mitigation start managed-object "CORE_INFRA" template "TMS_AGG_${cleanIp}"`,
+          sightline: `# ====================================================================\n# Sightline / TMS 9.4 - Nível 3: Contenção agressiva\n# ====================================================================\n# 1) Countermeasures em modo enforce (UG 9.4, Seções 23-24):\n#    Zombie Detection (p. 933) | TCP SYN Authentication (p. 905) |\n#    UDP Session Authentication (p. 929) | DNS Malformed (p. 946) |\n#    AIF e HTTP/URL Regular Expression (p. 940).\n# 2) Packet Header Filtering (p. 886): ip.src == ${offenderIp}\n# 3) Deny List Offloading via FlowSpec (p. 745; SAFI 133/134 — Pocket Guide p. 35).\n# 4) Blackhole Routing (p. 1022) quando o volume do prefixo comprometer o link.\n# Importante: FlowSpec anunciado não é FlowSpec aplicado — valide nos roteadores (p. 1003).`, 
           fcap: `# Expressão FCAP de descarte estrito\ndrop src host ${offenderIp}\ndrop src net ${offenderIp}/32\ndrop proto ${proto} and dst port ${targetPort} and tflags S/S`,
           state: `# Parâmetros de Estado e Taxa - Nível Agressivo (Proteção Máxima de Perímetro)\naif.threat_categories = High (Enforce total de feeds ASERT)\naif.confidence_index = 100 (Bloqueio estrito de reputação maliciosa)\nconnlimit.max_conn = 10 conexões por host\nidle.header_time = 5 segundos\nmalformed_packet_protection = enable (RFC 2616 e RFC 1035)\nfragment_detection = enable (drop overlapping frags)\ncloud_signaling = normal (limpeza upstream via GRE tunnel)`,
           siem: `# Log SIEM CEF:\nCEF:0|NETSCOUT|Arbor Edge Defense||${categoryName}|Blocked Host|9|rt=${nowStr} src=${offenderIp} dst=${targetIp} proto=${proto} spt=${targetPort} dpt=${targetPort} cs1=${category} cs6=Strict Inbound Drop cs7=${categoryName}\n\n# Log SIEM LEEF:\nLEEF:1.0|NETSCOUT|Arbor Edge Defense||${categoryName}|sev=9|rt=${nowStr}|src=${offenderIp}|dst=${targetIp}|proto=${proto}|srcPort=${targetPort}|dstPort=${targetPort}|cs1=${category}|cs7=${categoryName}`
@@ -10910,11 +10910,11 @@ ${analystNotes}`;
         let code = `# ====================================================================\n`;
         code += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - PARÂMETROS DE ESTADO & RATE LIMITING\n`;
         code += `# Data: ${dateStr} | Nível: ${tier.toUpperCase()}\n`;
-        code += `# Total de Alvos: ${ips.length} IPs | Referência: Pocket Guide p. 17 (/ services aed protection set opção ST nível valor)\n# Opções suportadas variam por versão/hardware — confira com: / services aps|aed protection show\n`;
+        code += `# Referências: AED 7.4 User Guide, Seção 12 (Protection Settings, p. 211+) | Pocket Guide p. 17 (sintaxe CLI)\n# Opções de CLI além de connlimit.max_conn/idle.*: confira com / services aed protection show\n# Aparelho gerenciado por AEM: configure no AEM (edição local desabilitada — UG p. 236)\n`;
         code += `# ====================================================================\n\n`;
 
         if (tier === 'light') {
-          code += `# 1. Limiares de Estado Preventivos (Server Type: Generic / Web)\n`;
+          code += `# 1. Limiares preventivos (nomes na UI: TCP Connection Limiting, Spoofed SYN Flood Prevention, DNS Rate Limiting)\n`;
           code += `/ services aed protection set spoofed_syn Generic Low enable\n`;
           code += `/ services aed protection set connlimit.max_conn Generic Low 100\n`;
           code += `/ services aed protection set idle.header_time Generic Low 30\n`;
@@ -10922,8 +10922,9 @@ ${analystNotes}`;
           code += `/ services aed protection set icmp.max_rate Generic Low 5000\n`;
           code += `/ config write\n`;
         } else if (tier === 'medium') {
-          code += `# 1. Limiares Médios de Conexão e Sessão (Mitigação Ativa)\n`;
+          code += `# 1. Limiares médios (DNS NXDomain Rate Limiting exige o AED enxergando as respostas DNS — p. 234)\n`;
           code += `/ services aed protection set spoofed_syn Generic Medium enable\n`;
+          code += `# automation_threshold: defina em pps na UI (Protect > Inbound Protection > Protection Groups)\n`;
           code += `/ services aed protection set connlimit.max_conn Generic Medium 25\n`;
           code += `/ services aed protection set idle.header_time Generic Medium 10\n`;
           code += `/ services aed protection set idle.rate_interval Generic Medium 5\n`;
@@ -10933,7 +10934,7 @@ ${analystNotes}`;
           code += `/ services aed protection set http.url_limit Web Medium 10\n`;
           code += `/ config write\n`;
         } else {
-          code += `# 1. Limiares Agressivos de Estado, Conexões e AIF (Alta Severidade)\n`;
+          code += `# 1. Limiares agressivos (Flexible Rate-based Blocking p. 238: bloqueia a origem ao estourar o threshold)\n`;
           code += `/ services aed protection set aif.threat_categories High enable\n`;
           code += `/ services aed protection set aif.confidence_index High 100\n`;
           code += `/ services aed protection set spoofed_syn Generic High enable\n`;
@@ -11906,7 +11907,7 @@ ${analystNotes}`;
         spoof: 'Os refletores são IPs reais; quem foi forjado é o IP da vítima, nas requisições enviadas a eles.',
         srcFilter: false,
         client: 'Filtrar por porta de origem do serviço (e tamanho) no roteador de borda ou firewall. Só é viável se o volume couber no link; acima disso, precisa ser tratado antes do link.',
-        operator: 'Filtro por porta de origem + tamanho no PE/borda (ACL ou FlowSpec) ou desvio para scrubbing. Rate-limit do protocolo refletido para o prefixo da vítima. RTBH só como último recurso, pois derruba o alvo.'
+        operator: 'Filtro por porta de origem + tamanho no PE/borda (ACL ou FlowSpec) ou desvio para scrubbing. No TMS, a countermeasure UDP Reflection/Amplification traz FCAPs predefinidas por serviço (p. 916) e o filtro DNS com criteria adicional bytes 2049..65535 (p. 917). RTBH só como último recurso, pois derruba o alvo.'
       },
       tcp_syn: {
         name: 'TCP SYN Flood', mitre: 'T1499.001', layer: 'L4 exaustão de estado',
@@ -11978,7 +11979,7 @@ ${analystNotes}`;
         spoof: 'Pode ser forjado.',
         srcFilter: false,
         client: 'Se o serviço não usa HTTP/3, bloquear UDP/443 de entrada; se usa, rate-limit por origem e validação de handshake.',
-        operator: 'Scrubbing com validação de QUIC; FlowSpec por tamanho quando o padrão é homogêneo.'
+        operator: 'Scrubbing com validação de QUIC; UDP Session Authentication no TMS (p. 929); FlowSpec por tamanho quando o padrão é homogêneo.'
       },
       dns_water_torture: {
         name: 'DNS Water Torture (subdomínios aleatórios)', mitre: 'T1499.002', layer: 'L7 (DNS)',
@@ -11986,7 +11987,7 @@ ${analystNotes}`;
         spoof: 'Costuma chegar por resolvedores legítimos (origem real), o que torna o bloqueio por IP inviável.',
         srcFilter: false,
         client: 'Rate-limit de respostas (RRL) e limitação de NXDOMAIN por zona no autoritativo; distribuir a zona (anycast).',
-        operator: 'Proteção DNS no scrubbing com detecção de subdomínios aleatórios; limitar consultas por zona nos resolvedores do provedor.'
+        operator: 'Scrubbing com detecção de subdomínios aleatórios. TMS: DNS Rate Limiting com Query Object Limiting (p. 951) e DNS Regular Expression por zona (p. 955). AED: DNS NXDomain Rate Limiting (p. 234) + Flexible Rate-based Blocking com FCAP (p. 238).'
       },
       dns_query_flood: {
         name: 'DNS Query Flood', mitre: 'T1499.002', layer: 'L7 (DNS)',
@@ -11994,7 +11995,7 @@ ${analystNotes}`;
         spoof: 'Pode ser forjado ou vir de resolvedores.',
         srcFilter: false,
         client: 'Rate-limit por origem e RRL no servidor DNS.',
-        operator: 'Proteção DNS no scrubbing.'
+        operator: 'Scrubbing com DNS Rate Limiting: DNS Query Rate Limit + Query Object Limiting no TMS (p. 951) ou DNS Query Rate Limit no AED (p. 236); ação Deny List Hosts para reincidentes.'
       },
       icmp_flood: {
         name: 'ICMP Flood', mitre: 'T1498.001', layer: 'L3 volumétrico',
