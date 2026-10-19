@@ -5123,9 +5123,11 @@
       box.classList.remove('hidden');
       box.innerHTML = '<div class="text-[11px] text-slate-400">Consultando RIPEstat…</div>';
       try {
-        const res = await fetch(`https://stat.ripe.net/data/prefix-overview/data.json?resource=${encodeURIComponent(raw)}&sourceapp=pcap-analyzer`);
-        const j = await res.json();
-        if (!j.data) throw new Error('resposta inválida');
+        // Passa pelo cache do app (memória+localStorage) e pelo proxy da borda:
+        // mesma consulta repetida não gera chamada nova ao RIPEstat (TTL 10 min)
+        const url = `https://stat.ripe.net/data/prefix-overview/data.json?resource=${encodeURIComponent(raw)}&sourceapp=pcap-analyzer`;
+        const j = await cachedFetchJson(url, {}, 15000, { ttl: 10 * 60 * 1000 });
+        if (!j || !j.data) throw new Error('sem dados (cache frio ou RIPEstat indisponível)');
         const prefixOut = (j.data.block && j.data.block.prefix) || j.data.resource || raw;
         const rows = (j.data.asns || []).map(a => ({ asn: a.asn, name: a.holder, prefix: prefixOut }));
         if (!rows.length) {
@@ -7616,6 +7618,16 @@
 • Alvo: ${a.victim}
 • Vetores: ${a.vectors.map(v => (v.tech ? v.tech.name : v.key) + v.extraName).join(' + ')}
 • Bloqueio por IP de origem: ${a.vectors.every(v => v.tech && v.tech.srcFilter) ? 'viável (origens reais)' : 'ineficaz (origens forjadas/refletores) — mitigue por características do tráfego'}`;
+          }
+          // Parecer com contexto do cliente (serviços expostos, baseline, assinaturas)
+          const ctx = (typeof assessWithContext === 'function') ? assessWithContext(a) : null;
+          if (ctx) {
+            const vt = { normal: 'Compatível com tráfego normal', suspicious: 'Suspeito — colete mais contexto antes de mitigar', attack: 'Ataque consistente — mitigar' }[ctx.verdict];
+            ddosBlock += `
+
+*PARECER COM CONTEXTO DO CLIENTE*
+• Classificação: ${vt}${ctx.reasons.length ? '\n• Fundamentos: ' + ctx.reasons.join(' ') : ''}
+• Conduta: ${ctx.advice}`;
           }
         } catch (e) { /* sem vetor classificável */ }
       }
