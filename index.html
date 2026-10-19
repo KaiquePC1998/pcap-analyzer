@@ -238,13 +238,6 @@
         <i data-lucide="zap"></i><span>DDoS</span>
         <span id="ddosVectorBadge" class="hidden px-1.5 text-[10px] bg-rose-500/20 text-rose-300 rounded-full font-mono font-bold">0</span>
       </button>
-      <button id="tabPayloadLabBtn" onclick="switchView('payloadLab')" class="nav-item" title="Nível 3: padrão de bytes no payload, regex sugerida e teste de acerto/colateral na captura">
-        <i data-lucide="binary"></i><span>Payload Lab</span>
-      </button>
-      <button id="tabIocBtn" onclick="switchView('ioc')" class="nav-item">
-        <i data-lucide="shield-alert"></i><span>IoC & Ataques</span>
-        <span id="badgeIocCount" class="hidden px-1.5 text-[10px] bg-red-500/20 text-red-300 rounded-full font-mono font-bold">0</span>
-      </button>
       <button id="tabBgpAuditBtn" onclick="switchView('bgpAudit')" class="nav-item" title="Auditoria de Roteamento BGP, Detecção de Prefix Leaks (LGView-NG), Loops Estáticos (LoopHunter) e Amplificação (AmpScan)">
         <i data-lucide="network"></i><span>BGP & Mitigação</span>
         <span id="bgpAlertBadge" class="hidden px-1.5 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold">OK</span>
@@ -259,20 +252,26 @@
         <i data-lucide="git-merge"></i><span>Conversas & Fluxos</span>
         <span id="flowsCountBadge" class="hidden px-1.5 text-[10px] bg-slate-700 text-slate-200 rounded-full font-mono">0</span>
       </button>
-      <button id="tabCorrelationBtn" onclick="switchView('correlation')" class="nav-item">
-        <i data-lucide="building-2"></i><span>Classificação & Produtos</span>
-      </button>
       <button id="tabStatsBtn" onclick="switchView('stats')" class="nav-item">
         <i data-lucide="bar-chart-3"></i><span>Dashboard</span>
         <span id="dashboardThreatsBadge" class="hidden px-1.5 text-[10px] bg-red-500/20 text-red-400 rounded-full font-mono font-bold">0</span>
       </button>
-      <button id="tabFilesManagerBtn" onclick="switchView('filesManager')" class="nav-item">
-        <i data-lucide="folder-kanban"></i><span>Arquivos</span>
-        <span id="filesCountBadge" class="px-1.5 text-[10px] bg-cyan-500/20 text-cyan-300 rounded-full font-mono">0</span>
+      <button id="tabIocBtn" onclick="switchView('ioc')" class="nav-item">
+        <i data-lucide="shield-alert"></i><span>IoC & Ataques</span>
+        <span id="badgeIocCount" class="hidden px-1.5 text-[10px] bg-red-500/20 text-red-300 rounded-full font-mono font-bold">0</span>
+      </button>
+
+      <div class="nav-label">Avançado</div>
+
+      <button id="tabPayloadLabBtn" onclick="switchView('payloadLab')" class="nav-item" title="Nível 3: padrão de bytes no payload, regex sugerida e teste de acerto/colateral na captura">
+        <i data-lucide="binary"></i><span>Payload Lab</span>
       </button>
 
       <div class="nav-label">Outros</div>
 
+      <button onclick="openNetProfileModal()" class="nav-item" title="Contexto do cliente: blocos, operadora de casa, serviços expostos e baseline — reduz falsos positivos e orienta a mitigação">
+        <i data-lucide="sliders-horizontal"></i><span>Perfil de Rede</span>
+      </button>
       <button onclick="openFirewallModalForAllThreats()" class="nav-item" title="Gerar regras de firewall automáticas">
         <i data-lucide="shield-ban"></i><span>Regras Firewall</span>
       </button>
@@ -308,6 +307,11 @@
           </select>
         </div>
         <span id="globalStatsSnippet" class="text-[11px] text-slate-400 font-mono">0 pacotes</span>
+        <button onclick="switchView('filesManager')" class="btn-ghost !py-0.5" title="Gerenciar capturas carregadas">
+          <i data-lucide="folder-kanban" class="w-3.5 h-3.5"></i>
+          <span>Arquivos</span>
+          <span id="filesCountBadge" class="px-1.5 text-[10px] bg-cyan-500/20 text-cyan-300 rounded-full font-mono">0</span>
+        </button>
         <span id="apiEnrichmentStatusBadge" onclick="openApiConfigModal()" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center space-x-1 cursor-pointer hover:bg-emerald-500/30 transition-all" title="Clique para abrir a Central de Inteligência & Diagnóstico de APIs">
           <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
           <span id="apiEnrichmentStatusText">Threat Intel & BGP (MANRS/Pulsedive)</span>
@@ -877,6 +881,7 @@
       <!-- Resumo do evento -->
       <div id="ddosSummary" class="grid grid-cols-2 md:grid-cols-6 gap-2"></div>
       <div id="ddosVerdict"></div>
+      <div id="ddosCtxVerdict"></div>
 
       <!-- Linha do tempo por vetor -->
       <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
@@ -1236,6 +1241,10 @@
           <button onclick="openThreatDetailsModal()" class="px-2.5 py-1 bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-500/30 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
             <span>Painel de Ameaças</span>
+          </button>
+          <button onclick="switchView('correlation')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs flex items-center space-x-1" title="Classificação de fabricantes/ASN e produtos detectados na captura">
+            <i data-lucide="building-2" class="w-3.5 h-3.5"></i>
+            <span>Classificação & Produtos</span>
           </button>
           <button onclick="renderCharts()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs flex items-center space-x-1">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
@@ -1649,6 +1658,22 @@
           </div>
         </div>
 
+        <!-- ORIGEM DO PREFIXO: onde o bloco do alvo está sendo anunciado (antes de mitigar) -->
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-2 text-xs font-semibold text-slate-300">
+              <i data-lucide="crosshair" class="w-4 h-4 text-cyan-300"></i>
+              <span>Origem do Prefixo (onde o bloco é anunciado — verifique antes de mitigar)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="bgpOriginInput" placeholder="IP ou prefixo do alvo, ex.: 200.200.10.7 ou 200.200.0.0/20" class="w-[300px] bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono text-xs outline-none focus:border-cyan-500">
+              <button onclick="bgpCheckOrigin()" class="btn-primary !py-1.5"><i data-lucide="search" class="w-3.5 h-3.5"></i><span>Consultar RIPEstat</span></button>
+            </div>
+          </div>
+          <div id="bgpOriginResult" class="mt-3 hidden"></div>
+          <div class="text-[10px] text-slate-500 mt-2">Regra de ouro: se o bloco do alvo é anunciado por outra operadora, mitigar no seu AS (AED/TMS/RTBH) não protege o cliente — o tráfego entra pelo AS anunciante. Nesse caso, acione a operadora que anuncia (Sightline/FlowSpec) ou invalide a rota na origem.</div>
+        </div>
+
         <div class="flex items-center space-x-2">
           <button onclick="autoPopulateBgpAuditFromPcap()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
@@ -1908,6 +1933,72 @@
   </footer>
 
   </div> <!-- fim #appCol -->
+
+  <!-- MODAL PERFIL DE REDE (contexto do cliente p/ reduzir falsos positivos e orientar a mitigação) -->
+  <div id="netProfileModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl w-[680px] max-w-full max-h-[88vh] overflow-y-auto">
+      <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between sticky top-0 bg-cyber-card z-10">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="sliders-horizontal" class="w-5 h-5 text-cyan-300"></i>
+          <div>
+            <div class="text-sm font-semibold text-white">Perfil de Rede do Cliente</div>
+            <div class="text-[11px] text-slate-400">Contexto do dia a dia: o analista usa isso para separar ataque de tráfego normal e escolher onde mitigar</div>
+          </div>
+        </div>
+        <button onclick="closeNetProfileModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-5 space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block space-y-1.5">
+            <span class="text-slate-300 font-semibold">ASN da sua operadora (onde você mitiga)</span>
+            <input id="npAsn" type="text" placeholder="ex.: AS26250 ou 26250" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500">
+          </label>
+          <label class="block space-y-1.5">
+            <span class="text-slate-300 font-semibold">Nome/Referência</span>
+            <input id="npAsnName" type="text" placeholder="ex.: MinhaNet Telecom" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-500">
+          </label>
+        </div>
+        <label class="block space-y-1.5">
+          <span class="text-slate-300 font-semibold">Blocos do cliente e quem anuncia cada um</span>
+          <textarea id="npPrefixes" rows="3" placeholder="um por linha: 200.200.0.0/20 anunciado por AS26250 | 200.201.10.0/24 anunciado por AS28573 (cliente em homing)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500"></textarea>
+          <span class="text-[10px] text-slate-500">Blocos anunciados por outra operadora não podem ser mitigados no seu AS: o scrubbing precisa ser acionado em quem anuncia.</span>
+        </label>
+        <label class="block space-y-1.5">
+          <span class="text-slate-300 font-semibold">Serviços expostos ao público (evita falso positivo em serviço legítimo)</span>
+          <input id="npServices" type="text" placeholder="ex.: 53 DNS, 443 HTTPS, 25 SMTP, 5060 SIP" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500">
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block space-y-1.5">
+            <span class="text-slate-300 font-semibold">Baseline do dia a dia — pps médio</span>
+            <input id="npBaseAvg" type="number" min="0" placeholder="ex.: 500" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500">
+          </label>
+          <label class="block space-y-1.5">
+            <span class="text-slate-300 font-semibold">Baseline do dia a dia — pico pps</span>
+            <input id="npBasePeak" type="number" min="0" placeholder="ex.: 3000" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono outline-none focus:border-cyan-500">
+          </label>
+        </div>
+        <button onclick="learnBaselineFromSelected()" class="w-full px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1.5">
+          <i data-lucide="graduation-cap" class="w-4 h-4 text-cyan-300"></i>
+          <span>Aprender baseline da captura selecionada no cabeçalho (tráfego normal de referência)</span>
+        </button>
+        <div>
+          <div class="text-slate-300 font-semibold mb-2">Caminhos de mitigação disponíveis</div>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathAed" type="checkbox" class="accent-cyan-500"><span><strong>AED</strong><br><span class="text-[10px] text-slate-500">scrub na borda</span></span></label>
+            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathSightline" type="checkbox" class="accent-cyan-500"><span><strong>Sightline</strong><br><span class="text-[10px] text-slate-500">operadora/TMS</span></span></label>
+            <label class="flex items-center space-x-2 p-2.5 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer hover:border-cyan-600"><input id="npPathTms" type="checkbox" class="accent-cyan-500"><span><strong>TMS próprio</strong><br><span class="text-[10px] text-slate-500">filtros locais</span></span></label>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-cyber-border">
+          <span id="npSavedAt" class="text-[10px] text-slate-500"></span>
+          <div class="flex items-center space-x-2">
+            <button onclick="resetNetProfile()" class="px-3 py-1.5 text-red-300 border border-red-500/40 rounded-lg hover:bg-red-950/40">Limpar</button>
+            <button onclick="saveNetProfile()" class="btn-primary"><i data-lucide="save" class="w-4 h-4"></i><span>Salvar perfil</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================================================================= -->
   <!-- MODAL: APRESENTAÇÃO EXECUTIVA & RELATÓRIO PARA O CLIENTE (Print / PDF / Visualização HD) -->
@@ -5012,6 +5103,238 @@
     }
 
     // =========================================================================================
+    // ORIGEM DO PREFIXO (RIPEstat): quem anuncia o bloco do alvo — decide ONDE mitigar
+    // =========================================================================================
+    function netProfilePrefixList() {
+      const prof = getNetProfile();
+      return (prof.prefixes || []).concat(
+        // Blocos inferidos do texto livre quando a estrutura falhar
+        (prof.prefixesTxt || '').split('\n').map(l => {
+          const pre = /((?:\d{1,3}\.){3}\d{1,3}\/\d{1,2})/.exec(l);
+          return pre ? { prefix: pre[1], asn: parseAsn(l) } : null;
+        }).filter(Boolean)
+      );
+    }
+    async function bgpCheckOrigin() {
+      const inp = document.getElementById('bgpOriginInput');
+      const box = document.getElementById('bgpOriginResult');
+      if (!inp || !box) return;
+      const raw = inp.value.trim();
+      box.classList.remove('hidden');
+      box.innerHTML = '<div class="text-[11px] text-slate-400">Consultando RIPEstat…</div>';
+      try {
+        const res = await fetch(`https://stat.ripe.net/data/prefix-overview/data.json?resource=${encodeURIComponent(raw)}&sourceapp=pcap-analyzer`);
+        const j = await res.json();
+        if (!j.data) throw new Error('resposta inválida');
+        const prefixOut = (j.data.block && j.data.block.prefix) || j.data.resource || raw;
+        const rows = (j.data.asns || []).map(a => ({ asn: a.asn, name: a.holder, prefix: prefixOut }));
+        if (!rows.length) {
+          box.innerHTML = '<div class="text-[11px] text-amber-300">Nenhum ASN anunciando esse recurso agora (prefixo não anunciado, IP de bogon ou rede sem anúncio). Não há como mitigar pela operadora — confirme com o cliente quem anuncia.</div>';
+          return;
+        }
+        const prof = getNetProfile();
+        const casa = prof.asnCasa || null;
+        const myPrefixes = netProfilePrefixList();
+        const rowsHtml = rows.map(r => {
+          const isCasa = casa && r.asn === casa;
+          const inProfile = myPrefixes.some(p => p.asn === r.asn);
+          const bg = isCasa ? 'bg-emerald-950/30 border-emerald-500/30' : 'bg-amber-950/30 border-amber-500/40';
+          const verdict = isCasa
+            ? '<strong class="text-emerald-300">Anunciado pelo SEU AS:</strong> mitigação local é eficaz (AED/TMS na borda, FlowSpec ou RTBH).'
+            : `<strong class="text-amber-300">Anunciado por TERCEIROS (AS${r.asn}${prof.asnCasa ? ' — não é o seu AS' + casa : ''}):</strong> sua mitigação local não afeta o caminho do tráfego. Acione a operadora anunciante${r.name ? ' (' + escapeHtml(r.name) + ')' : ''} para scrubbing (Sightline/FlowSpec) ou invalidar a rota na origem.${inProfile ? ' Este ASN está declarado no Perfil de Rede.' : ''}`;
+          return `<div class="px-3 py-2 rounded-lg border ${bg} text-[11px] text-slate-200 leading-relaxed">
+            <div class="font-mono">Prefixo: ${escapeHtml(r.prefix)} · AS${r.asn} · ${escapeHtml(r.name || 'titular não informado')}</div>
+            <div class="mt-0.5">${verdict}</div>
+          </div>`;
+        }).join('');
+        box.innerHTML = rowsHtml + `<div class="mt-1.5 text-[10px] text-slate-500">Fonte: RIPEstat prefix-overview (dados de roteamento globais). Para histórico de anúncios/rota-sets, consulte o recurso no RIPEstat.</div>`;
+      } catch (e) {
+        box.innerHTML = `<div class="text-[11px] text-red-300">Falha na consulta (${escapeHtml(e.message)}). Verifique a conexão ou consulte manualmente no RIPEstat.</div>`;
+      }
+    }
+
+    // =========================================================================================
+    // PERFIL DE REDE DO CLIENTE (contexto do dia a dia — localStorage)
+    // =========================================================================================
+    const NP_KEY = 'pcapAnalyzerNetProfile';
+    function getNetProfile() {
+      try { return JSON.parse(localStorage.getItem(NP_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function parseAsn(txt) {
+      const m = /(?:AS)?(\d{1,10})/i.exec(String(txt || ''));
+      return m ? parseInt(m[1], 10) : null;
+    }
+    function parseServices(txt) {
+      // "53 DNS, 443 HTTPS" -> [{port:53, name:'DNS'}, ...]
+      return String(txt || '').split(',').map(part => {
+        const m = /(?:^|\s)(\d{1,5})(?:\s+(.+))?$/.exec(part.trim());
+        return m ? { port: parseInt(m[1], 10), name: (m[2] || 'srv').toUpperCase() } : null;
+      }).filter(Boolean);
+    }
+    function parsePrefixes(txt) {
+      // "200.200.0.0/20 anunciado por AS26250" -> [{prefix, asn}]
+      return String(txt || '').split('\n').map(line => {
+        const pre = /((?:\d{1,3}\.){3}\d{1,3}\/\d{1,2})/.exec(line);
+        const asn = parseAsn(line.split('/').slice(1).join('/') || line);
+        return pre ? { prefix: pre[1], asn: parseAsn(line) } : null;
+      }).filter(Boolean);
+    }
+    function netProfilePaths(prof) {
+      const P = prof || getNetProfile();
+      const paths = [];
+      if (P.pathAed) paths.push('AED');
+      if (P.pathTms) paths.push('TMS');
+      if (P.pathSightline) paths.push('Sightline');
+      return paths;
+    }
+    function openNetProfileModal() {
+      const prof = getNetProfile();
+      const set = (id, v) => { const el = document.getElementById(id); if (el !== null) el.value = v ?? ''; };
+      set('npAsn', prof.asnCasa ? 'AS' + prof.asnCasa : '');
+      set('npAsnName', prof.asnName || '');
+      set('npPrefixes', prof.prefixesTxt || '');
+      set('npServices', prof.servicesTxt || '');
+      set('npBaseAvg', prof.basePpsAvg || '');
+      set('npBasePeak', prof.basePpsPeak || '');
+      const chk = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
+      chk('npPathAed', prof.pathAed); chk('npPathSightline', prof.pathSightline); chk('npPathTms', prof.pathTms);
+      const st = document.getElementById('npSavedAt');
+      if (st) st.textContent = prof.savedAt ? `Salvo em ${prof.savedAt}` : '';
+      document.getElementById('netProfileModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeNetProfileModal() { document.getElementById('netProfileModal').classList.add('hidden'); }
+    function resetNetProfile() { localStorage.removeItem(NP_KEY); closeNetProfileModal(); showSocToast('Perfil de rede removido.', 'info'); }
+    function saveNetProfile() {
+      const prof = {
+        asnCasa: parseAsn(document.getElementById('npAsn').value),
+        asnName: document.getElementById('npAsnName').value.trim(),
+        prefixesTxt: document.getElementById('npPrefixes').value.trim(),
+        prefixes: parsePrefixes(document.getElementById('npPrefixes').value),
+        servicesTxt: document.getElementById('npServices').value.trim(),
+        services: parseServices(document.getElementById('npServices').value),
+        basePpsAvg: parseInt(document.getElementById('npBaseAvg').value, 10) || 0,
+        basePpsPeak: parseInt(document.getElementById('npBasePeak').value, 10) || 0,
+        pathAed: document.getElementById('npPathAed').checked,
+        pathSightline: document.getElementById('npPathSightline').checked,
+        pathTms: document.getElementById('npPathTms').checked,
+        savedAt: new Date().toLocaleString('pt-BR')
+      };
+      localStorage.setItem(NP_KEY, JSON.stringify(prof));
+      closeNetProfileModal();
+      showSocToast('Perfil de rede salvo. A DDoS e a Triagem agora consideram o contexto do cliente.', 'success');
+      if (typeof renderDdosView === 'function' && !document.getElementById('viewDdos').classList.contains('hidden')) renderDdosView();
+      if (typeof renderTriageView === 'function' && !document.getElementById('viewTriage').classList.contains('hidden')) renderTriageView();
+    }
+    function learnBaselineFromSelected() {
+      const file = currentSelectedFile;
+      if (!file || file === 'ALL' || !loadedFilesMap.has(file)) {
+        showSocToast('Selecione uma captura de tráfego normal no cabeçalho antes de aprender o baseline.', 'warning');
+        return;
+      }
+      const m = computeFileMetrics(file);
+      document.getElementById('npBaseAvg').value = Math.round(m.avgPps);
+      document.getElementById('npBasePeak').value = Math.round(m.peakPps);
+      showSocToast(`Baseline aprendido de ${file}: ${fmtCount(m.avgPps)} pps médio, pico ${fmtCount(m.peakPps)} pps. Clique em Salvar perfil.`, 'info');
+    }
+
+    // =========================================================================================
+    // PARECER COM CONTEXTO (reduz a inclinação de chamar todo tráfego de ataque)
+    // Combina os vetores detectados com o perfil do cliente: serviços expostos,
+    // baseline de pps e indicadores fortes de ferramenta de ataque.
+    // =========================================================================================
+    function vectorTargetPorts(v) {
+      try {
+        if (v.dports && v.dports.size) return Array.from(v.dports.keys());
+        if (v.group && v.group.dports && v.group.dports.size) return Array.from(v.group.dports.keys());
+      } catch (e) {}
+      return [];
+    }
+    function assessWithContext(a) {
+      const prof = getNetProfile();
+      const reasons = [];
+      const svcPorts = (prof.services || []).map(s => s.port);
+      let suspicion = 0; // 0 = compatível com normal, 1 = suspeito, 2 = ataque consistente
+      const hasToolSignature = a.vectors.some(v => (v.indicators || []).some(i => /ferramenta|efêmero|forjad|não ocorre em tráfego legítimo|unidirecional/i.test(i)));
+
+      a.vectors.forEach(v => {
+        const ports = vectorTargetPorts(v).slice(0, 3);
+        const exposed = ports.filter(p => svcPorts.includes(p));
+        if (exposed.length && !hasToolSignature) {
+          v.ctxVerdict = 'suspicious';
+          v.ctxReason = `Porta ${exposed.join(',')} é serviço exposto do cliente (${((prof.services || []).find(s => s.port === exposed[0]) || {}).name || 'srv'}): pico pode ser demanda legítima`;
+          suspicion = Math.max(suspicion, 1);
+        } else {
+          v.ctxVerdict = 'attack';
+          v.ctxReason = hasToolSignature ? 'Assinatura de ferramenta de ataque (padrões homogêneos/origens forjadas/sockets efêmeros)' : 'Padrão incompatível com serviços e baseline do cliente';
+          suspicion = 2;
+        }
+        if (v.indicators && Array.isArray(v.indicators)) v.indicators.push('[contexto] ' + v.ctxReason);
+      });
+
+      if (prof.basePpsPeak > 0 && a.peakPps) {
+        const ratio = a.peakPps / prof.basePpsPeak;
+        if (ratio < 1.5) {
+          reasons.push(`Pico do evento (${fmtCount(a.peakPps)} pps) está abaixo de 1,5× o pico do baseline informado (${fmtCount(prof.basePpsPeak)} pps).`);
+          if (suspicion < 2) suspicion = 0;
+        } else if (ratio >= 3) {
+          reasons.push(`Pico do evento é ${ratio.toFixed(1)}× o pico do baseline (${fmtCount(prof.basePpsPeak)} pps): consistente com ataque volumétrico.`);
+          suspicion = 2;
+        } else {
+          reasons.push(`Pico do evento é ${ratio.toFixed(1)}× o baseline (${fmtCount(prof.basePpsPeak)} pps): acima do normal, requer atenção.`);
+          if (suspicion === 0) suspicion = 1;
+        }
+      }
+      if (svcPorts.length) reasons.push(`Serviços expostos considerados: ${svcPorts.join(', ')}.`);
+      if (!prof.asnCasa && !svcPorts.length && !prof.basePpsPeak) reasons.push('Perfil de rede vazio: preencha o Perfil de Rede para pareceres mais precisos.');
+
+      const verdict = suspicion === 2 ? 'attack' : suspicion === 1 ? 'suspicious' : 'normal';
+      const paths = netProfilePaths(prof);
+      let advice = 'Nenhuma mitigação necessária; registre a análise.';
+      if (verdict !== 'normal') {
+        if (paths.includes('AED') && paths.includes('Sightline')) advice = 'Mitigue na borda com o AED (scrub imediato) e, se o volume sustentar, acione o Sightline/TMS da operadora (FlowSpec ou RTBH por /32 do alvo).';
+        else if (paths.includes('AED')) advice = 'Mitigue na borda com o AED: scrub do tráfego ao alvo e RTBH do /32 do alvo se o volume sustentar.';
+        else if (paths.includes('TMS')) advice = 'Aplique filtros no TMS local para o vetor identificado (valorize bloqueio por características do tráfego).';
+        else if (paths.includes('Sightline')) advice = 'Acione o Sightline/TMS da operadora: FlowSpec para o vetor ou RTBH do /32 do alvo.';
+        else advice = 'Sem caminho de mitigação marcado no perfil: acione a operadora de casa ou habilite AED/Sightline/TMS no Perfil de Rede.';
+        advice += ' Antes de RTBH/blackhole, confirme na aba BGP & Mitigação quem anuncia o prefixo do alvo: bloco anunciado por outra operadora não é afetado pela sua mitigação.';
+      }
+      return { verdict, reasons, advice, paths };
+    }
+    function renderDdosCtxVerdict(a) {
+      const el = document.getElementById('ddosCtxVerdict');
+      if (!el) return;
+      const c = a.ctx || assessWithContext(a);
+      a.ctx = c;
+      const style = {
+        normal:   ['bg-emerald-950/30 border-emerald-500/30 text-emerald-100', 'Parecer com contexto: compatível com tráfego normal', 'check-circle-2'],
+        suspicious: ['bg-amber-950/30 border-amber-500/40 text-amber-100', 'Parecer com contexto: suspeito — colete mais contexto antes de mitigar (evita falso positivo)', 'help-circle'],
+        attack:   ['bg-rose-950/40 border-rose-500/40 text-rose-100', 'Parecer com contexto: ataque consistente — prossiga com a mitigação', 'alert-octagon']
+      }[c.verdict];
+      el.innerHTML = `<div class="mt-2 px-3 py-2.5 rounded-lg border ${style[0]} text-[11px] leading-relaxed">
+        <div class="flex items-center space-x-1.5 font-bold"><i data-lucide="${style[2]}" class="w-3.5 h-3.5"></i><span>${style[1]}</span></div>
+        ${c.reasons.length ? `<div class="mt-1 text-slate-300">${escapeHtml(c.reasons.join(' '))}</div>` : ''}
+        <div class="mt-1"><strong>Caminho recomendado:</strong> ${escapeHtml(c.advice)}</div>
+      </div>`;
+      lucide.createIcons();
+    }
+
+    // Contexto aplicado à Triagem: degrada sinais explicados pelo perfil
+    function triageApplyContext(signals, t) {
+      const prof = getNetProfile();
+      if (!signals || !signals.length) return signals;
+      let peak = 0;
+      try { const gr = triageRates(t.global, t.binSec, t.sampling); peak = gr.peakPps; } catch (e) {}
+      const inBaseline = prof.basePpsPeak > 0 && peak && peak < prof.basePpsPeak * 1.2;
+      return signals.map(s => {
+        if (inBaseline && s.lvl !== 'ok' && !/forjad|efêmero|ferramenta|spoof/i.test(s.text)) {
+          return { lvl: 'info', text: `${s.text} — dentro do baseline informado (pico ${fmtCount(peak)} pps vs. baseline ${fmtCount(prof.basePpsPeak)} pps): provável demanda legítima.` };
+        }
+        return s;
+      });
+    }
+
+    // =========================================================================================
     // UI VIEW SWITCHER & SORTING HANDLERS
     // =========================================================================================
 
@@ -5031,13 +5354,15 @@
       const tabs = [
         { id: 'Packets', view: 'viewPackets', btn: 'tabPacketsBtn' },
         { id: 'Flows', view: 'viewFlows', btn: 'tabFlowsBtn' },
-        { id: 'Correlation', view: 'viewCorrelation', btn: 'tabCorrelationBtn' },
+        { id: 'Correlation', view: 'viewCorrelation', btn: 'tabCorrelationBtn' }, // fora do menu (acesso: Dashboard)
+
         { id: 'Ddos', view: 'viewDdos', btn: 'tabDdosBtn' },
         { id: 'Ioc', view: 'viewIoc', btn: 'tabIocBtn' },
         { id: 'Triage', view: 'viewTriage', btn: 'tabTriageBtn' },
         { id: 'PayloadLab', view: 'viewPayloadLab', btn: 'tabPayloadLabBtn' },
         { id: 'Stats', view: 'viewStats', btn: 'tabStatsBtn' },
-        { id: 'FilesManager', view: 'viewFilesManager', btn: 'tabFilesManagerBtn' },
+        { id: 'FilesManager', view: 'viewFilesManager', btn: 'tabFilesManagerBtn' }, // fora do menu (acesso: cabeçalho)
+
         { id: 'BgpAudit', view: 'viewBgpAudit', btn: 'tabBgpAuditBtn' }
       ];
       if (viewName.toLowerCase() === 'bgpaudit') {
@@ -5048,19 +5373,19 @@
       tabs.forEach(t => {
         const btn = document.getElementById(t.btn);
         const view = document.getElementById(t.view);
-        if (btn && view) {
-          if (t.id.toLowerCase() === viewName.toLowerCase()) {
-            btn.className = "nav-item active";
-            if (t.id.toLowerCase() === 'packets' && !hasFiles) {
-              view.classList.add('hidden');
-            } else {
-              view.classList.remove('hidden');
-            }
-          } else {
-            btn.className = "nav-item";
+        if (!view) return;
+        const isActive = t.id.toLowerCase() === viewName.toLowerCase();
+        if (isActive) {
+          if (t.id.toLowerCase() === 'packets' && !hasFiles) {
             view.classList.add('hidden');
+          } else {
+            view.classList.remove('hidden');
           }
+        } else {
+          view.classList.add('hidden');
         }
+        // Botões fora do menu (Correlation/FilesManager) não têm elemento para destacar
+        if (btn) btn.className = isActive ? "nav-item active" : "nav-item";
       });
 
       // Mantém a aba ativa visível na barra lateral (rolagem vertical quando a lista não couber)
@@ -10788,8 +11113,8 @@ ${analystNotes}`;
         card('Fontes / Destinos', `${fmtCount(t.global.srcs.size)} / ${fmtCount(t.perDst.size)}`)
       ].join('');
 
-      // Sinais
-      const signals = buildTriageSignals(t);
+      // Sinais (com contexto do cliente: evita chamar de ataque o dia a dia dele)
+      const signals = triageApplyContext(buildTriageSignals(t), t);
       const sigStyle = {
         crit: 'bg-red-950/40 border-red-500/40 text-red-200',
         warn: 'bg-amber-950/30 border-amber-500/40 text-amber-200',
@@ -11692,6 +12017,8 @@ ${analystNotes}`;
 
       const a = computeDdosAnalysis(select.value, prof, 1);
       g_lastDdos = a;
+      // Parecer final considera o contexto do cliente (perfil de rede)
+      a.ctx = assessWithContext(a);
       const attackPkts = a.vectors.reduce((s, v) => s + v.pkts, 0);
       const attackBytes = a.vectors.reduce((s, v) => s + v.bytes, 0);
       // Pico do evento: soma dos vetores simultâneos em cada janela
@@ -11734,6 +12061,7 @@ ${analystNotes}`;
         </div>`;
       }
       document.getElementById('ddosVerdict').innerHTML = verdict;
+      renderDdosCtxVerdict(a);
 
       // Cartões de vetores
       document.getElementById('ddosVectors').innerHTML = a.vectors.map((v, i) => {
