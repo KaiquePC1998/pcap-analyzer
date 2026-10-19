@@ -1408,6 +1408,10 @@
             <i data-lucide="clipboard-copy" class="w-3.5 h-3.5"></i>
             <span>Copiar resumo p/ ticket</span>
           </button>
+          <button onclick="triageGoToDdos()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg font-semibold flex items-center space-x-1.5 transition-all" title="Envia o alvo principal da triagem para a classificação de vetor e a estratégia de mitigação">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+            <span>Classificar &amp; mitigar →</span>
+          </button>
         </div>
       </div>
 
@@ -10393,6 +10397,25 @@ ${analystNotes}`;
       }
       if (!signals.length) signals.push({ lvl: 'ok', text: 'Nenhum sinal forte de evento volumétrico nesta captura com os limiares atuais.' });
       return signals;
+    }
+
+    // Fecha o fluxo Nível 1 → classificação: leva o alvo principal da triagem
+    // para a aba DDoS (vetor, veredito e estratégia de mitigação)
+    function triageGoToDdos() {
+      const t = g_lastTriage;
+      const top = t && t.perDst && t.perDst.size
+        ? Array.from(t.perDst.entries()).sort((a, b) => b[1].pkts - a[1].pkts)[0][0]
+        : null;
+      if (!top) {
+        showSocToast('Carregue uma captura e rode a triagem antes de classificar.', 'warning');
+        return;
+      }
+      switchView('ddos');
+      const select = document.getElementById('ddosVictimSelect');
+      if (select && Array.from(select.options).some(o => o.value === top) && select.value !== top) {
+        select.value = top;
+        renderDdosView();
+      }
     }
 
     function renderTriageView() {
