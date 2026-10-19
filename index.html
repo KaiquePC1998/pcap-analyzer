@@ -932,6 +932,8 @@
       <!-- Cartões de vetores -->
       <div id="ddosVectors" class="space-y-3"></div>
 
+      <div id="ddosCsNote" class="hidden"></div>
+
       <!-- Análise DNS (UDP/53): perfil do servidor, zonas, qtypes, amplificação -->
       <div id="ddosDnsPanel" class="hidden"></div>
 
@@ -12511,6 +12513,30 @@ ${analystNotes}`;
       if (window.lucide) lucide.createIcons();
     }
 
+    // Card informativo do fluxo Cloud Signaling (APS/AED -> TMS), com tempos documentados (UG 9.4 p. 813-817).
+    function cloudSignalingNote(a) {
+      const el = document.getElementById('ddosCsNote');
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.innerHTML = `
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-3 space-y-1.5" style="border-left: 4px solid #0ea5e9">
+        <div class="flex flex-wrap items-center gap-2">
+          <i data-lucide="cloud-upload" class="w-4 h-4 text-sky-300"></i>
+          <span class="text-xs font-bold text-white">Transbordo Cloud Signaling (AED/APS do cliente → TMS)</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/[.06] border border-white/[.09] text-slate-300">heartbeat 60 s · 3 min sem heartbeat = falha · 4 h sem heartbeat = TMS encerra</span>
+        </div>
+        <div class="text-[11px] text-slate-400">
+          O APS/AED sinaliza ao Sightline quando o limiar é excedido; o alerta surge com severidade alta e a mitigação roda no TMS (automática se auto-mitigation estiver habilitada no managed object; manual via <strong class="text-slate-300">Mitigate Alert</strong> → Quick Start IPv4/IPv6 ou Configure TMS Mitigation — p. 647), devolvendo tráfego limpo por GRE.
+          Tipos de requisição (p. 815): <strong class="text-slate-300">global</strong> (CIDR inteiro do managed object; prefixo mais largo que /16 é ignorado — p. 813), <strong class="text-slate-300">protection groups</strong> (subconjunto, até /32) e <strong class="text-slate-300">targeted destination</strong> (APS 5.9+: mitiga só o destino que estourou; máx. 237 prefixos IPv4).
+          Acompanhe em System &gt; Status &gt; APS Cloud Signaling Status (p. 434) e no alerta Cloud Signaling Mitigation Request (p. 646); a aba Annotations lista os CIDRs e horários (p. 815).
+        </div>
+        <div class="text-[11px] text-slate-400 border-t border-cyber-border pt-1.5">
+          <span class="text-sky-300 font-semibold">Na sua operação: </span>sinalização ativa = tráfego do cliente sendo lavado no TMS. O TMS encerra a mitigação sozinho quando o APS parar de sinalizar e não houver mais tráfego sendo descartado (p. 816); sem auto-mitigation, pare manualmente em Mitigation &gt; Threat Management (p. 816).
+        </div>
+      </div>`;
+      if (window.lucide) lucide.createIcons();
+    }
+
     function renderDdosView() {
       const prof = getDdosProfile();
       const select = document.getElementById('ddosVictimSelect');
@@ -12623,6 +12649,7 @@ ${analystNotes}`;
       }).join('');
 
       renderDdosDns(a);
+      cloudSignalingNote(a);
 
       // Tráfego que não se caracterizou como ataque
       const other = a.nonAttack.filter(v => v.pkts > 0).slice(0, 8);
