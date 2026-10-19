@@ -1219,6 +1219,14 @@
             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
             <span>Copiar Resumo Executivo</span>
           </button>
+          <button onclick="downloadExecutiveSummaryMd()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo executivo como Markdown">
+            <i data-lucide="file-code-2" class="w-3.5 h-3.5"></i>
+            <span>Baixar .MD</span>
+          </button>
+          <button onclick="printExecutiveSummaryPdf()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Abrir versão para impressão / salvar como PDF">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>PDF / Imprimir</span>
+          </button>
         </div>
 
         <div class="flex items-center space-x-2">
@@ -1231,6 +1239,31 @@
             <span>Atualizar</span>
           </button>
         </div>
+      </div>
+
+      <!-- COMPARAÇÃO BASELINE vs EVENTO: prova o ataque pelo delta de pps/bps -->
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-2 text-xs font-semibold text-slate-300">
+            <i data-lucide="git-compare" class="w-4 h-4 text-cyan-300"></i>
+            <span>Comparação Baseline × Evento</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-[11px]">
+            <label class="flex items-center space-x-1.5">
+              <span class="text-slate-400">Baseline:</span>
+              <select id="cmpBaselineSel" class="text-[11px] font-mono px-2 py-1 outline-none cursor-pointer max-w-[220px] truncate"></select>
+            </label>
+            <label class="flex items-center space-x-1.5">
+              <span class="text-slate-400">Evento:</span>
+              <select id="cmpEventSel" class="text-[11px] font-mono px-2 py-1 outline-none cursor-pointer max-w-[220px] truncate"></select>
+            </label>
+            <button onclick="runBaselineCompare()" class="btn-primary !py-1.5">
+              <i data-lucide="scale" class="w-3.5 h-3.5"></i><span>Comparar</span>
+            </button>
+          </div>
+        </div>
+        <div id="cmpResult" class="mt-3 hidden"></div>
+        <div class="text-[10px] text-slate-500 mt-2">Selecione uma captura de referência (tráfego normal) e a captura do evento. O delta de pps/bps e a mudança no alvo principal ajudam a provar o ataque no relatório.</div>
       </div>
 
       <!-- PAINEL COLABORATIVO: INTELIGÊNCIA ARTIFICIAL FORENSE + PARECER DO ANALISTA HUMANO -->
@@ -1911,6 +1944,14 @@
           <button onclick="copyExecutiveClientSummary()" class="px-3 py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="copy" class="w-4 h-4"></i>
             <span>Copiar Resumo</span>
+          </button>
+          <button onclick="downloadExecutiveSummaryMd()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo como Markdown">
+            <i data-lucide="file-code-2" class="w-4 h-4"></i>
+            <span>.MD</span>
+          </button>
+          <button onclick="printExecutiveSummaryPdf()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Imprimir / salvar como PDF">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>PDF</span>
           </button>
           <button onclick="closeClientPresentationModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
             <i data-lucide="x" class="w-5 h-5"></i>
@@ -3284,6 +3325,8 @@
     function handlePcapSelectionChange(newVal) {
       currentSelectedFile = newVal;
       applyFilters();
+      // Re-renderiza as visões dependentes do escopo de arquivo
+      if (typeof renderTriageView === 'function' && !document.getElementById('viewTriage').classList.contains('hidden')) renderTriageView();
     }
 
     function clearAllLoadedFiles() {
@@ -6337,9 +6380,109 @@
       localStorage.removeItem('pcap_analyst_notes');
     }
 
+    // =========================================================================================
+    // COMPARAÇÃO BASELINE × EVENTO (prova do ataque pelo delta)
+    // =========================================================================================
+    function refreshCompareSelects() {
+      const a = document.getElementById('cmpBaselineSel');
+      const b = document.getElementById('cmpEventSel');
+      if (!a || !b) return;
+      const files = Array.from(loadedFilesMap.keys());
+      const opts = files.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+      a.innerHTML = opts; b.innerHTML = opts;
+      if (files.length >= 2) b.value = files[files.length - 1];
+    }
+
+    function computeFileMetrics(fName) {
+      const rec = loadedFilesMap.get(fName);
+      const pkts = rec ? rec.packets : [];
+      const total = pkts.length;
+      const bytes = pkts.reduce((s, p) => s + p.length, 0);
+      const dur = total ? Math.max(pkts[total - 1].relTime - pkts[0].relTime, 0.001) : 1;
+      const perSec = new Map();
+      const dstCounts = new Map();
+      const srcs = new Set();
+      pkts.forEach(p => {
+        const sec = Math.floor(p.relTime);
+        const cur = perSec.get(sec) || { pkts: 0, bytes: 0 };
+        cur.pkts++; cur.bytes += p.length;
+        perSec.set(sec, cur);
+        if (p.dst) dstCounts.set(p.dst, (dstCounts.get(p.dst) || 0) + 1);
+        if (p.src) srcs.add(p.src);
+      });
+      let peakPps = 0, peakBps = 0;
+      perSec.forEach(v => { peakPps = Math.max(peakPps, v.pkts); peakBps = Math.max(peakBps, v.bytes * 8); });
+      const topDst = Array.from(dstCounts.entries()).sort((x, y) => y[1] - x[1])[0];
+      return {
+        total, bytes, dur,
+        avgPps: total / dur,
+        avgBps: bytes * 8 / dur,
+        peakPps, peakBps,
+        topDst: topDst ? topDst[0] : '—',
+        topDstShare: topDst ? topDst[1] / total : 0,
+        srcs: srcs.size
+      };
+    }
+
+    function runBaselineCompare() {
+      const a = document.getElementById('cmpBaselineSel');
+      const b = document.getElementById('cmpEventSel');
+      const box = document.getElementById('cmpResult');
+      if (!box) return;
+      if (!a.value || !b.value || a.value === b.value) {
+        showSocToast('Selecione duas capturas diferentes (baseline e evento).', 'warning');
+        return;
+      }
+      const base = computeFileMetrics(a.value);
+      const ev = computeFileMetrics(b.value);
+      const r = (v) => v >= 10 ? fmtCount(Math.round(v)) : v.toFixed(1);
+      const delta = (now, was) => was > 0 ? ((now - was) / was * 100) : (now > 0 ? 100 : 0);
+      const row = (label, bv, ev_, unit, cls) => {
+        const d = delta(ev_, bv);
+        const arrow = d > 5 ? '▲' : d < -5 ? '▼' : '≈';
+        const color = cls || (d > 100 ? 'text-rose-300' : d > 5 ? 'text-amber-300' : 'text-slate-300');
+        return `<tr>
+          <td class="py-2 text-slate-400">${label}</td>
+          <td class="py-2 font-mono text-right">${r(bv)}${unit}</td>
+          <td class="py-2 font-mono text-right">${r(ev_)}${unit}</td>
+          <td class="py-2 font-mono text-right ${color}">${arrow} ${d >= 0 ? '+' : ''}${Math.round(d)}%</td>
+        </tr>`;
+      };
+      const sameDst = base.topDst === ev.topDst;
+      box.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs ov-table">
+            <thead><tr>
+              <th class="text-left">Métrica</th>
+              <th class="text-right">${escapeHtml(a.value)}</th>
+              <th class="text-right">${escapeHtml(b.value)}</th>
+              <th class="text-right">Δ</th>
+            </tr></thead>
+            <tbody>
+              ${row('Pacotes', base.total, ev.total, '')}
+              ${row('Volume (bytes)', base.bytes, ev.bytes, '')}
+              ${row('pps médio', base.avgPps, ev.avgPps, '')}
+              ${row('Pico pps (1 s)', base.peakPps, ev.peakPps, '', 'text-rose-300')}
+              ${row('Pico banda (1 s)', base.peakBps, ev.peakBps, '', 'text-rose-300')}
+              ${row('Origens únicas', base.srcs, ev.srcs, '')}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2 p-2.5 rounded-lg border text-[11px] ${ev.peakPps > base.peakPps * 2 ? 'bg-rose-950/40 border-rose-500/40 text-rose-100' : 'bg-slate-950 border-slate-800 text-slate-300'}">
+          <strong>Leitura:</strong> pico de ${fmtCount(ev.peakPps)} pps no evento vs. ${fmtCount(base.peakPps)} pps no baseline
+          (${ev.peakPps > 0 && base.peakPps > 0 ? 'x' + (ev.peakPps / Math.max(base.peakPps, 1)).toFixed(1) : '—'}), e pico de banda de ${fmtBitrate(ev.peakBps)} vs. ${fmtBitrate(base.peakBps)}.
+          ${sameDst
+            ? `Mesmo alvo dominante nas duas capturas: ${escapeHtml(ev.topDst)} (${Math.round(ev.topDstShare * 100)}% dos pacotes do evento).`
+            : `Alvo dominante mudou do baseline (${escapeHtml(base.topDst)}) para o evento (${escapeHtml(ev.topDst)}, ${Math.round(ev.topDstShare * 100)}% dos pacotes).`}
+          Use este trecho no laudo como evidência comparativa.
+        </div>`;
+      box.classList.remove('hidden');
+    }
+
     function renderCharts() {
       renderStatsCards();
       loadAnalystNotes();
+      refreshCompareSelects();
       if (consolidatedPackets.length === 0) return;
 
       const duration = Math.ceil(consolidatedPackets[consolidatedPackets.length - 1].relTime);
@@ -6365,19 +6508,19 @@
           data: {
             labels: timeLabels,
             datasets: [
-              { label: 'Throughput (KB/s)', data: bpsData, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
-              { label: 'Pacotes/s', data: ppsData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
+              { label: 'Throughput (KB/s)', data: bpsData, borderColor: '#92fe9d', backgroundColor: 'rgba(146, 254, 157, 0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+              { label: 'Pacotes/s', data: ppsData, borderColor: '#00c9ff', backgroundColor: 'rgba(0, 201, 255, 0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
             ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-              x: { grid: { color: '#1f2937' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-              y: { grid: { color: '#1f2937' }, ticks: { color: '#38bdf8' } },
-              y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#a855f7' } }
+              x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#898989', font: { size: 10 } } },
+              y: { grid: { color: '#1f2937' }, ticks: { color: '#00c9ff' } },
+              y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#92fe9d' } }
             },
-            plugins: { legend: { labels: { color: '#e2e8f0' } } }
+            plugins: { legend: { labels: { color: '#e9eaea' } } }
           }
         });
       }
@@ -6392,7 +6535,7 @@
           type: 'doughnut',
           data: {
             labels: Object.keys(protoCounts),
-            datasets: [{ data: Object.values(protoCounts), backgroundColor: ['#38bdf8', '#f59e0b', '#facc15', '#4ade80', '#a855f7', '#ec4899', '#818cf8', '#2dd4bf'], borderColor: '#111827' }]
+            datasets: [{ data: Object.values(protoCounts), backgroundColor: ['#00c9ff', '#92fe9d', '#898989', '#0388ad', '#45e9c4', '#6f7072', '#d3d4d5', '#0a4a60'], borderColor: '#000000' }]
           },
           options: {
             responsive: true,
@@ -6424,7 +6567,7 @@
           type: 'bar',
           data: { 
             labels: sortedSrcIps.map(i => i[0]), 
-            datasets: [{ label: 'Volume Origem (KB)', data: sortedSrcIps.map(i => (i[1] / 1024).toFixed(1)), backgroundColor: '#10b981', borderRadius: 4 }] 
+            datasets: [{ label: 'Volume Origem (KB)', data: sortedSrcIps.map(i => (i[1] / 1024).toFixed(1)), backgroundColor: '#00c9ff', borderRadius: 4 }] 
           },
           options: {
             responsive: true,
@@ -6534,7 +6677,7 @@
             labels: topProducts.map(p => p.title.split('/')[0].trim().slice(0, 20)),
             datasets: [{ 
               data: topProducts.map(p => (p.totalBytes / 1024).toFixed(1)), 
-              backgroundColor: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b'], 
+              backgroundColor: ['#92fe9d', '#00c9ff', '#45e9c4', '#f59e0b', '#f87171', '#898989', '#6f7072'], 
               borderColor: '#111827' 
             }]
           },
@@ -6558,7 +6701,7 @@
         if (topPortsChartInstance) topPortsChartInstance.destroy();
         topPortsChartInstance = new Chart(topPortsCtx, {
           type: 'bar',
-          data: { labels: sortedPorts.map(p => `Porta ${p[0]}`), datasets: [{ data: sortedPorts.map(p => p[1]), backgroundColor: '#f59e0b', borderRadius: 4 }] },
+          data: { labels: sortedPorts.map(p => `Porta ${p[0]}`), datasets: [{ data: sortedPorts.map(p => p[1]), backgroundColor: '#92fe9d', borderRadius: 4 }] },
           options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -6937,8 +7080,8 @@
           data: {
             labels: timeLabels,
             datasets: [
-              { label: 'Throughput (KB/s)', data: bpsData, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.15)', fill: true, tension: 0.3, yAxisID: 'y' },
-              { label: 'Pacotes/s', data: ppsData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.15)', fill: true, tension: 0.3, yAxisID: 'y1' }
+              { label: 'Throughput (KB/s)', data: bpsData, borderColor: '#92fe9d', backgroundColor: 'rgba(146, 254, 157, 0.15)', fill: true, tension: 0.3, yAxisID: 'y' },
+              { label: 'Pacotes/s', data: ppsData, borderColor: '#00c9ff', backgroundColor: 'rgba(0, 201, 255, 0.15)', fill: true, tension: 0.3, yAxisID: 'y1' }
             ]
           },
           options: {
@@ -6946,11 +7089,11 @@
             maintainAspectRatio: false,
             animation: false,
             scales: {
-              x: { grid: { color: '#1f2937' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-              y: { grid: { color: '#1f2937' }, ticks: { color: '#38bdf8' } },
-              y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#a855f7' } }
+              x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#898989', font: { size: 10 } } },
+              y: { grid: { color: '#1f2937' }, ticks: { color: '#00c9ff' } },
+              y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#92fe9d' } }
             },
-            plugins: { legend: { labels: { color: '#e2e8f0' } } }
+            plugins: { legend: { labels: { color: '#e9eaea' } } }
           }
         });
       }
@@ -6965,7 +7108,7 @@
           type: 'doughnut',
           data: {
             labels: Object.keys(protoCounts),
-            datasets: [{ data: Object.values(protoCounts), backgroundColor: ['#38bdf8', '#f59e0b', '#facc15', '#4ade80', '#a855f7', '#ec4899', '#818cf8', '#2dd4bf'], borderColor: '#111827' }]
+            datasets: [{ data: Object.values(protoCounts), backgroundColor: ['#00c9ff', '#92fe9d', '#898989', '#0388ad', '#45e9c4', '#6f7072', '#d3d4d5', '#0a4a60'], borderColor: '#000000' }]
           },
           options: {
             responsive: true,
@@ -6989,7 +7132,7 @@
           type: 'bar',
           data: {
             labels: sortedSrc.map(s => s[0]),
-            datasets: [{ label: 'Volume (KB)', data: sortedSrc.map(s => (s[1] / 1024).toFixed(1)), backgroundColor: '#10b981', borderRadius: 4 }]
+            datasets: [{ label: 'Volume (KB)', data: sortedSrc.map(s => (s[1] / 1024).toFixed(1)), backgroundColor: '#00c9ff', borderRadius: 4 }]
           },
           options: {
             responsive: true,
@@ -7096,7 +7239,8 @@
       }, 300);
     }
 
-    function copyExecutiveClientSummary() {
+    // Monta o texto do resumo executivo (usado por copiar, exportar .md e PDF)
+    function buildExecutiveClientSummary() {
       const clientName = document.getElementById('reportClientNameInput')?.value || 'Cliente Corporativo';
       const ref = document.getElementById('reportRefInput')?.value || 'CHAMADO-PCAP-2026';
       const total = consolidatedPackets.length;
@@ -7167,9 +7311,63 @@ ${document.getElementById('aiForensicSummaryText')?.textContent || 'Diagnóstico
 
 *PARECER DO ESPECIALISTA SOC:*
 ${analystNotes}`;
+      return summary;
+    }
 
-      navigator.clipboard.writeText(summary);
+    function copyExecutiveClientSummary() {
+      navigator.clipboard.writeText(buildExecutiveClientSummary());
       alert("Resumo executivo formatado copiado para a área de transferência!");
+    }
+
+    // Converte o resumo (texto com *negrito* e • ) em HTML para impressão/PDF
+    function executiveSummaryToHtml(txt) {
+      const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return txt.split('\n').map(line => {
+        if (!line.trim()) return '<div class="sp">&nbsp;</div>';
+        const bold = line.trim().startsWith('*') && line.trim().endsWith('*');
+        let t = esc(line).replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+        if (bold) return `<h2>${t.replace(/[ *]/g, m => m === '*' ? '' : ' ').trim().replace(/^/, '')}</h2>`;
+        return `<div>${t}</div>`;
+      }).join('');
+    }
+
+    function downloadExecutiveSummaryMd() {
+      const txt = buildExecutiveClientSummary();
+      const md = txt
+        .replace(/\*([^*]+)\*/g, '**$1**')
+        .replace(/•/g, '-')
+        .replace(/━+/g, '---');
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `relatorio-cliente-${new Date().toISOString().slice(0, 10)}.md`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showSocToast('Relatório Markdown baixado.', 'success');
+    }
+
+    function printExecutiveSummaryPdf() {
+      const txt = buildExecutiveClientSummary();
+      const w = window.open('', '_blank', 'width=820,height=900');
+      if (!w) { showSocToast('Permita pop-ups para gerar o PDF.', 'warning'); return; }
+      w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório Executivo</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; color: #111; margin: 40px; }
+          h1 { font-size: 18px; margin: 0 0 4px; }
+          .bar { height: 6px; background: linear-gradient(90deg, #92fe9d, #00c9ff); border-radius: 3px; margin: 10px 0 24px; }
+          h2 { font-size: 13px; margin: 18px 0 6px; letter-spacing: .02em; }
+          div { font-size: 12px; line-height: 1.55; }
+          .sp { height: 8px; }
+          footer { margin-top: 28px; font-size: 10px; color: #777; }
+          @media print { .noprint { display: none; } }
+        </style></head><body>
+        <h1>PCAP Analyzer — Resumo Executivo de Rede &amp; Forense</h1>
+        <div class="bar"></div>
+        ${executiveSummaryToHtml(txt)}
+        <footer>Documento gerado automaticamente pelo PCAP Analyzer · ${new Date().toLocaleString('pt-BR')}</footer>
+        <script>window.onload = () => { setTimeout(() => window.print(), 250); };<\/script>
+        </body></html>`);
+      w.document.close();
     }
 
 
@@ -10328,7 +10526,13 @@ ${analystNotes}`;
     }
 
     function computeTriageMetrics(binSec, sampling) {
-      const ipPkts = consolidatedPackets.filter(p => p.ipProto !== undefined && p.ipProto !== null);
+      // Respeita o arquivo selecionado no cabeçalho (evita diluir métricas ao
+      // concatenar capturas de épocas diferentes no modo "Todos os Arquivos")
+      let scopePkts = consolidatedPackets;
+      if (currentSelectedFile !== 'ALL' && loadedFilesMap.has(currentSelectedFile)) {
+        scopePkts = loadedFilesMap.get(currentSelectedFile).packets;
+      }
+      const ipPkts = scopePkts.filter(p => p.ipProto !== undefined && p.ipProto !== null);
       const res = { binSec, sampling, totalPkts: 0, totalBytes: 0, start: 0, end: 0, duration: 0, global: newTriageBucket(), perDst: new Map(), binNote: '' };
       if (ipPkts.length === 0) return res;
 
@@ -10620,7 +10824,7 @@ ${analystNotes}`;
         const v = vb ? (vb.bins.get(i) || { pkts: 0 }) : { pkts: 0 };
         victimPps.push(v.pkts * t.sampling / t.binSec);
       }
-      document.getElementById('triageChartScope').textContent = `(janela ${t.binSec}s${t.sampling > 1 ? `, amostragem 1:${t.sampling}` : ''})`;
+      document.getElementById('triageChartScope').textContent = `(${currentSelectedFile === 'ALL' ? 'todos os arquivos' : currentSelectedFile} · janela ${t.binSec}s${t.sampling > 1 ? `, amostragem 1:${t.sampling}` : ''})`;
 
       if (triageChartInstance) triageChartInstance.destroy();
       triageChartInstance = new Chart(canvas.getContext('2d'), {
@@ -10628,7 +10832,7 @@ ${analystNotes}`;
         data: {
           labels,
           datasets: [
-            { label: 'pps total', data: pps, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.10)', fill: true, pointRadius: 0, borderWidth: 1.5, yAxisID: 'y', stepped: true },
+            { label: 'pps total', data: pps, borderColor: '#00c9ff', backgroundColor: 'rgba(0,201,255,0.10)', fill: true, pointRadius: 0, borderWidth: 1.5, yAxisID: 'y', stepped: true },
             { label: `pps → ${g_triageSelectedDst || ''}`, data: victimPps, borderColor: '#fb923c', pointRadius: 0, borderWidth: 1.5, yAxisID: 'y', stepped: true },
             { label: 'Mbps total', data: mbps, borderColor: '#a78bfa', borderDash: [4, 3], pointRadius: 0, borderWidth: 1.2, yAxisID: 'y1', stepped: true }
           ]
@@ -11134,9 +11338,14 @@ ${analystNotes}`;
     }
 
     function computeDdosAnalysis(victim, prof, binSec) {
+      // Escopo: respeita o arquivo selecionado (consistente com a Triagem)
+      let ddosScopePkts = consolidatedPackets;
+      if (currentSelectedFile !== 'ALL' && loadedFilesMap.has(currentSelectedFile)) {
+        ddosScopePkts = loadedFilesMap.get(currentSelectedFile).packets;
+      }
       const toVictim = [], fromVictim = [];
       let start = Infinity, end = -Infinity;
-      for (const p of consolidatedPackets) {
+      for (const p of ddosScopePkts) {
         if (p.ipProto === undefined || p.ipProto === null) continue;
         if (p.dst === victim) toVictim.push(p);
         else if (p.src === victim) fromVictim.push(p);
@@ -11150,11 +11359,16 @@ ${analystNotes}`;
       if (res.duration / binSec > TRIAGE_MAX_CHART_POINTS) res.binSec = Math.ceil(res.duration / TRIAGE_MAX_CHART_POINTS);
 
       // O que a vítima enviou: por origem/porta, para medir resposta, amplificação e sessões
-      const victimSentTo = new Map();      // peer -> bytes
+      const victimSentTo = new Map();      // peer -> bytes (exclui ICMP: resposta de erro a flood não é sessão)
+      const victimIcmpTo = new Map();      // peer -> nº de respostas ICMP (sintoma de flood)
       const victimSentPort = new Map();    // `${peer}|${dport}` -> bytes (requisições UDP a serviços)
       let victimSyns = 0, victimSynAcks = 0, victimDnsResp = 0, victimNx = 0;
       for (const p of fromVictim) {
         const len = p.origLength || p.length || 0;
+        if (p.ipProto === 1 || p.ipProto === 58) {
+          victimIcmpTo.set(p.dst, (victimIcmpTo.get(p.dst) || 0) + 1);
+          continue;
+        }
         victimSentTo.set(p.dst, (victimSentTo.get(p.dst) || 0) + len);
         if (p.ipProto === 17 && p.dstPort != null) {
           const k = `${p.dst}|${p.dstPort}`;
@@ -11274,13 +11488,28 @@ ${analystNotes}`;
             indicators.push('Combinação de flags TCP que não ocorre em tráfego legítimo');
           }
         } else if (baseKey === 'udp_flood' || baseKey === 'quic_flood') {
-          let back = 0;
-          g.srcs.forEach((_, s) => { back += victimSentTo.get(s) || 0; });
+          let back = 0, icmpBack = 0;
+          g.srcs.forEach((_, s) => { back += victimSentTo.get(s) || 0; icmpBack += victimIcmpTo.get(s) || 0; });
           const backRatio = g.bytes ? back / g.bytes : 0;
+          // Assinatura de flood mesmo com serviço respondendo: cada pacote chega de uma
+          // porta de origem nova (socket efêmero por pacote), o que não ocorre em fluxo legítimo
+          const newFlowPerPkt = g.sports.size / g.pkts >= 0.9 && g.sports.size >= 20;
           if (bigEnough && backRatio < 0.1) {
             attack = true; confidence = 65;
             if (baseKey === 'udp_flood') techKey = g.dports.size >= 20 ? 'udp_flood_random' : 'udp_flood_port';
             indicators.push(`Tráfego praticamente unidirecional: a vítima devolveu ${(backRatio * 100).toFixed(1)}% dos bytes recebidos`);
+            indicators.push(`${g.dports.size} porta(s) de destino distintas${g.dports.size < 20 ? ` (principal: ${topOf(g.dports)[0][0]})` : ''}`);
+            if (icmpBack > g.pkts * 0.3) indicators.push(`A vítima emitiu ${fmtCount(icmpBack)} respostas ICMP a ${g.srcs.size} origem(ns) do flood (porta inacessível): sintoma do ataque`);
+          } else if (bigEnough && newFlowPerPkt) {
+            attack = true; confidence = 75;
+            if (baseKey === 'udp_flood') techKey = g.dports.size >= 20 ? 'udp_flood_random' : 'udp_flood_port';
+            indicators.push(`${fmtCount(g.sports.size)} portas de origem distintas em ${fmtCount(g.pkts)} pacotes: um fluxo novo por pacote (socket efêmero a cada envio) — assinatura de ferramenta de flood, não de sessão legítima`);
+            indicators.push(`Mesmo com o serviço respondendo (razão de retorno ${(backRatio * 100).toFixed(0)}%), o padrão de portas revela flood gerado por ferramenta`);
+            if (icmpBack > g.pkts * 0.1) indicators.push(`A vítima emitiu ${fmtCount(icmpBack)} respostas ICMP de erro (porta inacessível), típico de pacotes a serviços indisponíveis`);
+          } else if (bigEnough && icmpBack > g.pkts * 0.5) {
+            attack = true; confidence = 60;
+            if (baseKey === 'udp_flood') techKey = g.dports.size >= 20 ? 'udp_flood_random' : 'udp_flood_port';
+            indicators.push(`A vítima respondeu a ${fmtCount(icmpBack)} de ${fmtCount(g.pkts)} pacotes com ICMP de erro (porta inacessível): serviços sob o alvo não existem ou estão sobrecarregados`);
             indicators.push(`${g.dports.size} porta(s) de destino distintas${g.dports.size < 20 ? ` (principal: ${topOf(g.dports)[0][0]})` : ''}`);
           }
         } else if (baseKey === 'dns_query') {
@@ -11350,14 +11579,18 @@ ${analystNotes}`;
     // ABA DDoS: RENDERIZAÇÃO
     // =========================================================================================
     let g_ddosVictimCache = { sig: null, list: [] };
-    const DDOS_COLORS = ['#f43f5e', '#f59e0b', '#a855f7', '#38bdf8', '#10b981', '#ec4899', '#eab308', '#6366f1'];
+    const DDOS_COLORS = ['#f87171', '#fbbf24', '#92fe9d', '#00c9ff', '#fb923c', '#d3d4d5', '#6ee7b7', '#898989'];
 
     // Lista de alvos candidatos: os 10 destinos com mais tráfego, ordenados pelo volume classificado como ataque
     function ddosVictimCandidates(prof) {
-      const sig = `${consolidatedPackets.length}|${prof.key}`;
+      let candPkts = consolidatedPackets;
+      if (currentSelectedFile !== 'ALL' && loadedFilesMap.has(currentSelectedFile)) {
+        candPkts = loadedFilesMap.get(currentSelectedFile).packets;
+      }
+      const sig = `${candPkts.length}|${prof.key}|${currentSelectedFile}`;
       if (g_ddosVictimCache.sig === sig) return g_ddosVictimCache.list;
       const counts = new Map();
-      for (const p of consolidatedPackets) {
+      for (const p of candPkts) {
         if (p.ipProto === undefined || p.ipProto === null || !p.dst) continue;
         counts.set(p.dst, (counts.get(p.dst) || 0) + 1);
       }
@@ -11511,7 +11744,7 @@ ${analystNotes}`;
         borderColor: DDOS_COLORS[i], backgroundColor: DDOS_COLORS[i] + '55', fill: true, pointRadius: 0, borderWidth: 1.2, stepped: true
       }));
       const legit = labels.map((_, bi) => a.nonAttack.reduce((s, v) => s + (v.bins.get(bi)?.pkts || 0), 0) / a.binSec);
-      series.push({ label: 'Demais tráfegos', data: legit, borderColor: '#64748b', backgroundColor: 'rgba(100,116,139,0.25)', fill: true, pointRadius: 0, borderWidth: 1, stepped: true });
+      series.push({ label: 'Demais tráfegos', data: legit, borderColor: '#6f7072', backgroundColor: 'rgba(111,112,114,0.25)', fill: true, pointRadius: 0, borderWidth: 1, stepped: true });
       document.getElementById('ddosChartNote').textContent = `janela ${a.binSec}s • empilhado`;
       if (ddosChartInstance) ddosChartInstance.destroy();
       ddosChartInstance = new Chart(canvas.getContext('2d'), {
