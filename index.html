@@ -418,7 +418,7 @@
           <i data-lucide="arrow-down-up" class="w-3 h-3 text-cyan-400"></i>
           <span>Ordenar:</span>
         </span>
-        <select id="globalSortSelect" onchange="handleSortOptionChange(this.value)" class="bg-transparent text-cyan-300 text-xs font-mono outline-none cursor-pointer">
+        <select id="globalSortSelect" onchange="handleSortOptionChange(this.value)" class="bg-transparent text-cyan-300 text-xs outline-none cursor-pointer">
           <option value="frequency_desc">Mais Ocorridas (Maior -> Menor)</option>
           <option value="bytes_desc">Maior Volume (Bytes: Maior -> Menor)</option>
           <option value="threats_first">Ameaças & Suspeitos Primeiro</option>
@@ -428,15 +428,15 @@
 
       <!-- Quick Filter Tags -->
       <div class="flex items-center space-x-1">
-        <button onclick="setQuickFilter('')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 text-[11px] font-mono transition-all active">TODOS</button>
-        <button onclick="setQuickFilter('verdict == suspicious')" class="quick-filter-btn px-2 py-1 rounded bg-red-950/40 text-red-400 border border-red-500/30 hover:bg-red-900/40 text-[11px] font-mono transition-all flex items-center space-x-1">
+        <button onclick="setQuickFilter('')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 text-[11px] transition-all active">TODOS</button>
+        <button onclick="setQuickFilter('verdict == suspicious')" class="quick-filter-btn px-2 py-1 rounded bg-red-950/40 text-red-400 border border-red-500/30 hover:bg-red-900/40 text-[11px] transition-all flex items-center space-x-1">
           <i data-lucide="shield-alert" class="w-3 h-3"></i>
           <span>SUSPEITOS</span>
         </button>
-        <button onclick="setQuickFilter('verdict == legitimate')" class="quick-filter-btn px-2 py-1 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/40 text-[11px] font-mono transition-all">LÍCITOS</button>
-        <button onclick="setQuickFilter('service == google')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-cyan-300 border border-slate-700 text-[11px] font-mono transition-all">GOOGLE</button>
-        <button onclick="setQuickFilter('service == microsoft')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-blue-300 border border-slate-700 text-[11px] font-mono transition-all">MICROSOFT</button>
-        <button onclick="setQuickFilter('dns')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800/80 text-yellow-300 border border-yellow-500/20 hover:bg-yellow-950/40 text-[11px] font-mono transition-all">DNS</button>
+        <button onclick="setQuickFilter('verdict == legitimate')" class="quick-filter-btn px-2 py-1 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/40 text-[11px] transition-all">LÍCITOS</button>
+        <button onclick="setQuickFilter('service == google')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-cyan-300 border border-slate-700 text-[11px] transition-all">GOOGLE</button>
+        <button onclick="setQuickFilter('service == microsoft')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800 text-blue-300 border border-slate-700 text-[11px] transition-all">MICROSOFT</button>
+        <button onclick="setQuickFilter('dns')" class="quick-filter-btn px-2 py-1 rounded bg-slate-800/80 text-yellow-300 border border-yellow-500/20 hover:bg-yellow-950/40 text-[11px] transition-all">DNS</button>
       </div>
     </div>
   </section>
@@ -543,7 +543,7 @@
               <i data-lucide="folder-tree" class="w-3.5 h-3.5 text-cyan-400"></i>
               <span>Árvore de Protocolos & Inteligência de Serviço</span>
             </div>
-            <span id="selectedPacketBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded">Nenhum selecionado</span>
+            <span id="selectedPacketBadge" class="text-[10px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded">Nenhum selecionado</span>
           </div>
           <div id="protocolTreeContainer" class="flex-1 p-3 overflow-y-auto font-mono text-xs text-slate-300 space-y-2">
             <div class="text-slate-500 italic text-center py-6">Selecione um pacote na lista acima</div>
@@ -588,7 +588,7 @@
           <!-- Flow Sort Options -->
           <div class="flex items-center space-x-1 bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-700 text-xs">
             <span class="text-slate-400 font-semibold">Ordenar Fluxos:</span>
-            <select id="flowSortSelect" onchange="renderFlowsTable()" class="bg-transparent text-cyan-300 font-mono outline-none cursor-pointer">
+            <select id="flowSortSelect" onchange="renderFlowsTable()" class="bg-transparent text-cyan-300 outline-none cursor-pointer">
               <option value="packets_desc">Mais Ocorridas (Maior -> Menor)</option>
               <option value="bytes_desc">Maior Volume (KB: Maior -> Menor)</option>
               <option value="threats_first">Suspeitos / Alertas Primeiro</option>
@@ -676,7 +676,7 @@
           <div>
             <h3 class="text-sm font-bold text-white flex items-center space-x-2">
               <span>Classificação Inteligente & Threat Intelligence</span>
-              <span class="px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full font-mono">IA + APIs GeoIP/Abuse</span>
+              <span class="px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">IA + APIs GeoIP/Abuse</span>
             </h3>
             <p class="text-xs text-slate-400">Identificação automática de serviços lícitos (Google, Microsoft, AWS, Telefônica, VoIP) vs anomalias, scans e conexões de risco.</p>
           </div>
@@ -735,7 +735,7 @@
                 <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>Sentido:</span>
               </span>
-              <select id="corrDirectionSelect" onchange="renderCorrelationView()" class="bg-transparent text-cyan-300 font-mono outline-none cursor-pointer font-bold">
+              <select id="corrDirectionSelect" onchange="renderCorrelationView()" class="bg-transparent text-cyan-300 outline-none cursor-pointer font-bold">
                 <option value="all">Todas as Conexões</option>
                 <option value="inbound">Apenas Origem (Inbound / Emissores)</option>
                 <option value="outbound">Apenas Destino (Outbound / Alvos)</option>
@@ -749,7 +749,7 @@
                 <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
                 <span>Status / Risco:</span>
               </span>
-              <select id="corrVerdictSelect" onchange="renderCorrelationView()" class="bg-transparent text-emerald-300 font-mono outline-none cursor-pointer font-bold">
+              <select id="corrVerdictSelect" onchange="renderCorrelationView()" class="bg-transparent text-emerald-300 outline-none cursor-pointer font-bold">
                 <option value="all">Todos os Status</option>
                 <option value="legitimate">Apenas Lícitos / Confiáveis</option>
                 <option value="uncommon">Apenas Incomuns / Atenção</option>
@@ -764,7 +764,7 @@
                 <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 text-indigo-400"></i>
                 <span>Ordenar:</span>
               </span>
-              <select id="ipSortSelect" onchange="renderCorrelationView()" class="bg-transparent text-slate-200 font-mono outline-none cursor-pointer font-bold">
+              <select id="ipSortSelect" onchange="renderCorrelationView()" class="bg-transparent text-slate-200 outline-none cursor-pointer font-bold">
                 <option value="occurrences_desc">Mais Frequentes (Maior -> Menor)</option>
                 <option value="bytes_desc">Maior Volume de Dados</option>
                 <option value="threats_first">Ameaças & Suspeitos Primeiro</option>
@@ -787,7 +787,7 @@
         <div onclick="setCorrVerdictFilter('legitimate')" class="bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-500/60 rounded-md p-4 flex items-center justify-between cursor-pointer transition-all">
           <div>
             <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Comunicações Lícitas / Comuns</div>
-            <div id="countLegitCommunications" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+            <div id="countLegitCommunications" class="text-2xl font-bold text-white mt-1">0</div>
             <p class="text-[11px] text-slate-400 mt-1">Clique para isolar tráfego lícito</p>
           </div>
           <div class="p-3 bg-emerald-500/10 rounded-md text-emerald-400">
@@ -798,7 +798,7 @@
         <div onclick="setCorrVerdictFilter('uncommon')" class="bg-slate-900/90 border border-amber-500/30 hover:border-amber-500/60 rounded-md p-4 flex items-center justify-between cursor-pointer transition-all">
           <div>
             <div class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Comunicações Incomuns / Atenção</div>
-            <div id="countUncommonCommunications" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+            <div id="countUncommonCommunications" class="text-2xl font-bold text-white mt-1">0</div>
             <p class="text-[11px] text-slate-400 mt-1">Portas não padrão ou sem DNS</p>
           </div>
           <div class="p-3 bg-amber-500/10 rounded-md text-amber-400">
@@ -875,7 +875,7 @@
           </label>
           <label class="flex items-center space-x-1.5 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800" title="Mesmo perfil de sensibilidade do IoC Scanner">
             <span class="text-slate-400">Sensibilidade:</span>
-            <select id="ddosSensitivitySelect" onchange="renderDdosView()" class="bg-transparent text-cyan-300 font-mono outline-none cursor-pointer">
+            <select id="ddosSensitivitySelect" onchange="renderDdosView()" class="bg-transparent text-cyan-300 outline-none cursor-pointer">
               <option value="auto">Auto</option>
               <option value="alta">Alta</option>
               <option value="normal">Normal</option>
@@ -1038,7 +1038,7 @@
           <span class="text-slate-700 mx-1">|</span>
 
           <span class="text-[11px] text-slate-400 font-semibold uppercase mr-1">Categoria:</span>
-          <select id="iocCategorySelect" onchange="filterIocByCategory(this.value)" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-mono rounded px-2 py-1 outline-none cursor-pointer">
+          <select id="iocCategorySelect" onchange="filterIocByCategory(this.value)" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 outline-none cursor-pointer">
             <option value="ALL">Todas as Categorias</option>
             <option value="scan">Varredura & Scans</option>
             <option value="volumetric">DDoS Volumétrico & Amp</option>
@@ -1051,7 +1051,7 @@
           <span class="text-slate-700 mx-1">|</span>
 
           <span class="text-[11px] text-slate-400 font-semibold uppercase mr-1" title="Limiares mínimos de detecção. Auto = Alta para capturas pequenas (&lt; 1.000 pacotes), Normal para as demais.">Sensibilidade:</span>
-          <select id="iocSensitivitySelect" onchange="renderIocScanner()" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-mono rounded px-2 py-1 outline-none cursor-pointer">
+          <select id="iocSensitivitySelect" onchange="renderIocScanner()" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 outline-none cursor-pointer">
             <option value="auto">Auto</option>
             <option value="alta">Alta (amostras pequenas)</option>
             <option value="normal">Normal</option>
@@ -1068,7 +1068,7 @@
             <i data-lucide="list-checks" class="w-4 h-4 text-red-400"></i>
             <h4 class="text-xs font-bold text-white uppercase tracking-wider">Evidências Forenses & Playbooks de Mitigação Arbor</h4>
           </div>
-          <div class="flex items-center space-x-3 text-xs font-mono">
+          <div class="flex items-center space-x-3 text-xs">
             <span id="iocFilteredBadge" class="text-slate-400">0 exibidas</span>
             <span class="text-slate-600">•</span>
             <span id="iocTotalBadge" class="text-red-400 font-bold">0 evidências detectadas</span>
@@ -1101,7 +1101,7 @@
               <i data-lucide="network" class="w-4 h-4 text-purple-400"></i>
               <span>IPs Compartilhados em Múltiplos Arquivos</span>
             </h4>
-            <span class="text-[10px] text-slate-400 font-mono">Presente em 2+ PCAPs</span>
+            <span class="text-[10px] text-slate-400">Presente em 2+ PCAPs</span>
           </div>
           <div id="sharedIpsContainer" class="space-y-2 max-h-96 overflow-y-auto font-mono text-xs">
             <div class="text-slate-500 italic text-center py-6">Nenhum IP compartilhado detectado</div>
@@ -1115,7 +1115,7 @@
               <i data-lucide="globe-2" class="w-4 h-4 text-cyan-400"></i>
               <span>Domínios (DNS / TLS SNI) Compartilhados</span>
             </h4>
-            <span class="text-[10px] text-slate-400 font-mono">Presente em 2+ PCAPs</span>
+            <span class="text-[10px] text-slate-400">Presente em 2+ PCAPs</span>
           </div>
           <div id="sharedDomainsContainer" class="space-y-2 max-h-96 overflow-y-auto font-mono text-xs">
             <div class="text-slate-500 italic text-center py-6">Nenhum domínio compartilhado detectado</div>
@@ -1135,7 +1135,7 @@
             <i data-lucide="layers" class="w-4 h-4 text-cyan-300"></i>
           </div>
           <div id="statTotalPackets" class="kpi-value">0</div>
-          <div id="statFilteredPackets" class="text-[10px] text-slate-400 mt-1 font-mono">100% visíveis</div>
+          <div id="statFilteredPackets" class="text-[10px] text-slate-400 mt-1">100% visíveis</div>
         </div>
 
         <div class="kpi-card">
@@ -1144,7 +1144,7 @@
             <i data-lucide="hard-drive" class="w-4 h-4 text-cyan-300"></i>
           </div>
           <div id="statTotalBytes" class="kpi-value">0 KB</div>
-          <div id="statAvgPacketSize" class="text-[10px] text-slate-400 mt-1 font-mono">Média: 0 B</div>
+          <div id="statAvgPacketSize" class="text-[10px] text-slate-400 mt-1">Média: 0 B</div>
         </div>
 
         <div class="kpi-card">
@@ -1153,7 +1153,7 @@
             <i data-lucide="gauge" class="w-4 h-4 text-cyan-300"></i>
           </div>
           <div id="statPeakPps" class="kpi-value">0</div>
-          <div class="text-[10px] text-slate-400 mt-1 font-mono">pacotes/s na janela de 1 s</div>
+          <div class="text-[10px] text-slate-400 mt-1">pacotes/s na janela de 1 s</div>
         </div>
 
         <div class="kpi-card">
@@ -1162,7 +1162,7 @@
             <i data-lucide="activity" class="w-4 h-4 text-cyan-300"></i>
           </div>
           <div id="statPeakBps" class="kpi-value">0</div>
-          <div class="text-[10px] text-slate-400 mt-1 font-mono">taxa de transmissão máxima</div>
+          <div class="text-[10px] text-slate-400 mt-1">taxa de transmissão máxima</div>
         </div>
 
         <div onclick="switchView('triage')" class="kpi-card cursor-pointer hover:brightness-125 transition-all" title="Abrir Triagem (Nível 1)">
@@ -1171,7 +1171,7 @@
             <i data-lucide="triangle-alert" class="w-4 h-4 text-amber-300"></i>
           </div>
           <div id="statTriageSignals" class="kpi-value">—</div>
-          <div class="text-[10px] text-slate-400 mt-1 font-mono">da triagem: alvo, rajada, spoofing</div>
+          <div class="text-[10px] text-slate-400 mt-1">da triagem: alvo, rajada, spoofing</div>
         </div>
 
         <!-- Interactive Threat Card -->
@@ -1204,7 +1204,7 @@
         </div>
 
         <!-- Direction Breakdown Badges -->
-        <div class="flex items-center space-x-3 text-xs font-mono">
+        <div class="flex items-center space-x-3 text-xs">
           <div class="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-emerald-500/30">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span class="text-slate-400">Inbound (Entrada):</span>
@@ -1313,7 +1313,7 @@
           </div>
           <div class="mt-3 pt-2.5 border-t border-indigo-500/20 flex items-center justify-between text-[11px] text-indigo-200/80">
             <span>Base de Heurísticas: <strong>Threat Intel + APIs + Assinaturas de Protocolos</strong></span>
-            <span class="text-indigo-400 font-mono">Consenso Ativo</span>
+            <span class="text-indigo-400">Consenso Ativo</span>
           </div>
         </div>
 
@@ -1489,7 +1489,7 @@
       <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-semibold text-slate-200">Taxa ao longo do tempo <span id="triageChartScope" class="text-slate-400 font-normal"></span></span>
-          <span class="text-[10px] text-slate-500 font-mono">pps (esq.) • Mbps (dir.)</span>
+          <span class="text-[10px] text-slate-500">pps (esq.) • Mbps (dir.)</span>
         </div>
         <div class="relative h-56"><canvas id="triageRateChart"></canvas></div>
       </div>
@@ -1520,7 +1520,7 @@
         <!-- Detalhe da vítima -->
         <div class="xl:col-span-2 bg-cyber-card border border-cyber-border rounded-md p-3 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-200">Perfil do tráfego para <span id="triageDetailTarget" class="text-cyan-300 font-mono">—</span></span>
+            <span class="text-xs font-semibold text-slate-200">Perfil do tráfego para <span id="triageDetailTarget" class="text-cyan-300">—</span></span>
             <button onclick="applyTriageVictimFilter()" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:text-white" title="Filtrar a tabela de pacotes por este destino">Ver pacotes</button>
           </div>
           <div id="triageDetail" class="space-y-3 text-[11px]"></div>
@@ -1671,7 +1671,7 @@
           <div>
             <div class="flex items-center space-x-2">
               <h3 class="text-sm font-bold text-white">Central de Engenharia BGP, Auditoria de Mitigação & Detecção Forense</h3>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">v3.0 ISP PRO</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">v6</span>
             </div>
             <p class="text-xs text-slate-400">LGView-NG (Verificador de Prefix Leaks & AS-PATH) • MANRS Observatory v2 • LoopHunter (Loops Estáticos) • AmpScan (23 Vetores de Amplificação)</p>
           </div>
@@ -1737,17 +1737,17 @@
           <!-- Input Fields -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             <div>
-              <label class="block text-slate-400 font-mono text-[10px] mb-1">Prefixo Sob Mitigação:</label>
+              <label class="block text-slate-400 text-[10px] mb-1">Prefixo Sob Mitigação:</label>
               <input type="text" id="lgPrefixInput" value="177.11.98.0/24" placeholder="Ex: 177.11.98.0/24 ou IPv6"
                      class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-cyan-300 font-mono text-xs outline-none focus:border-cyan-500">
             </div>
             <div>
-              <label class="block text-slate-400 font-mono text-[10px] mb-1">ASN Mitigação (Scrubber/TMS):</label>
+              <label class="block text-slate-400 text-[10px] mb-1">ASN da operadora (TMS/Sightline — você):</label>
               <input type="text" id="lgAsnMitigationInput" value="264409" placeholder="Ex: 264409 (Huge/TMS)"
                      class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-amber-300 font-mono text-xs outline-none focus:border-amber-500">
             </div>
             <div>
-              <label class="block text-slate-400 font-mono text-[10px] mb-1">ASN Mitigado (Cliente/Rede):</label>
+              <label class="block text-slate-400 text-[10px] mb-1">ASN do cliente:</label>
               <input type="text" id="lgAsnMitigatedInput" value="262875" placeholder="Ex: 262875"
                      class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-emerald-300 font-mono text-xs outline-none focus:border-emerald-500">
             </div>
@@ -1786,7 +1786,7 @@
               <div>
                 <h4 class="text-sm font-bold text-white flex items-center space-x-2">
                   <span>MANRS Observatory • Postura de Roteamento & RPKI</span>
-                  <span class="px-2 py-0.2 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">API v2 CONECTADA</span>
+                  <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">API v2 CONECTADA</span>
                 </h4>
                 <p class="text-[11px] text-slate-400">Auditoria oficial da Internet Society: Anti-Spoofing, Filtragem, ROAs/RPKI e incidentes MOAS.</p>
               </div>
@@ -1799,10 +1799,10 @@
           <!-- ASN Input & Trigger -->
           <div class="flex items-center space-x-2 text-xs">
             <div class="flex-1">
-              <label class="block text-slate-400 font-mono text-[10px] mb-1">ASN para Auditoria:</label>
+              <label class="block text-slate-400 text-[10px] mb-1">ASN para auditoria:</label>
               <div class="flex items-center space-x-2">
                 <div class="relative flex-1">
-                  <span class="absolute left-2.5 top-1.5 text-slate-500 font-mono">AS</span>
+                  <span class="absolute left-2.5 top-1.5 text-slate-500">AS</span>
                   <input type="number" id="manrsAsnInput" value="264409" placeholder="Ex: 264409 ou 13335"
                          class="w-full bg-slate-950 border border-slate-700 rounded pl-8 pr-2.5 py-1.5 text-emerald-300 font-mono text-xs outline-none focus:border-emerald-500">
                 </div>
@@ -1850,7 +1850,7 @@
           </div>
 
           <!-- Live Loop Status Banner -->
-          <div id="loopHunterStatusBanner" class="p-3 bg-slate-950 rounded-md border border-slate-800 text-xs font-mono flex items-center justify-between">
+          <div id="loopHunterStatusBanner" class="p-3 bg-slate-950 rounded-md border border-slate-800 text-xs flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span id="loopHunterIndicator" class="w-3 h-3 rounded-full bg-emerald-500"></span>
               <span id="loopHunterStatusText" class="text-slate-200 font-semibold">Nenhum loop estático detectado no PCAP atual.</span>
@@ -1936,7 +1936,7 @@
   </main>
 
   <!-- BOTTOM STATUS BAR -->
-  <footer class="bg-cyber-card border-t border-cyber-border px-4 py-1.5 flex items-center justify-between text-xs text-slate-400 font-mono select-none">
+  <footer class="bg-cyber-card border-t border-cyber-border px-4 py-1.5 flex items-center justify-between text-xs text-slate-400 select-none">
     <div class="flex items-center space-x-4">
       <div class="flex items-center space-x-1.5">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -2106,7 +2106,7 @@
           <div>
             <div class="flex items-center space-x-2">
               <h2 class="text-base font-bold text-white tracking-wide uppercase">Relatório Executivo de Tráfego & Inteligência de Ameaças</h2>
-              <span class="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-mono font-bold">CLIENT REPORT</span>
+              <span class="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-bold">LAUDO DO CLIENTE</span>
             </div>
             <p class="text-xs text-slate-300 mt-0.5">Visão consolidada para apresentação ao cliente • Classificação de serviços e vetores de risco</p>
           </div>
@@ -2306,7 +2306,7 @@
 
       <!-- Modal Footer -->
       <div class="bg-slate-900 px-6 py-3 border-t border-slate-800 flex items-center justify-between text-xs no-print">
-        <span class="text-slate-400 font-mono">Relatório pronto para envio e apresentação executiva</span>
+        <span class="text-slate-400">Relatório pronto para envio e apresentação executiva</span>
         <div class="flex items-center space-x-2">
           <button onclick="printClientReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg flex items-center space-x-1.5">
             <i data-lucide="printer" class="w-4 h-4"></i>
@@ -2352,17 +2352,17 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div class="bg-slate-950 p-4 rounded-md border border-red-500/30">
             <div class="text-xs font-semibold text-red-400 uppercase">TCP Resets (RST)</div>
-            <div id="modalRstCount" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+            <div id="modalRstCount" class="text-2xl font-bold text-white mt-1">0</div>
             <p class="text-[11px] text-slate-400 mt-1">Conexões abortadas ou portas fechadas</p>
           </div>
           <div class="bg-slate-950 p-4 rounded-md border border-amber-500/30">
             <div class="text-xs font-semibold text-amber-400 uppercase">Varreduras de Portas (Scans)</div>
-            <div id="modalScanCount" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+            <div id="modalScanCount" class="text-2xl font-bold text-white mt-1">0</div>
             <p class="text-[11px] text-slate-400 mt-1">Sondas consecutivas em múltiplas portas</p>
           </div>
           <div class="bg-slate-950 p-4 rounded-md border border-purple-500/30">
             <div class="text-xs font-semibold text-purple-400 uppercase">IPs de Risco / Reputação</div>
-            <div id="modalRiskyIpsCount" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+            <div id="modalRiskyIpsCount" class="text-2xl font-bold text-white mt-1">0</div>
             <p class="text-[11px] text-slate-400 mt-1">Identificados por regras ou AbuseIPDB</p>
           </div>
         </div>
@@ -2371,7 +2371,7 @@
         <div class="bg-slate-950 rounded-md border border-cyber-border overflow-hidden">
           <div class="bg-slate-900/80 px-4 py-2.5 border-b border-cyber-border flex items-center justify-between text-xs font-semibold text-slate-300">
             <span>Lista de Eventos e Indicadores Suspeitos</span>
-            <span class="text-[11px] font-mono text-slate-400">Clique em 'Isolar' para analisar no painel</span>
+            <span class="text-[11px] text-slate-400">Clique em 'Isolar' para analisar no painel</span>
           </div>
           <div id="modalThreatEventsList" class="p-3 divide-y divide-slate-800/80 max-h-72 overflow-y-auto font-mono text-xs space-y-2">
             <!-- Dynamically populated threat cards -->
@@ -2408,8 +2408,8 @@
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h3 class="text-sm font-bold text-white font-mono">Dossiê de Threat Intelligence & Reconhecimento</h3>
-              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">v3.0</span>
+              <h3 class="text-sm font-bold text-white">Dossiê de Threat Intelligence & Reconhecimento</h3>
+              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">v6</span>
             </div>
             <p class="text-[11px] text-slate-400">Pulsedive IoC Intelligence • MANRS • RDAP • AbuseIPDB</p>
           </div>
@@ -2423,9 +2423,9 @@
       <div class="mt-4 p-3.5 bg-slate-950 border border-slate-800 rounded-md flex flex-wrap items-center justify-between gap-3">
         <div class="space-y-1">
           <div class="flex items-center space-x-2">
-            <span class="text-xs text-slate-400 font-mono">IP Alvo:</span>
+            <span class="text-xs text-slate-400">IP alvo:</span>
             <span id="tiModalIp" class="text-base font-bold font-mono text-cyan-300 select-all">0.0.0.0</span>
-            <span id="tiModalRiskBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300">AVALIANDO</span>
+            <span id="tiModalRiskBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">AVALIANDO</span>
           </div>
           <div class="text-[11px] text-slate-400 font-mono flex items-center space-x-3">
             <span>Provedor: <strong id="tiModalProvider" class="text-slate-200">-</strong></span>
@@ -2449,12 +2449,12 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <span class="font-bold text-slate-200 font-mono flex items-center space-x-1.5">
+              <span class="font-bold text-slate-200 flex items-center space-x-1.5">
                 <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
                 <span>Pulsedive Threat Intelligence (API Integrada)</span>
               </span>
             </div>
-            <span id="pdStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">100% OPERACIONAL</span>
+            <span id="pdStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">100% OPERACIONAL</span>
           </div>
 
           <div id="pdContentContainer" class="space-y-2 text-slate-300">
@@ -2498,12 +2498,12 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <span class="font-bold text-slate-200 font-mono flex items-center space-x-1.5">
+              <span class="font-bold text-slate-200 flex items-center space-x-1.5">
                 <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
                 <span>MANRS Observatory • Postura de Roteamento BGP & RPKI</span>
               </span>
             </div>
-            <span id="tiModalManrsStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">MANRS V2</span>
+            <span id="tiModalManrsStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">MANRS V2</span>
           </div>
 
           <div id="tiModalManrsDetails" class="space-y-2 text-[11px] font-mono">
@@ -2540,7 +2540,7 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-              <span class="font-bold text-amber-200 font-mono flex items-center space-x-1.5">
+              <span class="font-bold text-amber-200 flex items-center space-x-1.5">
                 <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
                 <span id="tiModalAmpScanTitle">AmpScan • Vetor de Reflexão Identificado</span>
               </span>
@@ -2561,21 +2561,21 @@
 
         <!-- 4. Outras Fontes de Threat Intelligence (VirusTotal, AbuseIPDB, Shodan) -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-md p-3.5">
-          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 font-mono">Pivots Adicionais de Cibersegurança & OSINT:</div>
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Pivots Adicionais de Cibersegurança & OSINT:</div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button onclick="pivotActiveIpToVirusTotal()" class="p-2 bg-slate-950 hover:bg-slate-800 text-purple-300 border border-purple-500/30 rounded-lg text-[11px] font-mono font-semibold flex items-center justify-center space-x-1 transition-all">
+            <button onclick="pivotActiveIpToVirusTotal()" class="p-2 bg-slate-950 hover:bg-slate-800 text-purple-300 border border-purple-500/30 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all">
               <i data-lucide="bug" class="w-3.5 h-3.5"></i>
               <span>VirusTotal &nearr;</span>
             </button>
-            <button onclick="pivotActiveIpToAbuseIpDb()" class="p-2 bg-slate-950 hover:bg-slate-800 text-red-300 border border-red-500/30 rounded-lg text-[11px] font-mono font-semibold flex items-center justify-center space-x-1 transition-all">
+            <button onclick="pivotActiveIpToAbuseIpDb()" class="p-2 bg-slate-950 hover:bg-slate-800 text-red-300 border border-red-500/30 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all">
               <i data-lucide="shield-x" class="w-3.5 h-3.5"></i>
               <span>AbuseIPDB &nearr;</span>
             </button>
-            <button onclick="pivotActiveIpToShodan()" class="p-2 bg-slate-950 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-mono font-semibold flex items-center justify-center space-x-1 transition-all">
+            <button onclick="pivotActiveIpToShodan()" class="p-2 bg-slate-950 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all">
               <i data-lucide="server" class="w-3.5 h-3.5"></i>
               <span>Shodan &nearr;</span>
             </button>
-            <button onclick="pivotActiveIpToLacnic()" class="p-2 bg-slate-950 hover:bg-slate-800 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-mono font-semibold flex items-center justify-center space-x-1 transition-all">
+            <button onclick="pivotActiveIpToLacnic()" class="p-2 bg-slate-950 hover:bg-slate-800 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
               <span>Whois / RDAP &nearr;</span>
             </button>
@@ -2586,7 +2586,7 @@
 
       <!-- Modal Footer -->
       <div class="mt-4 pt-3 border-t border-cyber-border flex items-center justify-between">
-        <span class="text-[11px] text-slate-400 font-mono">PCAP Analyzer v3.0 • Threat Intel Engine</span>
+        <span class="text-[11px] text-slate-400">PCAP Analyzer v6 · Threat Intel</span>
         <div class="flex items-center space-x-2">
           <button onclick="openFirewallModal(g_activeThreatIntelIp)" class="px-3.5 py-1.5 bg-red-600/30 hover:bg-red-600/50 text-red-300 border border-red-500/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <i data-lucide="shield-ban" class="w-3.5 h-3.5"></i>
@@ -2612,7 +2612,7 @@
           <div>
             <div class="flex items-center space-x-2">
               <h3 class="text-sm font-bold text-white">Central de Threat Intelligence & Diagnóstico de APIs</h3>
-              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">v3.0</span>
+              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">v6</span>
             </div>
             <p class="text-[11px] text-slate-400">Pulsedive • MANRS • AbuseIPDB • VirusTotal (pivot)</p>
           </div>
@@ -2644,7 +2644,7 @@
           <!-- IP Selector / Input for Live Testing -->
           <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center space-x-2 flex-1 min-w-[240px]">
-              <span class="text-[11px] text-slate-400 font-mono">IP para Teste:</span>
+              <span class="text-[11px] text-slate-400">IP para teste:</span>
               <input type="text" id="apiTestIpInput" value="8.8.8.8" placeholder="Ex: 8.8.8.8 ou 1.1.1.1" 
                      class="flex-1 bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-cyan-300 font-mono outline-none focus:border-cyan-500">
             </div>
@@ -2655,7 +2655,7 @@
           </div>
 
           <!-- Cache & Contingency Summary -->
-          <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 font-mono">
+          <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
             <span id="ipCacheStatusText">Cache Local: Calculando...</span>
             <span id="apiProxyModeText" class="text-slate-400">Modo: verificando…</span>
           </div>
@@ -2670,7 +2670,7 @@
 
         <!-- Solutions Config Cards -->
         <div class="space-y-3">
-          <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider font-mono flex items-center justify-between">
+          <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
             <span>Provedores de Threat Intelligence & Cyberspace Search</span>
             <span class="text-[10px] text-emerald-400 font-normal">Chaves salvas localmente no navegador</span>
           </div>
@@ -2721,7 +2721,7 @@
                 <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
                 <span>MANRS Observatory API Key (Routing Security, RPKI & Anti-Spoofing)</span>
               </label>
-              <span class="px-2 py-0.2 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">CONTA KAIQUE CAMILO (RESEARCHER)</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Licença Researcher</span>
             </div>
             <div class="flex items-center space-x-2">
               <input type="password" id="inputManrsKey" value="" placeholder="Chave de API do MANRS Observatory..."
@@ -2885,7 +2885,7 @@
           </div>
         </div>
 
-        <div class="text-[11px] text-slate-400 font-mono">
+        <div class="text-[11px] text-slate-400">
           <span class="text-emerald-400 font-bold">Master Filter List (FCAP) / Inspeção de Estado / Rate Limiting</span> | <span class="text-indigo-400 font-semibold">Sem Blackhole / Sem FlowSpec</span>
         </div>
       </div>
@@ -2938,7 +2938,7 @@
               <span>Reconstrução de Conversa ("Follow Stream")</span>
               <span id="streamModalProtoBadge" class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">TCP</span>
             </h3>
-            <p id="streamModalSubtitle" class="text-xs text-slate-400 font-mono">Host A &harr; Host B</p>
+            <p id="streamModalSubtitle" class="text-xs text-slate-400">Host A &harr; Host B</p>
           </div>
         </div>
         <button onclick="closeStreamFollowerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
@@ -3236,7 +3236,7 @@
         showSocToast('Informe um IPv4 válido para o teste.', 'warning');
         return;
       }
-      container.innerHTML = `<div class="p-3 text-slate-400 font-mono text-[11px] flex items-center space-x-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Testando com ${escapeHtml(testIp)}…</span></div>`;
+      container.innerHTML = `<div class="p-3 text-slate-400 text-[11px] flex items-center space-x-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Testando com ${escapeHtml(testIp)}…</span></div>`;
       lucide.createIcons();
 
       const manrsKey = getManrsKey();
@@ -4520,7 +4520,7 @@
         info: 'bg-slate-900/95 border-cyan-500/50 text-cyan-200'
       };
 
-      toast.className = `p-3 rounded-md border text-xs font-mono transition-all transform translate-y-2 opacity-0 pointer-events-auto flex items-start space-x-2 ${bgColors[type] || bgColors.info}`;
+      toast.className = `p-3 rounded-md border text-xs transition-all transform translate-y-2 opacity-0 pointer-events-auto flex items-start space-x-2 ${bgColors[type] || bgColors.info}`;
       toast.innerHTML = `
         <i data-lucide="${type === 'success' ? 'check-circle-2' : (type === 'error' ? 'alert-octagon' : (type === 'warning' ? 'alert-triangle' : 'info'))}" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
         <div class="flex-1 leading-snug">${escapeHtml(message)}</div>
@@ -5447,7 +5447,7 @@
       const prof = getNetProfile();
       const t = document.getElementById('ddosVictimSelect')?.value || g_triageSelectedDst || null;
       document.getElementById('collectionGuideBody').innerHTML =
-        `<pre class="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-slate-200 bg-slate-950/70 border border-cyber-border rounded-xl p-4">${escapeHtml(collectionGuideText(t))}</pre>
+        `<pre class="whitespace-pre-wrap text-[11px] leading-relaxed text-slate-200 bg-slate-950/70 border border-cyber-border rounded-xl p-4">${escapeHtml(collectionGuideText(t))}</pre>
          <div class="text-[10px] text-slate-500">O IP do alvo já vem preenchido quando há uma análise em andamento. Sem alvo, o guia sai com placeholders.</div>`;
       document.getElementById('collectionGuideModal').classList.remove('hidden');
       lucide.createIcons();
@@ -9680,7 +9680,7 @@ ${analystNotes}`;
                 </span>
               </div>
 
-              <h4 class="text-xs font-bold text-white font-mono mt-1">${escapeHtml(f.title)}</h4>
+              <h4 class="text-xs font-bold text-white mt-1">${escapeHtml(f.title)}</h4>
               <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(f.desc)}</p>
 
               <!-- Technical Forensic Evidence Box -->
@@ -9776,7 +9776,7 @@ ${analystNotes}`;
             </div>
 
             <!-- Code output box for this finding -->
-            <div id="iocMitigationContent_${f.id}" class="space-y-1.5 font-mono text-xs">
+            <div id="iocMitigationContent_${f.id}" class="space-y-1.5 text-xs">
               <!-- Dynamically rendered -->
             </div>
           </div>
@@ -9847,7 +9847,7 @@ ${analystNotes}`;
       targetDiv.innerHTML = `
         <div class="flex items-center justify-between text-[11px] text-slate-300 font-sans font-semibold mb-1">
           <span>Estratégia: <strong class="text-cyan-300">${escapeHtml(mit.strategy)}</strong></span>
-          <span class="text-emerald-400 font-mono text-[10px] flex items-center space-x-1">
+          <span class="text-emerald-400 text-[10px] flex items-center space-x-1">
             <span>Mitigação Ativa de Perímetro</span>
           </span>
         </div>
@@ -9936,7 +9936,7 @@ ${analystNotes}`;
       const dateStr = new Date().toLocaleString('pt-BR');
       let out = `# ====================================================================\n`;
       out += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - MASTER FILTER LIST CONSOLIDADO\n`;
-      out += `# Gerado por PCAP Analyzer v2.0 | Data: ${dateStr}\n`;
+      out += `# Gerado por PCAP Analyzer v6 | Data: ${dateStr}\n`;
       out += `# Instrução: Cole na GUI do AED em Protect > Inbound Protection > Master Filter Lists\n`;
       out += `# ====================================================================\n\n`;
 
@@ -9965,7 +9965,7 @@ ${analystNotes}`;
       const dateStr = new Date().toLocaleString('pt-BR');
       let out = `# ====================================================================\n`;
       out += `# NETSCOUT ARBOR SIGHTLINE & TMS - SCRIPT CONSOLIDADO DE MITIGAÇÃO\n`;
-      out += `# Gerado por PCAP Analyzer v2.0 | Data: ${dateStr}\n`;
+      out += `# Gerado por PCAP Analyzer v6 | Data: ${dateStr}\n`;
       out += `# Total de Vetores Identificados: ${findings.length}\n`;
       out += `# ====================================================================\n\n`;
 
@@ -9993,7 +9993,7 @@ ${analystNotes}`;
 
       const report = {
         metadata: {
-          product: "PCAP Analyzer v2.0 - NETSCOUT Arbor Threat Intelligence",
+          product: "PCAP Analyzer v6 - Threat Intelligence",
           generatedAt: new Date().toISOString(),
           totalFindings: findings.length,
           activeFilters: {
@@ -10882,7 +10882,7 @@ ${analystNotes}`;
         let code = `# ====================================================================\n`;
         code += `# NETSCOUT ARBOR EDGE DEFENSE (AED) - PARÂMETROS DE ESTADO & RATE LIMITING\n`;
         code += `# Data: ${dateStr} | Nível: ${tier.toUpperCase()}\n`;
-        code += `# Total de Alvos: ${ips.length} IPs | Referência: AED User Guide v7.4 (Seção 12)\n`;
+        code += `# Total de Alvos: ${ips.length} IPs | Referência: guia de configuração do AED (state & rate limiting)\n`;
         code += `# ====================================================================\n\n`;
 
         if (tier === 'light') {
@@ -10928,7 +10928,7 @@ ${analystNotes}`;
       if (format === 'mikrotik') {
         let code = `# ====================================================================\n`;
         code += `# REGRAS DE MITIGAÇÃO AUTOMÁTICA MIKROTIK ROUTEROS\n`;
-        code += `# Gerado por: PCAP Analyzer v2.0 - Data: ${dateStr}\n`;
+        code += `# Gerado por: PCAP Analyzer v6 - Data: ${dateStr}\n`;
         code += `# Total de Ameaças: ${ips.length} IPs\n`;
         code += `# ====================================================================\n\n`;
         code += `/ip firewall filter\n`;
@@ -10947,7 +10947,7 @@ ${analystNotes}`;
         let code = `#!/bin/bash\n`;
         code += `# ====================================================================\n`;
         code += `# SCRIPT DE BLOQUEIO LINUX (IPTABLES & NFTABLES)\n`;
-        code += `# Gerado por: PCAP Analyzer v2.0 - Data: ${dateStr}\n`;
+        code += `# Gerado por: PCAP Analyzer v6 - Data: ${dateStr}\n`;
         code += `# ====================================================================\n\n`;
         code += `# 1. Regras IPTABLES (Drop imediato na entrada e encaminhamento):\n`;
         ips.forEach(ip => {
@@ -10964,7 +10964,7 @@ ${analystNotes}`;
       if (format === 'cisco') {
         let code = `! ====================================================================\n`;
         code += `! CISCO IOS / HUAWEI ACL DE BLOQUEIO DE AMEAÇAS\n`;
-        code += `! Gerado por: PCAP Analyzer v2.0 - Data: ${dateStr}\n`;
+        code += `! Gerado por: PCAP Analyzer v6 - Data: ${dateStr}\n`;
         code += `! ====================================================================\n\n`;
         code += `ip access-list extended BLOCK_PCAP_ANALYZER\n`;
         ips.forEach(ip => {
@@ -10980,7 +10980,7 @@ ${analystNotes}`;
       if (format === 'fortigate') {
         let code = `# ====================================================================\n`;
         code += `# FORTIGATE FORTIOS CLI - OBJECT ADDRESS & POLICY DENY\n`;
-        code += `# Gerado por: PCAP Analyzer v2.0 - Data: ${dateStr}\n`;
+        code += `# Gerado por: PCAP Analyzer v6 - Data: ${dateStr}\n`;
         code += `# ====================================================================\n\n`;
         code += `config firewall address\n`;
         ips.forEach(ip => {
@@ -11852,8 +11852,8 @@ ${analystNotes}`;
       const topCol = Array.from(collateral.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
       out.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-          <div class="p-2 rounded-lg bg-slate-950 border border-slate-800"><div class="text-slate-400">Acerto na seleção</div><div class="text-sm font-bold font-mono ${hitColor}">${hitPct.toFixed(1)}%</div><div class="text-slate-500 font-mono">${inHit} de ${inTotal} pacotes</div></div>
-          <div class="p-2 rounded-lg bg-slate-950 border border-slate-800"><div class="text-slate-400">Colateral (só a regex, fora da seleção)</div><div class="text-sm font-bold font-mono ${colColor}">${colPct.toFixed(2)}%</div><div class="text-slate-500 font-mono">${outHit} de ${outTotal} pacotes com payload</div></div>
+          <div class="p-2 rounded-lg bg-slate-950 border border-slate-800"><div class="text-slate-400">Acerto na seleção</div><div class="text-sm font-bold ${hitColor}">${hitPct.toFixed(1)}%</div><div class="text-slate-500 text-[10px]">${inHit} de ${inTotal} pacotes</div></div>
+          <div class="p-2 rounded-lg bg-slate-950 border border-slate-800"><div class="text-slate-400">Colateral (só a regex, fora da seleção)</div><div class="text-sm font-bold ${colColor}">${colPct.toFixed(2)}%</div><div class="text-slate-500 text-[10px]">${outHit} de ${outTotal} pacotes com payload</div></div>
           <div class="p-2 rounded-lg bg-slate-950 border border-slate-800"><div class="text-slate-400">Regra completa</div><div class="text-[11px] font-mono text-slate-300 mt-0.5">${escapeHtml(plSelectionLabel(sel))}</div><div class="text-[11px] font-mono text-fuchsia-300 break-all">+ payload =~ /${escapeHtml(src)}/</div></div>
         </div>
         <div class="px-3 py-1.5 rounded-lg border ${verdict.cls}">${verdict.txt}</div>
@@ -12418,8 +12418,8 @@ ${analystNotes}`;
               </div>
               <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
                 <div class="text-slate-400 font-semibold">Estratégia de mitigação</div>
-                <div><span class="text-cyan-300 font-semibold">Borda do cliente: </span><span class="text-slate-300">${escapeHtml(t.client)}</span></div>
-                <div><span class="text-purple-300 font-semibold">Operadora: </span><span class="text-slate-300">${escapeHtml(t.operator)}</span></div>
+                <div><span class="text-cyan-300 font-semibold">Borda do cliente (AED, quando gerenciado): </span><span class="text-slate-300">${escapeHtml(t.client)}</span></div>
+                <div><span class="text-purple-300 font-semibold">TMS da operadora (você opera): </span><span class="text-slate-300">${escapeHtml(t.operator)}</span></div>
                 <div class="text-slate-500">Bloqueio por IP de origem: ${t.srcFilter ? '<span class="text-emerald-300">eficaz</span>' : '<span class="text-red-300">ineficaz</span>'}</div>
               </div>
             </div>
@@ -12497,7 +12497,7 @@ ${analystNotes}`;
         v.indicators.forEach(x => lines.push(`  - ${x}`));
         if (v.spoofHint) lines.push(`  - ${v.spoofHint}`);
         lines.push(`  Técnica: ${t.how}`);
-        lines.push(`  Mitigação (cliente): ${t.client}`);
+        lines.push(`  Borda do cliente (AED, se gerenciado): ${t.client}`);
         lines.push(`  Mitigação (operadora): ${t.operator}`);
         lines.push(`  Bloqueio por IP de origem: ${t.srcFilter ? 'eficaz' : 'ineficaz'}`);
         lines.push('');
