@@ -269,6 +269,10 @@
 
       <div class="nav-label">Outros</div>
 
+      <button onclick="openIncidentsModal()" class="nav-item" title="Casos anteriores: histórico de análises salvas com vetores, origem do prefixo, parecer e notas — ajuda a reconhecer padrões recorrentes">
+        <i data-lucide="archive"></i><span>Histórico</span>
+        <span id="incidentsCountBadge" class="px-1.5 text-[10px] bg-slate-700 text-slate-200 rounded-full font-mono">0</span>
+      </button>
       <button onclick="openNetProfileModal()" class="nav-item" title="Contexto do cliente: blocos, operadora de casa, serviços expostos e baseline — reduz falsos positivos e orienta a mitigação">
         <i data-lucide="sliders-horizontal"></i><span>Perfil de Rede</span>
       </button>
@@ -280,6 +284,9 @@
       </button>
       <button onclick="openClientPresentationModal()" class="nav-item" title="Gerar e apresentar relatório executivo formatado para o cliente">
         <i data-lucide="presentation"></i><span>Relatório do Cliente</span>
+      </button>
+      <button onclick="openCollectionGuideModal()" class="nav-item" title="Guia de coleta de PCAP: comandos prontos para o cliente copiar, onde posicionar a coleta e quanto tempo capturar">
+        <i data-lucide="clipboard-list"></i><span>Checklist de Coleta</span>
       </button>
     </nav>
 
@@ -882,6 +889,11 @@
       <div id="ddosSummary" class="grid grid-cols-2 md:grid-cols-6 gap-2"></div>
       <div id="ddosVerdict"></div>
       <div id="ddosCtxVerdict"></div>
+      <div class="mt-2">
+        <button id="ddosSaveCaseBtn" onclick="saveIncidentToHistory()" class="hidden btn-ghost" title="Arquiva este caso (vetores, pico, parecer e notas) no Histórico">
+          <i data-lucide="archive" class="w-3.5 h-3.5"></i><span>Salvar caso no histórico</span>
+        </button>
+      </div>
 
       <!-- Linha do tempo por vetor -->
       <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
@@ -1453,6 +1465,10 @@
             <i data-lucide="clipboard-copy" class="w-3.5 h-3.5"></i>
             <span>Copiar resumo p/ ticket</span>
           </button>
+          <button onclick="saveIncidentToHistory()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg font-semibold flex items-center space-x-1.5 transition-all" title="Arquiva este caso (vetores, pico, parecer e notas) no Histórico">
+            <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+            <span>Salvar caso</span>
+          </button>
           <button onclick="triageGoToDdos()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg font-semibold flex items-center space-x-1.5 transition-all" title="Envia o alvo principal da triagem para a classificação de vetor e a estratégia de mitigação">
             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
             <span>Classificar &amp; mitigar →</span>
@@ -1933,6 +1949,48 @@
   </footer>
 
   </div> <!-- fim #appCol -->
+
+  <!-- MODAL HISTÓRICO DE INCIDENTES -->
+  <div id="incidentsModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl w-[860px] max-w-full max-h-[88vh] overflow-y-auto">
+      <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between sticky top-0 bg-cyber-card z-10">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="archive" class="w-5 h-5 text-cyan-300"></i>
+          <div>
+            <div class="text-sm font-semibold text-white">Histórico de Incidentes</div>
+            <div class="text-[11px] text-slate-400">Análises salvas neste navegador — reconheça padrões recorrentes e reúna material para o relatório final</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="exportIncidentsJson()" class="btn-ghost !py-1" title="Exportar todo o histórico como JSON"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>Exportar JSON</span></button>
+          <button onclick="closeIncidentsModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+      </div>
+      <div class="p-5">
+        <div id="incidentsList" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHECKLIST DE COLETA -->
+  <div id="collectionGuideModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl w-[760px] max-w-full max-h-[88vh] overflow-y-auto">
+      <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between sticky top-0 bg-cyber-card z-10">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="clipboard-list" class="w-5 h-5 text-cyan-300"></i>
+          <div>
+            <div class="text-sm font-semibold text-white">Checklist de Coleta de PCAP</div>
+            <div class="text-[11px] text-slate-400">Envie ao cliente: comandos prontos e regras de ouro para a captura servir de prova</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="copyCollectionGuide()" class="btn-ghost !py-1"><i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar tudo</span></button>
+          <button onclick="closeCollectionGuideModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+      </div>
+      <div id="collectionGuideBody" class="p-5 space-y-4 text-xs"></div>
+    </div>
+  </div>
 
   <!-- MODAL PERFIL DE REDE (contexto do cliente p/ reduzir falsos positivos e orientar a mitigação) -->
   <div id="netProfileModal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
@@ -3419,6 +3477,8 @@
     function handlePcapSelectionChange(newVal) {
       currentSelectedFile = newVal;
       applyFilters();
+      // Invalida a última análise DDoS (era do arquivo anterior)
+      if (typeof g_lastDdos !== 'undefined') g_lastDdos = null;
       // Re-renderiza as visões dependentes do escopo de arquivo
       if (typeof renderTriageView === 'function' && !document.getElementById('viewTriage').classList.contains('hidden')) renderTriageView();
     }
@@ -5153,6 +5213,189 @@
       } catch (e) {
         box.innerHTML = `<div class="text-[11px] text-red-300">Falha na consulta (${escapeHtml(e.message)}). Verifique a conexão ou consulte manualmente no RIPEstat.</div>`;
       }
+    }
+
+    // =========================================================================================
+    // HISTÓRICO DE INCIDENTES (localStorage) — casos anteriores para reconhecer padrões
+    // =========================================================================================
+    const INC_KEY = 'pcapAnalyzerIncidentHistory';
+    function getIncidents() {
+      try { return JSON.parse(localStorage.getItem(INC_KEY)) || []; } catch (e) { return []; }
+    }
+    function updateIncidentsBadge() {
+      const el = document.getElementById('incidentsCountBadge');
+      if (el) el.textContent = getIncidents().length;
+    }
+    function buildIncidentRecord() {
+      // Snapshot do caso atual: perfil, triagem, DDoS (com contexto), origem do prefixo e notas
+      const prof = getNetProfile();
+      const rec = {
+        id: 'INC-' + Date.now(),
+        when: new Date().toLocaleString('pt-BR'),
+        files: Array.from(loadedFilesMap.keys()),
+        currentFile: currentSelectedFile,
+        totalPkts: consolidatedPackets.length,
+        triage: null, ddos: null, ctx: null, notes: ''
+      };
+      if (typeof g_lastTriage !== 'undefined' && g_lastTriage) {
+        const t = g_lastTriage;
+        const gr = triageRates(t.global, t.binSec, t.sampling);
+        rec.triage = {
+          peakPps: Math.round(gr.peakPps), peakBps: Math.round(gr.peakBps),
+          srcs: t.global.srcs.size, dsts: t.perDst.size,
+          signals: triageApplyContext(buildTriageSignals(t), t).map(s => ({ lvl: s.lvl, text: s.text }))
+        };
+      }
+      const victim = (document.getElementById('ddosVictimSelect') || {}).value || null;
+      const cached = (typeof g_lastDdos !== 'undefined' && g_lastDdos && g_lastDdos.victim === victim) ? g_lastDdos : null;
+      const dd = (victim && typeof computeDdosAnalysis === 'function') ? (cached || computeDdosAnalysis(victim, getDdosProfile(), 1)) : null;
+      if (dd && dd.vectors && dd.vectors.length) {
+        // Picos são calculados no render da aba; reuse quando disponíveis
+        if (cached && cached.peakPps) { dd.peakPps = cached.peakPps; dd.peakBps = cached.peakBps; }
+        else {
+          const combined = new Map();
+          dd.vectors.forEach(v => v.bins.forEach((b, bi) => {
+            const c = combined.get(bi) || { pkts: 0, bytes: 0 };
+            c.pkts += b.pkts; c.bytes += b.bytes; combined.set(bi, c);
+          }));
+          let pp = 0, pb = 0;
+          combined.forEach(c => { pp = Math.max(pp, c.pkts / dd.binSec); pb = Math.max(pb, c.bytes * 8 / dd.binSec); });
+          dd.peakPps = pp; dd.peakBps = pb;
+        }
+        const ctx = (typeof assessWithContext === 'function') ? assessWithContext(dd) : null;
+        rec.ddos = {
+          victim: dd.victim,
+          vectors: dd.vectors.map(v => ({ name: v.tech ? v.tech.name : v.key, extra: v.extraName, conf: v.confidence, target: v.target })),
+          peakPps: Math.round(dd.peakPps || 0), peakBps: Math.round(dd.peakBps || 0),
+          srcFilterable: dd.vectors.every(v => v.tech && v.tech.srcFilter)
+        };
+        rec.ctx = ctx ? { verdict: ctx.verdict, reasons: ctx.reasons, advice: ctx.advice } : null;
+      }
+      rec.notes = (document.getElementById('analystNotesTextarea') || {}).value || '';
+      return rec;
+    }
+    function saveIncidentToHistory() {
+      const inc = getIncidents();
+      const rec = buildIncidentRecord();
+      if (!rec.triage && !rec.ddos) {
+        showSocToast('Nada para salvar ainda: carregue uma captura e rode a Triagem ou a aba DDoS.', 'warning');
+        return;
+      }
+      // Deduplica: mesmo conjunto de arquivos com o mesmo veredito não entra duas vezes
+      const sig = JSON.stringify([rec.files, rec.ddos ? rec.ddos.vectors.map(v => v.name) : [], rec.triage ? rec.triage.peakPps : 0]);
+      if (inc.some(r => JSON.stringify([r.files, r.ddos ? r.ddos.vectors.map(v => v.name) : [], r.triage ? r.triage.peakPps : 0]) === sig)) {
+        showSocToast('Este caso idêntico já está no histórico.', 'info');
+        return;
+      }
+      inc.unshift(rec);
+      try { localStorage.setItem(INC_KEY, JSON.stringify(inc.slice(0, 100))); } catch (e) {}
+      updateIncidentsBadge();
+      showSocToast('Caso salvo no histórico (' + rec.when + ').', 'success');
+    }
+    function deleteIncident(id) {
+      const inc = getIncidents().filter(r => r.id !== id);
+      localStorage.setItem(INC_KEY, JSON.stringify(inc));
+      updateIncidentsBadge();
+      renderIncidentsList();
+    }
+    function exportIncidentsJson() {
+      const blob = new Blob([JSON.stringify(getIncidents(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `historico-incidentes-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    function openIncidentsModal() {
+      document.getElementById('incidentsModal').classList.remove('hidden');
+      renderIncidentsList();
+      lucide.createIcons();
+    }
+    function closeIncidentsModal() { document.getElementById('incidentsModal').classList.add('hidden'); }
+    updateIncidentsBadge();
+
+    function renderIncidentsList() {
+      const inc = getIncidents();
+      const box = document.getElementById('incidentsList');
+      if (!inc.length) {
+        box.innerHTML = '<div class="text-center py-10 text-slate-500 text-xs">Nenhum caso salvo ainda. Analise uma captura e clique em “Salvar caso no histórico”.</div>';
+        return;
+      }
+      const vt = { normal: ['text-emerald-300', 'Tráfego normal'], suspicious: ['text-amber-300', 'Suspeito'], attack: ['text-rose-300', 'Ataque'] };
+      box.innerHTML = inc.map(r => {
+        const c = r.ctx ? vt[r.ctx.verdict] || ['', '—'] : ['', 'Sem parecer'];
+        return `<div class="rounded-xl border border-cyber-border bg-slate-950/60 p-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${c[0] ? (c[0].includes('rose') ? 'bg-rose-500/20 border-rose-500/40' : c[0].includes('amber') ? 'bg-amber-500/20 border-amber-500/40' : 'bg-emerald-500/20 border-emerald-500/40') : 'bg-slate-700 border-slate-600 text-slate-300'}">${c[1]}</span>
+              <span class="text-[11px] text-slate-400 font-mono">${r.when}</span>
+              <span class="text-[11px] text-slate-500 truncate">${r.files.length} captura(s) · ${r.totalPkts.toLocaleString()} pacotes</span>
+            </div>
+            <button onclick="deleteIncident('${r.id}')" class="text-[11px] text-red-400 hover:text-red-300">Remover</button>
+          </div>
+          ${r.ddos ? `<div class="mt-2 text-[11px] text-slate-300">Alvo <strong class="font-mono">${escapeHtml(r.ddos.victim)}</strong> · Vetores: ${r.ddos.vectors.map(v => escapeHtml(v.name) + (v.extra || '')).join(', ')} · Pico ${fmtCount(r.ddos.peakPps)} pps / ${fmtBitrate(r.ddos.peakBps)}${r.ctx ? ' · <span class="text-slate-400">' + escapeHtml(r.ctx.advice.slice(0, 120)) + '…</span>' : ''}</div>` : (r.triage ? `<div class="mt-2 text-[11px] text-slate-300">Triagem: pico ${fmtCount(r.triage.peakPps)} pps · ${r.triage.dsts} alvo(s) · ${r.triage.signals.length} sinal(is)</div>` : '')}
+          ${r.notes ? `<div class="mt-1.5 text-[11px] text-slate-400 border-l-2 border-slate-700 pl-2">Notas: ${escapeHtml(r.notes.slice(0, 180))}${r.notes.length > 180 ? '…' : ''}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // =========================================================================================
+    // CHECKLIST DE COLETA — guia enviado ao cliente para a captura servir de prova
+    // =========================================================================================
+    function collectionGuideText(targetIp, port) {
+      const t = targetIp || '<IP_DO_ALVO>';
+      const p = port || '<PORTA>';
+      return `GUIA DE COLETA DE TRÁFEGO (PCAP) — PARA O CLIENTE
+====================================================
+
+1) ONDE COLETAR (escolha um, em ordem de preferência)
+  a. Na borda do AS, ANTES do equipamento de mitigação (TMS/scrubber): mostra o ataque como ele chega.
+  b. No host alvo: confirma o impacto real no serviço.
+  c. Evite capturar APENAS depois de filtros/scrubbing: o ataque aparece "limpo" e a análise perde evidência.
+
+2) COMANDOS PRONTOS (copiar e colar)
+
+  Linux (tcpdump) — ataque em curso, foco no alvo:
+    tcpdump -i any -s 96 -w captura-ataque.pcap 'host ${t}'
+  Linux (tcpdump) — dia normal para baseline (10 min bastam):
+    timeout 600 tcpdump -i any -s 96 -w captura-baseline.pcap 'host ${t}'
+  Somente o sentido de entrada do serviço ${p}:
+    tcpdump -i any -s 96 -w captura-ataque.pcap 'dst host ${t} and dst port ${p}'
+  Juniper (mirror na borda):
+    use o analisador/filtro de portas e salve em formato .pcap (não .pcapng misto).
+
+3) REGRAS DE OURO (a captura precisa disto para servir de prova)
+  [ ] Formato .pcap ou .pcapng, sem filtros que escondam metade do tráfego
+  [ ] Capturar os DOIS sentidos (ida e volta) do host alvo
+  [ ] Não capturar através de VPN/túnel (os timestamps e checksums se perdem)
+  [ ] Anotar: hora local do início (com fuso), endereço IP do alvo, serviço afetado
+  [ ] Se possível, uma segunda captura em horário normal (baseline) no MESMO ponto
+  [ ] Enviar o arquivo SEM renomear/editar: qualquer corte manual invalida a análise
+
+4) QUANTO TEMPO
+  Ataque em curso: 5 a 10 minutos já bastam (evite arquivos gigantes).
+  Suspeita intermitente: 15 a 30 min no horário da reclamação + 10 min de baseline.
+  Pós-mitigação: repita 5 min no mesmo ponto para comprovar a eficácia.
+
+5) O QUE A ANÁLISE RETORNA
+  Pico (pps/bps) vs. baseline do dia a dia · alvo e portas atacadas ·
+  vetores prováveis (SYN/UDP/amplificação/reflexão) · indício de origem forjada ·
+  onde mitigar (seu AS x operadora anunciante) e sugestão de conduta.`;
+    }
+    function openCollectionGuideModal() {
+      const prof = getNetProfile();
+      const t = document.getElementById('ddosVictimSelect')?.value || g_triageSelectedDst || null;
+      document.getElementById('collectionGuideBody').innerHTML =
+        `<pre class="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-slate-200 bg-slate-950/70 border border-cyber-border rounded-xl p-4">${escapeHtml(collectionGuideText(t))}</pre>
+         <div class="text-[10px] text-slate-500">O IP do alvo já vem preenchido quando há uma análise em andamento. Sem alvo, o guia sai com placeholders.</div>`;
+      document.getElementById('collectionGuideModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeCollectionGuideModal() { document.getElementById('collectionGuideModal').classList.add('hidden'); }
+    function copyCollectionGuide() {
+      const t = document.getElementById('ddosVictimSelect')?.value || g_triageSelectedDst || null;
+      navigator.clipboard.writeText(collectionGuideText(t));
+      showSocToast('Guia de coleta copiado — cole no chamado para o cliente.', 'success');
     }
 
     // =========================================================================================
@@ -12074,6 +12317,8 @@ ${analystNotes}`;
       }
       document.getElementById('ddosVerdict').innerHTML = verdict;
       renderDdosCtxVerdict(a);
+      const saveBtn = document.getElementById('ddosSaveCaseBtn');
+      if (saveBtn) saveBtn.classList.remove('hidden');
 
       // Cartões de vetores
       document.getElementById('ddosVectors').innerHTML = a.vectors.map((v, i) => {
