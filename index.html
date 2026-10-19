@@ -70,6 +70,9 @@
   <!-- SheetJS for Full Excel .XLSX Export with multiple tabs -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <!-- jsPDF para exportação direta do relatório executivo em PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     /* Base: tipografia e densidade de ferramenta de operação */
     html { font-size: 14px; }
@@ -1223,9 +1226,9 @@
             <i data-lucide="file-code-2" class="w-3.5 h-3.5"></i>
             <span>Baixar .MD</span>
           </button>
-          <button onclick="printExecutiveSummaryPdf()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Abrir versão para impressão / salvar como PDF">
+          <button onclick="downloadExecutiveSummaryPdf()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo executivo como PDF">
             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-            <span>PDF / Imprimir</span>
+            <span>Baixar PDF</span>
           </button>
         </div>
 
@@ -1949,7 +1952,7 @@
             <i data-lucide="file-code-2" class="w-4 h-4"></i>
             <span>.MD</span>
           </button>
-          <button onclick="printExecutiveSummaryPdf()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Imprimir / salvar como PDF">
+          <button onclick="downloadExecutiveSummaryPdf()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo como PDF">
             <i data-lucide="file-text" class="w-4 h-4"></i>
             <span>PDF</span>
           </button>
@@ -7319,16 +7322,103 @@ ${analystNotes}`;
       alert("Resumo executivo formatado copiado para a área de transferência!");
     }
 
-    // Converte o resumo (texto com *negrito* e • ) em HTML para impressão/PDF
-    function executiveSummaryToHtml(txt) {
-      const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return txt.split('\n').map(line => {
-        if (!line.trim()) return '<div class="sp">&nbsp;</div>';
-        const bold = line.trim().startsWith('*') && line.trim().endsWith('*');
-        let t = esc(line).replace(/\*(.+?)\*/g, '<strong>$1</strong>');
-        if (bold) return `<h2>${t.replace(/[ *]/g, m => m === '*' ? '' : ' ').trim().replace(/^/, '')}</h2>`;
-        return `<div>${t}</div>`;
-      }).join('');
+    // Exporta o resumo executivo direto em PDF (jsPDF, texto selecionável, sem janela de impressão)
+    function downloadExecutiveSummaryPdf() {
+      if (typeof jspdf === 'undefined') {
+        showSocToast('Biblioteca jsPDF não carregou (verifique a conexão).', 'warning');
+        return;
+      }
+      const txt = buildExecutiveClientSummary();
+      // Normaliza glifos fora do WinAnsi (fontes padrão do PDF não têm Unicode completo)
+      const sane = (s) => s
+        .replace(/\u2501+/g, '------------------------------------------------------------')
+        .replace(/\u2022/g, '-').replace(/[\u2013\u2014]/g, '-')
+        .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
+        .replace(/\u00D7/g, 'x').replace(/\u2248/g, '~').replace(/\u2192/g, '->')
+        .replace(/\u25B2/g, '+').replace(/\u25BC/g, '-')
+        .replace(/\u00A0/g, ' ');
+
+      const doc = new jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+      const W = 210, M = 20, BOTTOM = 272;
+      let y = 22, firstHeading = true;
+
+      const ensureSpace = (need) => {
+        if (y + (need || 4.2) > BOTTOM) { doc.addPage(); y = 20; }
+      };
+      const gradientBar = () => {
+        const c1 = [146, 254, 157], c2 = [0, 201, 255];
+        const steps = 60, w = (W - 2 * M) / steps;
+        for (let i = 0; i < steps; i++) {
+          const t = i / (steps - 1);
+          doc.setFillColor(...c1.map((v, k) => Math.round(v + (c2[k] - v) * t)));
+          doc.rect(M + i * w, y, w + 0.3, 2.4, 'F');
+        }
+        y += 9;
+      };
+
+      sane(txt).split('\n').forEach(raw => {
+        const line = raw.trim();
+        if (!line) { y += 2.6; return; }
+
+        const fullStar = /^\*(.+)\*$/.exec(line);
+        const keyVal = /^\*([^*]+:\*)\s*(.*)$/.exec(line.replace(/\*$/, '')) ||
+                       (fullStar && fullStar[1].includes(':') ? [null, fullStar[1].replace(/:\*?$/, ':'), ''] : null);
+
+        if (fullStar && !line.slice(1, -1).includes(':')) {
+          // Título (primeira linha) ou cabeçalho de seção
+          ensureSpace(12);
+          if (firstHeading) {
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(10, 10, 12);
+            doc.text(line.slice(1, -1), M, y); y += 7;
+            gradientBar();
+            firstHeading = false;
+          } else {
+            y += 3;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(10, 10, 12);
+            doc.text(line.slice(1, -1), M, y); y += 5.4;
+          }
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(30, 30, 34);
+          return;
+        }
+
+        ensureSpace(4.4);
+        doc.setFontSize(9.5); doc.setTextColor(30, 30, 34);
+
+        if (keyVal) {
+          // "Rótulo: valor" com o rótulo em negrito
+          const k = keyVal[1].replace(/:\*$/, ':'), v = keyVal[2];
+          doc.setFont('helvetica', 'bold');
+          const kw = doc.getTextWidth(k);
+          doc.text(k, M + (line.startsWith('-') || line.startsWith('\u2022') ? 2.5 : 0), y);
+          doc.setFont('helvetica', 'normal');
+          const vLines = doc.splitTextToSize(v, W - 2 * M - kw);
+          doc.text(vLines[0] ? ' ' + vLines[0].trim() : '', M + (line.startsWith('-') || line.startsWith('\u2022') ? 2.5 : 0) + kw, y);
+          y += 4.4;
+          for (let i = 1; i < vLines.length; i++) {
+            ensureSpace(4.4);
+            doc.text(vLines[i], M + 6, y); y += 4.4;
+          }
+          return;
+        }
+
+        const isBullet = line.startsWith('-') || line.startsWith('\u2022');
+        doc.setFont('helvetica', 'normal');
+        const lines = doc.splitTextToSize(line, W - 2 * M - (isBullet ? 2.5 : 0));
+        lines.forEach((l, i) => {
+          ensureSpace(4.4);
+          doc.text(l, M + (isBullet ? 2.5 : 0), y); y += 4.4;
+        });
+      });
+
+      // Rodapé com numeração
+      const n = doc.getNumberOfPages();
+      for (let i = 1; i <= n; i++) {
+        doc.setPage(i);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(130, 130, 135);
+        doc.text(`PCAP Analyzer - gerado em ${new Date().toLocaleString('pt-BR')} - pag. ${i}/${n}`, W / 2, 291, { align: 'center' });
+      }
+      doc.save(`relatorio-cliente-${new Date().toISOString().slice(0, 10)}.pdf`);
+      showSocToast('Relatório PDF baixado.', 'success');
     }
 
     function downloadExecutiveSummaryMd() {
@@ -7347,27 +7437,8 @@ ${analystNotes}`;
     }
 
     function printExecutiveSummaryPdf() {
-      const txt = buildExecutiveClientSummary();
-      const w = window.open('', '_blank', 'width=820,height=900');
-      if (!w) { showSocToast('Permita pop-ups para gerar o PDF.', 'warning'); return; }
-      w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório Executivo</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; color: #111; margin: 40px; }
-          h1 { font-size: 18px; margin: 0 0 4px; }
-          .bar { height: 6px; background: linear-gradient(90deg, #92fe9d, #00c9ff); border-radius: 3px; margin: 10px 0 24px; }
-          h2 { font-size: 13px; margin: 18px 0 6px; letter-spacing: .02em; }
-          div { font-size: 12px; line-height: 1.55; }
-          .sp { height: 8px; }
-          footer { margin-top: 28px; font-size: 10px; color: #777; }
-          @media print { .noprint { display: none; } }
-        </style></head><body>
-        <h1>PCAP Analyzer — Resumo Executivo de Rede &amp; Forense</h1>
-        <div class="bar"></div>
-        ${executiveSummaryToHtml(txt)}
-        <footer>Documento gerado automaticamente pelo PCAP Analyzer · ${new Date().toLocaleString('pt-BR')}</footer>
-        <script>window.onload = () => { setTimeout(() => window.print(), 250); };<\/script>
-        </body></html>`);
-      w.document.close();
+      // Substituído por downloadExecutiveSummaryPdf (PDF direto, sem janela de impressão)
+      downloadExecutiveSummaryPdf();
     }
 
 
