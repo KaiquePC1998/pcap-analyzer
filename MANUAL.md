@@ -1,3 +1,24 @@
+## Autenticação e banco de dados (Cloudflare D1)
+
+O sistema agora exige login (lista fechada: admin cadastra os analistas) e guarda o
+histórico de casos por conta. Tudo roda no Cloudflare (Pages Functions + D1).
+
+> **Siga o guia completo, passo a passo, em [DEPLOY.md](DEPLOY.md)** — cobre instalação,
+> criação do banco, migração, conexão do binding, primeiro acesso (admin) e verificação.
+
+Resumo das etapas (detalhes no DEPLOY.md):
+1. `wrangler d1 create pcap-analyzer-db` e colar o `database_id` em `wrangler.toml`
+2. `wrangler d1 execute pcap-analyzer-db --remote --file=migrations/0001_init.sql`
+3. Conectar o binding `DB`: painel do Cloudflare Pages (Settings → Functions → D1)
+   ou, se publica por CLI, `wrangler pages deploy . --project-name=<SEU_PAGES>`
+4. Abrir `https://<SEU_PAGES>.pages.dev/login.html` → criar a conta de **admin**
+   (formulário só aparece enquanto a tabela `users` estiver vazia)
+5. Logado como admin, ícone de usuários no rodapé da sidebar → cadastrar analistas
+
+Sem o binding `DB` configurado, o site funciona em modo "sem login" (facilita rodar
+localmente com `python -m http.server`, por exemplo) — o middleware detecta a ausência
+do banco e libera o acesso.
+
 # PCAP Analyzer — Manual rápido
 
 Analisador de tráfego (PCAP) para analistas de segurança em **NetSec / proteção DDoS**.

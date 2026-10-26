@@ -1,0 +1,8 @@
+name = "pcap-analyzer"
+pages_build_output_dir = "."
+compatibility_date = "2024-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pcap-analyzer-db"
+database_id = "abde5c0f-42aa-474a-ab8a-f8c6ee7a5c56"
