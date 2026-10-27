@@ -2733,7 +2733,7 @@
         <div class="space-y-3">
           <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
             <span>Provedores de Threat Intelligence & Busca de Dispositivos Expostos</span>
-            <span class="text-[10px] text-emerald-400 font-normal">Chaves salvas localmente no navegador</span>
+            <span class="text-[10px] text-emerald-400 font-normal">Chaves: secrets do servidor (env.*)</span>
           </div>
 
           <!-- 1. Pulsedive Config Card -->
@@ -2746,8 +2746,8 @@
               <span id="pdKeyStatusBadge" class="px-2 py-0.2 rounded text-[10px] font-mono text-slate-400 border border-slate-700">—</span>
             </div>
             <div class="flex items-center space-x-2">
-              <input type="password" id="inputPulsediveKey" placeholder="Chave de API do Pulsedive..."
-                     class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 font-mono outline-none focus:border-emerald-500">
+              <input type="password" id="inputPulsediveKey" disabled placeholder="Chave gerenciada pelo servidor (secret env.*)"
+                     class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-500 font-mono outline-none">
               <button onclick="testPulsediveDirectly()" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 rounded-lg text-xs font-semibold transition-all">
                 Testar
               </button>
@@ -2762,16 +2762,16 @@
                 <span>AbuseIPDB Key (Denúncias)</span>
                 <a href="https://www.abuseipdb.com/register" target="_blank" class="text-cyan-400 hover:underline">&nearr;</a>
               </label>
-              <input type="password" id="inputAbuseIpKey" placeholder="Chave AbuseIPDB..."
-                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-slate-200 font-mono outline-none focus:border-cyan-500 text-xs">
+              <input type="password" id="inputAbuseIpKey" disabled placeholder="Chave gerenciada pelo servidor (secret env.*)"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-slate-500 font-mono outline-none text-xs">
             </div>
             <div class="bg-slate-900/90 border border-slate-800 rounded-md p-3 space-y-1.5">
               <label class="block text-slate-300 font-semibold text-[11px] flex items-center justify-between">
                 <span>VirusTotal Key (Antivírus)</span>
                 <a href="https://www.virustotal.com/gui/join-us" target="_blank" class="text-cyan-400 hover:underline">&nearr;</a>
               </label>
-              <input type="password" id="inputVirusTotalKey" placeholder="Chave VirusTotal..."
-                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-slate-200 font-mono outline-none focus:border-purple-500 text-xs">
+              <input type="password" id="inputVirusTotalKey" disabled placeholder="Chave gerenciada pelo servidor (secret env.*)"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-slate-500 font-mono outline-none text-xs">
             </div>
           </div>
 
@@ -2785,8 +2785,8 @@
               <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Licença Researcher</span>
             </div>
             <div class="flex items-center space-x-2">
-              <input type="password" id="inputManrsKey" value="" placeholder="Chave de API do MANRS Observatory..."
-                     class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 font-mono outline-none focus:border-emerald-500">
+              <input type="password" id="inputManrsKey" disabled value="" placeholder="Chave gerenciada pelo servidor (secret env.*)"
+                     class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-500 font-mono outline-none">
               <button onclick="testManrsDirectly()" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 rounded-lg text-xs font-semibold transition-all">
                 Testar
               </button>
@@ -3117,44 +3117,20 @@
     }
 
     function saveApiKeys() {
-      const pdKey = document.getElementById('inputPulsediveKey')?.value.trim() || '';
-      const abuseKey = document.getElementById('inputAbuseIpKey')?.value.trim() || '';
-      const vtKey = document.getElementById('inputVirusTotalKey')?.value.trim() || '';
-      const manrsKey = document.getElementById('inputManrsKey')?.value.trim() || '';
-
-      localStorage.setItem('pcap_pulsedive_key', pdKey);
-
-      localStorage.setItem('pcap_manrs_key', manrsKey);
-      localStorage.setItem('pcap_abuseipdb_key', abuseKey);
-      localStorage.setItem('pcap_virustotal_key', vtKey);
-
-      // Chave nova: libera hosts pausados por 401/403 e descarta falhas em cache feitas com a chave antiga
+      // As chaves externas (Pulsedive/AbuseIPDB/VirusTotal/MANRS) agora são configuradas
+      // como SECRETS do projeto Cloudflare (env.*) e injetadas somente no proxy do site.
+      // O navegador não armazena nem transmite mais essas chaves.
       g_apiCache.cooldown = {};
       Object.keys(g_apiCache.entries).forEach(k => { if (g_apiCache.entries[k].neg) delete g_apiCache.entries[k]; });
       g_manrsAsnCache.clear();
       persistApiCacheNow();
-
       closeApiConfigModal();
-      showSocToast("Configurações de Threat Intel salvas com sucesso!", "success");
+      showSocToast("As chaves de Threat Intel agora são secrets do servidor (env.*) e não ficam mais no navegador.", "success");
       renderCorrelationView();
     }
 
     function loadSavedApiKeys() {
-      const pdKey = getPulsediveKey();
-      const abuseKey = getAbuseIpDbKey();
-      const vtKey = getVirusTotalKey();
-      const manrsKey = getManrsKey();
-
-      const elPd = document.getElementById('inputPulsediveKey');
-      const elA = document.getElementById('inputAbuseIpKey');
-      const elV = document.getElementById('inputVirusTotalKey');
-
-      if (elPd) elPd.value = pdKey;
-      if (elA) elA.value = abuseKey;
-      if (elV) elV.value = vtKey;
-      const elManrs = document.getElementById('inputManrsKey');
-      if (elManrs) elManrs.value = manrsKey;
-
+      // Sem chaves locais: getters retornam null e o proxy injeta os secrets. Só atualiza o diagnóstico.
       updateApiDiagnosticUI();
     }
 
@@ -3178,7 +3154,7 @@
       setText('apiCacheCooldownText', s.cooldowns.length ? s.cooldowns.map(c => `${c.host} (${c.minutes}m)`).join(', ') : 'nenhum');
       setText('apiProxyModeText', g_localProxyAvailable === true ? 'Modo: proxy do site'
         : g_localProxyAvailable === false ? 'Modo: arquivo local (Pulsedive/AbuseIPDB/VT indisponíveis)' : 'Modo: proxy ainda não testado');
-      setText('pdKeyStatusBadge', getPulsediveKey() ? 'chave local' : 'sem chave local');
+      setText('pdKeyStatusBadge', 'secret do servidor (env.*)');
       setText('footerApiStatus', `cache: ${count} IPs · ${s.entries} respostas · ${s.saved} chamadas evitadas${s.cooldowns.length ? ` · ${s.cooldowns.length} API(s) em pausa` : ''}`);
     }
 
@@ -3300,29 +3276,23 @@
       container.innerHTML = `<div class="p-3 text-slate-400 text-[11px] flex items-center space-x-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Testando com ${escapeHtml(testIp)}…</span></div>`;
       lucide.createIcons();
 
-      const manrsKey = getManrsKey();
-      const vtKey = getVirusTotalKey();
-      const abuseKey = getAbuseIpDbKey();
-      const pdKey = getPulsediveKey();
       const targets = [
         { name: 'ipwho.is', role: 'GeoIP / ASN', url: `https://ipwho.is/${testIp}` },
         { name: 'ipinfo.io', role: 'GeoIP / ASN (reserva)', url: `https://ipinfo.io/${testIp}/json` },
         { name: 'LACNIC RDAP', role: 'Titular do bloco', url: `https://rdap.lacnic.net/rdap/ip/${testIp}`, headers: { 'Accept': 'application/rdap+json' } },
         { name: 'Cloudflare DoH', role: 'PTR reverso', url: `https://cloudflare-dns.com/dns-query?name=${ptrNameFor(testIp)}&type=PTR`, headers: { 'Accept': 'application/dns-json' } },
         { name: 'RIPEstat', role: 'Estado BGP', url: `https://stat.ripe.net/data/network-info/data.json?resource=${testIp}` },
-        { name: 'Pulsedive', role: 'Reputação', proxyOnly: true, url: `https://pulsedive.com/api/info.php?indicator=${testIp}${pdKey ? `&key=${encodeURIComponent(pdKey)}` : ''}` },
-        { name: 'AbuseIPDB', role: 'Denúncias', proxyOnly: true, url: `https://api.abuseipdb.com/api/v2/check?ipAddress=${testIp}&maxAgeInDays=90`, headers: abuseKey ? { 'Key': abuseKey, 'Accept': 'application/json' } : { 'Accept': 'application/json' } },
-        { name: 'VirusTotal', role: 'Detecções AV', proxyOnly: true, url: `https://www.virustotal.com/api/v3/ip_addresses/${testIp}`, headers: vtKey ? { 'x-apikey': vtKey } : {} },
-        { name: 'MANRS Observatory', role: 'Conformidade de roteamento', needsKey: !manrsKey, url: 'https://observatory.manrs.org/api/v2/ases/13335', headers: manrsKey ? { 'Authorization': `Bearer ${manrsKey}`, 'Accept': 'application/json' } : {} }
+        { name: 'Pulsedive', role: 'Reputação', proxyOnly: true, url: `https://pulsedive.com/api/info.php?indicator=${testIp}` },
+        { name: 'AbuseIPDB', role: 'Denúncias', proxyOnly: true, url: `https://api.abuseipdb.com/api/v2/check?ipAddress=${testIp}&maxAgeInDays=90`, headers: { 'Accept': 'application/json' } },
+        { name: 'VirusTotal', role: 'Detecções AV', proxyOnly: true, url: `https://www.virustotal.com/api/v3/ip_addresses/${testIp}` },
+        { name: 'MANRS Observatory', role: 'Conformidade de roteamento', proxyOnly: true, url: 'https://observatory.manrs.org/api/v2/ases/13335', headers: { 'Accept': 'application/json' } }
       ];
 
       let ok = 0, tested = 0;
       const rows = [];
       for (const t of targets) {
         let cell;
-        if (t.needsKey) {
-          cell = { cls: 'text-slate-500', txt: 'sem chave configurada', ms: '' };
-        } else if (t.proxyOnly && g_localProxyAvailable === false) {
+        if (t.proxyOnly && g_localProxyAvailable === false) {
           cell = { cls: 'text-slate-500', txt: 'só via proxy do site', ms: '' };
         } else {
           const r = await probeApi(t.url, t.headers || {});
@@ -4301,28 +4271,14 @@
       }
     }
 
-    // Chaves de API: nunca fixas no código (o arquivo pode ser compartilhado).
-    // Configure em "Status APIs" > Salvar Configurações; ficam apenas no localStorage deste navegador.
-    const DEFAULT_PULSEDIVE_KEY = "";
-    const DEFAULT_ABUSEIPDB_KEY = "";
-    const DEFAULT_VIRUSTOTAL_KEY = "";
-    const DEFAULT_MANRS_KEY = "";
+    // API keys agora vivem SOMENTE como secrets do projeto (env.* no proxy),
+// nunca no navegador. Elas não são fixas no código nem no localStorage.
+['pcap_pulsedive_key','pcap_abuseipdb_key','pcap_virustotal_key','pcap_manrs_key'].forEach(k => localStorage.removeItem(k));
 
-    function getManrsKey() {
-      return localStorage.getItem('pcap_manrs_key') || DEFAULT_MANRS_KEY;
-    }
-
-    function getPulsediveKey() {
-      return localStorage.getItem('pcap_pulsedive_key') || DEFAULT_PULSEDIVE_KEY;
-    }
-
-    function getAbuseIpDbKey() {
-      return localStorage.getItem('pcap_abuseipdb_key') || DEFAULT_ABUSEIPDB_KEY;
-    }
-
-    function getVirusTotalKey() {
-      return localStorage.getItem('pcap_virustotal_key') || DEFAULT_VIRUSTOTAL_KEY;
-    }
+    function getManrsKey() { return null; }
+    function getPulsediveKey() { return null; }
+    function getAbuseIpDbKey() { return null; }
+    function getVirusTotalKey() { return null; }
 
     // =========================================================================================
     // v3.0 THREAT INTELLIGENCE & CYBERSPACE ENRICHMENT ENGINE (Pulsedive, MANRS, RDAP)
@@ -4339,10 +4295,9 @@
     async function queryPulsediveThreatIntelligence(ip, force = false) {
       if (!ip || isPrivateIp(ip)) return null;
       if (!pulsediveAvailable()) return null;
-      const key = getPulsediveKey();
 
       try {
-        const url = `https://pulsedive.com/api/info.php?indicator=${encodeURIComponent(ip)}${key ? `&key=${encodeURIComponent(key)}` : ''}`;
+        const url = `https://pulsedive.com/api/info.php?indicator=${encodeURIComponent(ip)}`;
         const data = await fetchWithMultiProxyFallback(url, { 'Accept': 'application/json' }, true, { force, validate: d => d && !d.error && (d.indicator || d.risk) });
         if (data && (data.indicator || data.risk)) {
           const threats = Array.isArray(data.threats) ? data.threats.map(t => typeof t === 'string' ? t : (t.name || JSON.stringify(t))) : [];
@@ -4535,12 +4490,11 @@
 
     // Direct Test Functions inside API Config Modal
     async function testPulsediveDirectly() {
-      const key = document.getElementById('inputPulsediveKey')?.value.trim() || getPulsediveKey();
       const testIp = document.getElementById('apiTestIpInput')?.value.trim() || '8.8.8.8';
       showSocToast(`Testando Pulsedive API com IP ${testIp}...`, 'info');
       try {
         const t0 = performance.now();
-        const url = `https://pulsedive.com/api/info.php?indicator=${encodeURIComponent(testIp)}&key=${encodeURIComponent(key)}`;
+        const url = `https://pulsedive.com/api/info.php?indicator=${encodeURIComponent(testIp)}`;
         const res = await fetchWithMultiProxyFallback(url, { 'Accept': 'application/json' }, true, { force: true, validate: d => d && !d.error && (d.indicator || d.risk) });
         const dt = Math.round(performance.now() - t0);
         if (!pulsediveAvailable()) {
@@ -4826,13 +4780,11 @@
       // Tier 7: AbuseIPDB e VirusTotal. Nenhuma das duas libera CORS para o navegador, então só funcionam
       // via proxy do site (/api/proxy). Aberto como arquivo local, a chamada falhava sempre e gerava
       // cache negativo; agora é pulada.
-      // No proxy a chave pode vir do secret do projeto, então a chave local é opcional lá.
-      const userAbuseKey = getAbuseIpDbKey();
+      // No proxy a chave vem do secret do projeto, então o navegador nunca manda chave.
       if (g_localProxyAvailable !== false) {
         try {
           const abuseUrl = `https://api.abuseipdb.com/api/v2/check?ipAddress=${ip}&maxAgeInDays=90`;
           const abuseHeaders = { 'Accept': 'application/json' };
-          if (userAbuseKey) abuseHeaders['Key'] = userAbuseKey;
           const abuseData = await fetchWithMultiProxyFallback(abuseUrl, abuseHeaders, true, { ...opts, validate: d => d && d.data });
           if (abuseData?.data) {
             const d = abuseData.data;
@@ -4848,12 +4800,10 @@
           }
         } catch (eA) {}
 
-        // VirusTotal v3: a chave era salva mas nunca usada na v4
-        const userVtKey = getVirusTotalKey();
+        // VirusTotal v3
         try {
           const vtUrl = `https://www.virustotal.com/api/v3/ip_addresses/${ip}`;
           const vtHeaders = { 'Accept': 'application/json' };
-          if (userVtKey) vtHeaders['x-apikey'] = userVtKey;
           const vt = await fetchWithMultiProxyFallback(vtUrl, vtHeaders, true, { ...opts, validate: d => d && d.data && d.data.attributes });
           const st = vt?.data?.attributes?.last_analysis_stats;
           if (st) {
@@ -5133,7 +5083,7 @@
       if (typeof window !== 'undefined' && window.event && window.event.shiftKey) force = true;
       const fromCache = !force && !!getFreshIpCacheEntry(ip);
       if (!fromCache) showSocToast(`Consultando APIs de inteligência para ${ip}...`, 'info');
-      await querySingleIpIntelligence(ip, getAbuseIpDbKey(), getVirusTotalKey(), { force });
+      await querySingleIpIntelligence(ip, null, null, { force });
       propagateIpIntelligence(ip);
       renderCorrelationView();
       renderStatsCards();
@@ -5155,7 +5105,7 @@
       showSocToast(`Consultando ${publicIps.length - cachedCount} IP(s) do grupo ${group.title} (${cachedCount} já em cache)...`, 'info');
 
       for (const info of publicIps) {
-        await querySingleIpIntelligence(info.ip, getAbuseIpDbKey(), getVirusTotalKey());
+        await querySingleIpIntelligence(info.ip, null, null);
         propagateIpIntelligence(info.ip);
       }
       renderCorrelationView();
@@ -10360,13 +10310,8 @@ ${analystNotes}`;
     const g_manrsAsnCache = new Map();
 
     async function testManrsDirectly() {
-      const key = document.getElementById('inputManrsKey')?.value.trim() || getManrsKey();
-      if (!key) {
-        showSocToast("Insira uma chave MANRS válida.", "warning");
-        return;
-      }
-      showSocToast("Testando autenticação no MANRS Observatory...", "info");
-      const r = await probeApi('https://observatory.manrs.org/api/v2/ases/13335', { 'Authorization': `Bearer ${key}`, 'Accept': 'application/json' });
+      showSocToast("Testando autenticação no MANRS Observatory (via secret do servidor)...", "info");
+      const r = await probeApi('https://observatory.manrs.org/api/v2/ases/13335', { 'Accept': 'application/json' });
       const d = describeProbeStatus(r);
       if (r.status >= 200 && r.status < 300) showSocToast(`MANRS OK (${r.ms} ms, ${r.via})`, "success");
       else showSocToast(`MANRS: ${d.txt} (${r.via})`, r.status === 0 || r.status === 401 || r.status === 403 ? "error" : "warning");
@@ -10380,9 +10325,7 @@ ${analystNotes}`;
       if (!cleanAsn) return null;
       if (g_manrsAsnCache.has(cleanAsn)) return g_manrsAsnCache.get(cleanAsn);
 
-      const key = getManrsKey();
-      if (!key) return null;   // sem chave a API responde 401 e pausaria o host por 30 min
-      const headers = { 'Accept': 'application/json', 'Authorization': `Bearer ${key}` };
+      const headers = { 'Accept': 'application/json' }; // Authorization: Bearer vem do secret MANRS_KEY no proxy
 
       try {
         const asUrl = `https://observatory.manrs.org/api/v2/ases/${cleanAsn}`;
@@ -10421,10 +10364,6 @@ ${analystNotes}`;
       if (!asnVal || !container) return;
 
       const cleanAsn = String(asnVal).replace(/[^0-9]/g, '');
-      if (!getManrsKey()) {
-        container.innerHTML = `<div class="text-slate-400 p-4 text-center text-xs">Configure a chave do MANRS Observatory em Status APIs para consultar AS${cleanAsn}.</div>`;
-        return;
-      }
       container.innerHTML = `
         <div class="py-6 flex items-center justify-center space-x-2 text-slate-400 text-xs">
           <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
@@ -10814,7 +10753,7 @@ ${analystNotes}`;
         if (elRir) elRir.textContent = `${data.rir || '-'} (${data.country || '-'})`;
         if (elInc) elInc.textContent = data.incidents === null ? 'consulta falhou' : `${data.incidents.length} no mês`;
       } else {
-        if (elOrg) elOrg.textContent = getManrsKey() ? 'sem dados no MANRS' : 'sem chave MANRS';
+        if (elOrg) elOrg.textContent = 'sem dados no MANRS';
         if (elRir) elRir.textContent = '-';
         if (elInc) elInc.textContent = '-';
       }

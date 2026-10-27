@@ -44,21 +44,18 @@ function cacheKeyOf(target) {
   return u.toString();
 }
 
-// Injeta credenciais guardadas como secrets do projeto
-function applyCredentials(target, headers, env, clientHeaders) {
+// Injeta credenciais SOMENTE de secrets do projeto (env.*). O navegador nunca mais manda chave.
+function applyCredentials(target, headers, env) {
   const host = target.hostname;
   if (host === 'pulsedive.com') {
     if (env.PULSEDIVE_KEY) target.searchParams.set('key', env.PULSEDIVE_KEY);
   } else if (host === 'api.abuseipdb.com') {
-    const k = env.ABUSEIPDB_KEY || clientHeaders.get('Key');
-    if (k) headers.set('Key', k);
+    if (env.ABUSEIPDB_KEY) headers.set('Key', env.ABUSEIPDB_KEY);
   } else if (host === 'www.virustotal.com') {
     if (!target.pathname.startsWith('/api/v3/')) return;
-    const k = env.VIRUSTOTAL_KEY || clientHeaders.get('x-apikey');
-    if (k) headers.set('x-apikey', k);
+    if (env.VIRUSTOTAL_KEY) headers.set('x-apikey', env.VIRUSTOTAL_KEY);
   } else if (host === 'observatory.manrs.org') {
-    const auth = env.MANRS_KEY ? `Bearer ${env.MANRS_KEY}` : clientHeaders.get('Authorization');
-    if (auth) headers.set('Authorization', auth);
+    if (env.MANRS_KEY) headers.set('Authorization', `Bearer ${env.MANRS_KEY}`);
   }
 }
 
@@ -111,7 +108,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
   // 2. Consulta à API de origem
   const headers = new Headers({ Accept: request.headers.get('Accept') || 'application/json' });
-  applyCredentials(target, headers, env, request.headers);
+  applyCredentials(target, headers, env);
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), rule.timeout || DEFAULT_TIMEOUT);
   let upstream;
