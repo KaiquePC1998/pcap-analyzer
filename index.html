@@ -208,7 +208,9 @@
       .text-purple-400, .text-purple-300 { color: #7c3aed !important; }
       .text-amber-400, .text-amber-300 { color: #d97706 !important; }
       #clientPresentationModal { position: static !important; inset: auto !important; background: #ffffff !important; padding: 0 !important; display: block !important; }
-      #clientPresentationModal > div { max-width: 100% !important; max-height: none !important; border: none !important; box-shadow: none !important; }
+      #clientPresentationModal > div { max-width: 100% !important; max-height: none !important; border: none !important; box-shadow: none !important; background: #ffffff !important; }
+      #clientPresentationModal, #clientPresentationModal div, #clientPresentationModal input, #clientPresentationModal table, #clientPresentationModal thead, #clientPresentationModal tbody, #clientPresentationModal tr, #clientPresentationModal td, #clientPresentationModal th { background-color: #ffffff !important; color: #0f172a !important; border-color: #e2e8f0 !important; }
+      #clientPresentationModal h2, #clientPresentationModal h4, #clientPresentationModal span, #clientPresentationModal p, #clientPresentationModal div { color: #0f172a !important; }
       .print-page-break { page-break-after: always; }
       canvas { max-width: 100% !important; height: auto !important; }
     }
@@ -2332,187 +2334,246 @@
   </div>
 
   <!-- ========================================================================================= -->
-  <!-- MODAL: APRESENTAÇÃO EXECUTIVA & RELATÓRIO PARA O CLIENTE (Print / PDF / Visualização HD) -->
+  <!-- MODAL: APRESENTAÇÃO EXECUTIVA & RELATÓRIO PARA O CLIENTE (Figma Design System)            -->
   <!-- ========================================================================================= -->
-  <div id="clientPresentationModal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-700 rounded-lg max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden text-slate-100">
+  <div id="clientPresentationModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-[#0d1211] border border-[#2d1c3d] rounded-xl max-w-6xl w-full max-h-[94vh] flex flex-col overflow-hidden text-[#f4f1f6] shadow-2xl">
       
-      <!-- Executive Header (With Action Bar) -->
-      <div class="bg-slate-900 px-6 py-4 border-b border-indigo-500/30 flex items-center justify-between flex-wrap gap-3">
+      <!-- Top Action Bar (Figma Executive Header) -->
+      <div class="bg-[#151217] px-5 py-3.5 border-b border-[#2d1c3d] flex items-center justify-between flex-wrap gap-3 no-print">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-md bg-indigo-500 flex items-center justify-center text-white">
-            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          <div class="w-9 h-9 rounded-lg bg-[#9b7cff]/15 border border-[#9b7cff]/40 flex items-center justify-center text-[#9b7cff]">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h2 class="text-base font-bold text-white tracking-wide uppercase">Relatório Executivo de Tráfego & Inteligência de Ameaças</h2>
-              <span class="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-bold">LAUDO DO CLIENTE</span>
+              <span class="text-xs font-bold tracking-[0.2em] text-[#9b7cff] uppercase">PCAP ANALYZER</span>
+              <span class="text-xs text-[#625e67]">·</span>
+              <span class="text-xs font-bold tracking-wider text-[#f4f1f6] uppercase">RELATÓRIO EXECUTIVO</span>
+              <span class="px-2 py-0.5 text-[10px] bg-[#9b7cff]/20 text-[#9b7cff] border border-[#9b7cff]/30 rounded-full font-semibold">LAUDO TÉCNICO</span>
             </div>
-            <p class="text-xs text-slate-300 mt-0.5">Visão consolidada para apresentação ao cliente • Classificação de serviços e vetores de risco</p>
+            <p class="text-[11px] text-[#918d96] mt-0.5">Apresentação consolidada de inteligência de tráfego e postura de segurança</p>
           </div>
         </div>
 
-        <!-- Print & Export Buttons -->
-        <div class="flex items-center space-x-2 no-print">
-          <button onclick="printClientReport()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all">
+        <!-- Action & Export Buttons -->
+        <div class="flex items-center space-x-2">
+          <button onclick="printClientReport()" class="px-3 py-1.5 bg-[#9b7cff] hover:bg-[#8b65ff] text-[#0d1211] rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm" title="Imprimir ou Salvar como PDF">
             <i data-lucide="printer" class="w-4 h-4"></i>
-            <span>Imprimir / Salvar PDF</span>
+            <span>Imprimir / PDF</span>
           </button>
-          <button onclick="exportFullDashboardExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all">
+          <button onclick="exportFullDashboardExcel()" class="px-3 py-1.5 bg-[#151217] hover:bg-[#1f1b24] text-[#7cc7a0] border border-[#7cc7a0]/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar dados completos em Excel">
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-            <span>Baixar Excel (.XLSX)</span>
+            <span>Excel (.XLSX)</span>
           </button>
-          <button onclick="exportAllChartsZip()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
+          <button onclick="exportAllChartsZip()" class="px-3 py-1.5 bg-[#151217] hover:bg-[#1f1b24] text-[#f4f1f6] border border-[#2d1c3d] rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Exportar gráficos em alta resolução">
             <i data-lucide="image" class="w-4 h-4"></i>
-            <span>Exportar Gráficos</span>
+            <span>Gráficos (ZIP)</span>
           </button>
-          <button onclick="copyExecutiveClientSummary()" class="px-3 py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
+          <button onclick="copyExecutiveClientSummary()" class="px-3 py-1.5 bg-[#151217] hover:bg-[#1f1b24] text-[#9b7cff] border border-[#9b7cff]/40 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Copiar resumo formatado para a área de transferência">
             <i data-lucide="copy" class="w-4 h-4"></i>
             <span>Copiar Resumo</span>
           </button>
-          <button onclick="downloadExecutiveSummaryMd()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo como Markdown">
-            <i data-lucide="file-code-2" class="w-4 h-4"></i>
+          <button onclick="downloadExecutiveSummaryMd()" class="px-2.5 py-1.5 bg-[#151217] hover:bg-[#1f1b24] text-[#918d96] hover:text-[#f4f1f6] border border-[#2d1c3d] rounded-lg text-xs font-mono transition-all" title="Baixar o resumo como Markdown">
             <span>.MD</span>
           </button>
-          <button onclick="downloadExecutiveSummaryPdf()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all" title="Baixar o resumo como PDF">
-            <i data-lucide="file-text" class="w-4 h-4"></i>
+          <button onclick="downloadExecutiveSummaryPdf()" class="px-2.5 py-1.5 bg-[#151217] hover:bg-[#1f1b24] text-[#918d96] hover:text-[#f4f1f6] border border-[#2d1c3d] rounded-lg text-xs font-mono transition-all" title="Baixar o resumo rápido como PDF">
             <span>PDF</span>
           </button>
-          <button onclick="closeClientPresentationModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+          <button onclick="closeClientPresentationModal()" class="p-1.5 text-[#918d96] hover:text-[#f4f1f6] rounded-lg hover:bg-[#1f1b24] transition-colors ml-1" title="Fechar relatório">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
       </div>
 
-      <!-- Executive Printable Body -->
-      <div id="clientReportPrintableArea" class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-950">
+      <!-- Executive Printable Body (Figma Layout) -->
+      <div id="clientReportPrintableArea" class="flex-1 p-5 sm:p-7 overflow-y-auto space-y-6 bg-[#0d1211]">
         
-        <!-- Metadata Header Box -->
-        <div class="bg-slate-900 border border-slate-800 rounded-md p-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-xs font-mono">
-          <div>
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Cliente / Organização:</span>
-            <input type="text" id="reportClientNameInput" value="Cliente Corporativo / Operação" 
-                   class="bg-transparent text-cyan-300 font-bold text-sm outline-none border-b border-dashed border-slate-700 focus:border-cyan-400 w-full mt-0.5" 
-                   placeholder="Nome do Cliente...">
+        <!-- Header Row (Figma Eyebrow & Headline) -->
+        <div class="border-b border-[#2d1c3d] pb-5">
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-[#918d96] uppercase mb-3">
+            <span>AUDITORIA FORENSE DE REDE · COMITÊ EXECUTIVO</span>
+            <span class="text-[#9b7cff]">DIAGNÓSTICO CONSOLIDADO</span>
           </div>
-          <div>
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Referência / Chamado:</span>
-            <input type="text" id="reportRefInput" value="CHAMADO-PCAP-2026" 
-                   class="bg-transparent text-indigo-300 font-bold text-sm outline-none border-b border-dashed border-slate-700 focus:border-indigo-400 w-full mt-0.5"
-                   placeholder="Ref ou Ticket...">
-          </div>
-          <div>
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Analista Responsável:</span>
-            <input type="text" id="reportAnalystNameInput" value="Especialista de Redes & SOC" 
-                   class="bg-transparent text-emerald-300 font-bold text-sm outline-none border-b border-dashed border-slate-700 focus:border-emerald-400 w-full mt-0.5"
-                   placeholder="Nome do Analista...">
-          </div>
-          <div>
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Data / Hora:</span>
-            <span id="reportGenTime" class="text-slate-200 font-bold text-sm block mt-0.5">-</span>
-          </div>
-          <div>
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Capturas Analisadas:</span>
-            <span id="reportCapturesCount" class="text-emerald-400 font-bold text-sm block mt-0.5">0 arquivos</span>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+            <!-- Headline & Subtitle -->
+            <div class="lg:col-span-2 space-y-2">
+              <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#f4f1f6] leading-tight">
+                Diagnóstico de Tráfego & Postura de Segurança Perimetral
+              </h2>
+              <p class="text-xs sm:text-sm text-[#918d96] leading-relaxed max-w-2xl">
+                Uma visão consolidada do tráfego analisado, classificação comportamental de fluxos e validação de serviços corporativos em conformidade operacional.
+              </p>
+            </div>
+
+            <!-- Metadata Box (Client, Ref, Analyst, Date) -->
+            <div class="bg-[#151217] border border-[#2d1c3d] rounded-lg p-3.5 space-y-2.5 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider text-[#625e67] block font-semibold">Cliente / Organização:</span>
+                  <input type="text" id="reportClientNameInput" value="Cliente Corporativo / Operação" 
+                         class="bg-transparent text-[#9b7cff] font-bold text-xs outline-none border-b border-dashed border-[#2d1c3d] focus:border-[#9b7cff] w-full mt-0.5" 
+                         placeholder="Nome do Cliente...">
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider text-[#625e67] block font-semibold">Referência / Chamado:</span>
+                  <input type="text" id="reportRefInput" value="CHAMADO-PCAP-2026" 
+                         class="bg-transparent text-[#f4f1f6] font-mono text-xs outline-none border-b border-dashed border-[#2d1c3d] focus:border-[#9b7cff] w-full mt-0.5" 
+                         placeholder="Ref ou Ticket...">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-[#2d1c3d]/60">
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider text-[#625e67] block font-semibold">Analista SOC:</span>
+                  <input type="text" id="reportAnalystNameInput" value="Especialista de Redes & SOC" 
+                         class="bg-transparent text-[#7cc7a0] font-bold text-xs outline-none border-b border-dashed border-[#2d1c3d] focus:border-[#7cc7a0] w-full mt-0.5" 
+                         placeholder="Nome do Analista...">
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider text-[#625e67] block font-semibold">Data / Hora:</span>
+                  <span id="reportGenTime" class="text-[#f4f1f6] font-mono text-xs font-semibold block mt-1">-</span>
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider text-[#625e67] block font-semibold">Capturas:</span>
+                  <span id="reportCapturesCount" class="text-[#7cc7a0] font-mono text-xs font-semibold block mt-1">0 arquivos</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Executive Security Scorecard -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="bg-slate-900 border border-slate-800 rounded-md p-3.5">
-            <span class="text-[11px] text-slate-400 uppercase font-semibold block">Volume Total Analisado</span>
-            <div id="reportTotalVolume" class="text-xl font-bold text-white font-mono mt-1">0 KB</div>
-            <span id="reportTotalPackets" class="text-[10px] text-cyan-400 font-mono">0 pacotes</span>
+        <!-- 4 Numbered KPI Cards (Figma Grid Layout) -->
+        <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#2d1c3d]">
+          <!-- Card 01 -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-bold text-[#625e67]">01</span>
+              <span class="text-[10px] font-semibold tracking-[0.18em] text-[#918d96] uppercase">Volume Analisado</span>
+            </div>
+            <div id="reportTotalVolume" class="text-2xl sm:text-3xl font-bold font-mono text-[#f4f1f6] tracking-tight">0.00 MB</div>
+            <div class="flex items-center space-x-1.5 text-xs text-[#7cc7a0] font-mono">
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              <span id="reportTotalPackets">0 pacotes analisados</span>
+            </div>
           </div>
 
-          <div class="bg-slate-900 border border-emerald-500/30 rounded-md p-3.5">
-            <span class="text-[11px] text-emerald-400 uppercase font-semibold block">Tráfego Lícito & Autenticado</span>
-            <div id="reportLegitPercent" class="text-xl font-bold text-emerald-400 font-mono mt-1">100%</div>
-            <span class="text-[10px] text-slate-400">Google, Microsoft, AWS, Cloudflare</span>
+          <!-- Card 02 -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-bold text-[#625e67]">02</span>
+              <span class="text-[10px] font-semibold tracking-[0.18em] text-[#918d96] uppercase">Tráfego Lícito</span>
+            </div>
+            <div id="reportLegitPercent" class="text-2xl sm:text-3xl font-bold font-mono text-[#7cc7a0] tracking-tight">100%</div>
+            <div class="text-xs text-[#918d96] flex items-center space-x-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#7cc7a0]"></i>
+              <span>Google, Microsoft, AWS, Cloudflare</span>
+            </div>
           </div>
 
-          <div class="bg-slate-900 border border-amber-500/30 rounded-md p-3.5">
-            <span class="text-[11px] text-amber-400 uppercase font-semibold block">Tráfego Incomum / Não Padrão</span>
-            <div id="reportUncommonCount" class="text-xl font-bold text-amber-400 font-mono mt-1">0</div>
-            <span class="text-[10px] text-slate-400">Portas sem serviço registrado</span>
+          <!-- Card 03 -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-bold text-[#625e67]">03</span>
+              <span class="text-[10px] font-semibold tracking-[0.18em] text-[#918d96] uppercase">Tráfego Incomum</span>
+            </div>
+            <div id="reportUncommonCount" class="text-2xl sm:text-3xl font-bold font-mono text-[#d3ac71] tracking-tight">0</div>
+            <div class="text-xs text-[#918d96] flex items-center space-x-1">
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-[#d3ac71]"></i>
+              <span>Portas sem serviço registrado</span>
+            </div>
           </div>
 
-          <div class="bg-slate-900 border border-red-500/30 rounded-md p-3.5">
-            <span class="text-[11px] text-red-400 uppercase font-semibold block">Ameaças & Conexões de Risco</span>
-            <div id="reportThreatsCount" class="text-xl font-bold text-red-400 font-mono mt-1">0</div>
-            <span class="text-[10px] text-red-300">TCP RST, Scans e IPs Maliciosos</span>
+          <!-- Card 04 -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-bold text-[#625e67]">04</span>
+              <span class="text-[10px] font-semibold tracking-[0.18em] text-[#918d96] uppercase">Ameaças / Risco</span>
+            </div>
+            <div id="reportThreatsCount" class="text-2xl sm:text-3xl font-bold font-mono text-[#f87171] tracking-tight">0</div>
+            <div class="text-xs text-[#f87171]/90 flex items-center space-x-1">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#f87171]"></i>
+              <span>TCP RST, Scans e IPs Maliciosos</span>
+            </div>
           </div>
         </div>
 
-        <!-- PARECER TÉCNICO & CONCLUSÃO DO ESPECIALISTA SOC -->
-        <div class="bg-slate-900 border border-cyan-500/30 rounded-md p-4">
-          <h4 class="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-            <i data-lucide="user-check" class="w-4 h-4 text-cyan-400"></i>
-            <span>Parecer & Conclusão do Especialista Responsável:</span>
-          </h4>
-          <p id="reportAnalystDiagnosisText" class="text-xs text-slate-300 leading-relaxed italic"></p>
+        <!-- Parecer Técnico & Conclusão do Especialista SOC -->
+        <div class="bg-[#151217] border border-[#2d1c3d] border-l-4 border-l-[#9b7cff] rounded-xl p-4 sm:p-5 space-y-2">
+          <div class="flex items-center space-x-2 text-xs font-semibold tracking-[0.15em] text-[#9b7cff] uppercase">
+            <i data-lucide="file-check-2" class="w-4 h-4 text-[#9b7cff]"></i>
+            <span>Parecer Técnico & Conclusão do Especialista Responsável:</span>
+          </div>
+          <p id="reportAnalystDiagnosisText" class="text-xs sm:text-sm text-[#f4f1f6]/90 leading-relaxed italic bg-[#0d1211]/50 p-3 rounded-lg border border-[#2d1c3d]/60"></p>
         </div>
 
-        <!-- Visual Charts Executive Layout (Rendered Live for Print/Presentation) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Report Timeline Canvas -->
-          <div class="bg-slate-900 border border-slate-800 rounded-md p-4 flex flex-col">
-            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-              <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i>
-              <span>Vazão ao longo do tempo (pps / Mbps)</span>
-            </h4>
-            <div class="h-48 relative">
+        <!-- Executive Visual Charts Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+          <!-- Chart 1: Timeline -->
+          <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl p-4 sm:p-5 flex flex-col">
+            <div class="text-[10px] tracking-[0.2em] uppercase text-[#625e67] font-semibold mb-1">TEMPORALIDADE & VAZÃO</div>
+            <div class="text-xs sm:text-sm font-bold text-[#f4f1f6] flex items-center justify-between mb-3">
+              <span class="flex items-center space-x-1.5">
+                <i data-lucide="trending-up" class="w-4 h-4 text-[#9b7cff]"></i>
+                <span>Vazão ao Longo do Tempo (pps / Throughput)</span>
+              </span>
+              <span class="text-[10px] font-mono text-[#7cc7a0] bg-[#7cc7a0]/10 border border-[#7cc7a0]/30 px-2 py-0.5 rounded">TEMPO REAL</span>
+            </div>
+            <div class="h-52 relative">
               <canvas id="reportTimelineCanvas"></canvas>
             </div>
           </div>
 
-          <!-- Report Protocol Canvas -->
-          <div class="bg-slate-900 border border-slate-800 rounded-md p-4 flex flex-col">
-            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-              <i data-lucide="pie-chart" class="w-4 h-4 text-purple-400"></i>
+          <!-- Chart 2: Protocol -->
+          <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl p-4 sm:p-5 flex flex-col">
+            <div class="text-[10px] tracking-[0.2em] uppercase text-[#625e67] font-semibold mb-1">COMPOSIÇÃO DE CAMADA 4</div>
+            <div class="text-xs sm:text-sm font-bold text-[#f4f1f6] flex items-center space-x-1.5 mb-3">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-[#9b7cff]"></i>
               <span>Distribuição de Protocolos</span>
-            </h4>
-            <div class="h-48 relative flex items-center justify-center">
+            </div>
+            <div class="h-52 relative flex items-center justify-center">
               <canvas id="reportProtocolCanvas"></canvas>
             </div>
           </div>
 
-          <!-- Report Top Sources Canvas -->
-          <div class="bg-slate-900 border border-slate-800 rounded-md p-4 flex flex-col">
-            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-              <i data-lucide="arrow-down-left" class="w-4 h-4 text-emerald-400"></i>
+          <!-- Chart 3: Top Sources -->
+          <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl p-4 sm:p-5 flex flex-col">
+            <div class="text-[10px] tracking-[0.2em] uppercase text-[#625e67] font-semibold mb-1">ANÁLISE DE INGRESSO</div>
+            <div class="text-xs sm:text-sm font-bold text-[#f4f1f6] flex items-center space-x-1.5 mb-3">
+              <i data-lucide="arrow-down-left" class="w-4 h-4 text-[#7cc7a0]"></i>
               <span>Principais Origens de Tráfego (Inbound)</span>
-            </h4>
-            <div class="h-48 relative">
+            </div>
+            <div class="h-52 relative">
               <canvas id="reportTopSrcCanvas"></canvas>
             </div>
           </div>
 
-          <!-- Report Top Destinations Canvas -->
-          <div class="bg-slate-900 border border-slate-800 rounded-md p-4 flex flex-col">
-            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-              <i data-lucide="arrow-up-right" class="w-4 h-4 text-indigo-400"></i>
-              <span>Principais Destinos & Produtos Requisitados (Outbound)</span>
-            </h4>
-            <div class="h-48 relative">
+          <!-- Chart 4: Top Destinations -->
+          <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl p-4 sm:p-5 flex flex-col">
+            <div class="text-[10px] tracking-[0.2em] uppercase text-[#625e67] font-semibold mb-1">ANÁLISE DE EGRESSO</div>
+            <div class="text-xs sm:text-sm font-bold text-[#f4f1f6] flex items-center space-x-1.5 mb-3">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#9b7cff]"></i>
+              <span>Principais Destinos & Serviços (Outbound)</span>
+            </div>
+            <div class="h-52 relative">
               <canvas id="reportTopDstCanvas"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- Consolidated Executive Product & ASN Matrix -->
-        <div class="bg-slate-900 border border-slate-800 rounded-md overflow-hidden">
-          <div class="bg-slate-850 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-            <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-              <i data-lucide="building-2" class="w-4 h-4 text-emerald-400"></i>
-              <span>Classificação Consolidada por Produto, Serviço & Titular do AS</span>
-            </h4>
-            <span id="reportGroupCountSnippet" class="text-[11px] font-mono text-cyan-300">0 grupos / provedores</span>
+        <!-- Consolidated Product & ASN Matrix -->
+        <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-[#2d1c3d] flex items-center justify-between flex-wrap gap-2 bg-[#151217]">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="layers" class="w-4 h-4 text-[#9b7cff]"></i>
+              <h4 class="text-xs font-bold text-[#f4f1f6] uppercase tracking-wider">Classificação Consolidada por Produto, Serviço & Titular do AS</h4>
+            </div>
+            <span id="reportGroupCountSnippet" class="text-[11px] font-mono text-[#9b7cff] bg-[#9b7cff]/10 border border-[#9b7cff]/30 px-2.5 py-0.5 rounded-full">0 grupos / provedores identificados</span>
           </div>
 
           <div class="overflow-x-auto">
             <table class="w-full text-left font-mono text-xs">
-              <thead class="bg-slate-950 text-[10px] text-slate-400 uppercase tracking-wider border-b border-slate-800">
+              <thead class="bg-[#0d1211] text-[10px] text-[#918d96] uppercase tracking-wider border-b border-[#2d1c3d]">
                 <tr>
                   <th class="p-3">Produto / Empresa / Dono do AS</th>
                   <th class="p-3">IPs Abrangidos</th>
@@ -2523,7 +2584,7 @@
                   <th class="p-3">Parecer Técnico / Conformidade</th>
                 </tr>
               </thead>
-              <tbody id="reportTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tbody id="reportTableBody" class="divide-y divide-[#2d1c3d]/60 text-[#f4f1f6]">
                 <!-- Dynamically populated product rows -->
               </tbody>
             </table>
@@ -2531,32 +2592,45 @@
         </div>
 
         <!-- Executive Security Recommendations -->
-        <div class="bg-slate-900 border border-indigo-500/30 rounded-md p-4 text-xs space-y-2">
-          <h4 class="font-bold text-indigo-300 flex items-center space-x-1.5">
-            <i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i>
+        <div class="bg-[#151217] border border-[#2d1c3d] rounded-xl p-4 sm:p-5 text-xs space-y-2">
+          <div class="flex items-center space-x-1.5 text-xs font-bold text-[#7cc7a0] uppercase tracking-wider">
+            <i data-lucide="check-circle" class="w-4 h-4 text-[#7cc7a0]"></i>
             <span>Recomendações e Parecer Técnico do SOC:</span>
-          </h4>
-          <ul id="reportRecommendationsList" class="list-disc list-inside space-y-1 text-slate-300 leading-relaxed">
+          </div>
+          <ul id="reportRecommendationsList" class="list-disc list-inside space-y-1.5 text-[#918d96] leading-relaxed">
             <li>Tráfego de serviços corporativos em nuvem (Google, Microsoft, AWS, Cloudflare) validado como lícito e em conformidade com padrões operacionais.</li>
             <li>Recomenda-se manter o bloqueio no firewall de borda para origens que apresentaram tentativas sucessivas de TCP RST ou varreduras em portas não autorizadas.</li>
             <li>Nenhuma anomalia crítica de exfiltração de dados em massa foi observada nos fluxos correlacionados.</li>
           </ul>
         </div>
+
+        <!-- Figma Design Footer (Brand, Timestamp, Confidentiality) -->
+        <div class="pt-4 border-t border-[#2d1c3d] flex items-center justify-between flex-wrap gap-2 text-[10px] text-[#625e67]">
+          <div class="flex items-center space-x-2">
+            <span class="font-semibold tracking-[0.2em] text-[#9b7cff]">PCAP ANALYZER</span>
+            <span>·</span>
+            <span>INTELIGÊNCIA FORENSE E DEFESA DE REDE</span>
+          </div>
+          <div>Documento confidencial gerado sob demanda técnica</div>
+          <div class="text-[#918d96]">Metodologia RFC 793 / BGP Flowspec</div>
+        </div>
       </div>
 
-      <!-- Modal Footer -->
-      <div class="bg-slate-900 px-6 py-3 border-t border-slate-800 flex items-center justify-between text-xs no-print">
-        <span class="text-slate-400">Relatório pronto para envio e apresentação executiva</span>
+      <!-- Modal Footer (Action buttons) -->
+      <div class="bg-[#151217] px-6 py-3 border-t border-[#2d1c3d] flex items-center justify-between text-xs no-print">
+        <span class="text-[#918d96]">Relatório pronto para envio e apresentação executiva</span>
         <div class="flex items-center space-x-2">
-          <button onclick="printClientReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg flex items-center space-x-1.5">
+          <button onclick="printClientReport()" class="px-4 py-2 bg-[#9b7cff] hover:bg-[#8b65ff] text-[#0d1211] font-bold rounded-lg flex items-center space-x-1.5 transition-all shadow-sm">
             <i data-lucide="printer" class="w-4 h-4"></i>
             <span>Imprimir / Gerar PDF</span>
           </button>
-          <button onclick="exportFullDashboardExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg flex items-center space-x-1.5">
+          <button onclick="exportFullDashboardExcel()" class="px-4 py-2 bg-[#151217] hover:bg-[#1f1b24] text-[#7cc7a0] border border-[#7cc7a0]/40 font-bold rounded-lg flex items-center space-x-1.5 transition-all">
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
             <span>Baixar Planilha Excel</span>
           </button>
-          <button onclick="closeClientPresentationModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg">Fechar</button>
+          <button onclick="closeClientPresentationModal()" class="px-4 py-2 bg-[#151217] hover:bg-[#1f1b24] text-[#918d96] hover:text-[#f4f1f6] border border-[#2d1c3d] rounded-lg transition-colors">
+            Fechar
+          </button>
         </div>
       </div>
     </div>
