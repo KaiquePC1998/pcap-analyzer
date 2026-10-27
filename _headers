@@ -1,29 +1,5 @@
 /*
-  ======================================================================================
-  Segurança HTTP para o PCAP Analyzer (Páginas estáticas + login.html + respostas).
-  Observação: os headers abaixo são aplicados por este arquivo às páginas HTML/recursos.
-  Os endpoints /api/* são responderam pelo middleware; o rate limit e a auth ficam nas
-  Pages Functions. CSP aqui é o equilíbrio entre segurança e não quebrar o app
-  (el via ::tailwind cdn + fonts + um grande número de onclick="" inline já existentes).
-  ======================================================================================
-*/
-/*
-  Strict-Transport-Security (HSTS): forçe HTTPS por 1 ano, incluindo subdomínios.
-  X-Content-Type-Options: evita que o navegador "adivinhe" o tipo de um recurso.
-  X-Frame-Options: bloqueia a página em <frame>/<iframe> (anti-clickjacking).
-  Referrer-Policy: nunca vaza a URL completa em interações cross-origin.
-  Permissions-Policy: restringe APIs sensíveis (câmera/mic/geolocalização/indisponibilidade).
-  X-XSS-Protection: legado de defesa em profundidade (aceito de boa forma).
-  CSP: 'self' para scripts/mídia; permite inline (necessário p/ o app atual), mas
-        bloqueia data:/javascript: externos e iframes/objects não confiáveis.
-*/
-/*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-  X-XSS-Protection: 1; mode=block
-  Cache-Control: no-cache
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.abuseipdb.com https://cloudflare-dns.com https://ipinfo.io https://ipwho.is https://observatory.manrs.org https://pulsedive.com https://rdap.lacnic.net https://stat.ripe.net https://www.virustotal.com https://www.abuseipdb.com https://www.shodan.io https://codeberg.org; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
-*/
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
