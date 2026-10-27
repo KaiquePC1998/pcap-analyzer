@@ -247,8 +247,8 @@
         <i data-lucide="network"></i><span>BGP & Mitigação</span>
         <span id="bgpAlertBadge" class="hidden px-1.5 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold">OK</span>
       </button>
-      <button id="tabPrefixSplitterBtn" onclick="switchView('prefixSplitter')" class="nav-item" title="Quebre um bloco IP (ex.: /16) em vários /25 — ideal para criar rotas mais específicas na mitigação">
-        <i data-lucide="split"></i><span>Quebrador de Bloco</span>
+      <button id="tabPrefixSplitterBtn" onclick="switchView('prefixSplitter')" class="nav-item" title="Divida um bloco IP (ex.: /16) em vários /25 — ideal para criar rotas mais específicas na mitigação">
+        <i data-lucide="split"></i><span>Dividir Bloco</span>
       </button>
 
       <div class="nav-label">Análise</div>
@@ -1664,7 +1664,7 @@
             <i data-lucide="split" class="w-6 h-6"></i>
           </div>
           <div>
-            <h2 class="text-sm font-semibold text-white">Quebrador de Bloco</h2>
+            <h2 class="text-sm font-semibold text-white">Dividir Bloco</h2>
             <p class="text-[11px] text-slate-400">Quebre um prefixo IP em sub-redes menores — gera as rotas mais específicas necessárias para mitigar (ex.: /16 → vários /25).</p>
           </div>
         </div>
@@ -1672,10 +1672,10 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-3">
-          <label class="text-[11px] text-slate-400 font-semibold uppercase">Prefixo a quebrar</label>
+          <label class="text-[11px] text-slate-400 font-semibold uppercase">Prefixo a dividir</label>
           <input id="psInput" value="200.220.0.0/16" spellcheck="false" placeholder="Ex.: 200.220.0.0/16" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-200 outline-none focus:border-cyan-500">
           <div class="flex items-center gap-2">
-            <label class="text-[11px] text-slate-400">Quebrar em&nbsp;/</label>
+            <label class="text-[11px] text-slate-400">Dividir em&nbsp;/</label>
             <select id="psSubnet" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px] font-mono">
               <option value="25">/25 (128 IPs)</option>
               <option value="24">/24 (256 IPs)</option>
@@ -1689,7 +1689,7 @@
           </div>
           <div class="flex flex-wrap gap-2">
             <button onclick="psSplit()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg font-semibold text-xs flex items-center space-x-1.5">
-              <i data-lucide="split" class="w-3.5 h-3.5"></i><span>Quebrar</span>
+              <i data-lucide="split" class="w-3.5 h-3.5"></i><span>Dividir</span>
             </button>
             <button onclick="psCopyAll()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs flex items-center space-x-1.5">
               <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar lista</span>
