@@ -271,6 +271,12 @@
       <button id="tabPayloadLabBtn" onclick="switchView('payloadLab')" class="nav-item" title="Nível 3: padrão de bytes no payload, regex sugerida e teste de acerto/colateral na captura">
         <i data-lucide="binary"></i><span>Payload Lab</span>
       </button>
+      <button id="tabTranslatorBtn" onclick="switchView('regexConverter')" class="nav-item" title="Conversor de regex: converta logs, texto ou padrões em expressão regular pronta para uso">
+        <i data-lucide="shuffle"></i><span>Conversor Regex</span>
+      </button>
+      <button id="tabRegexBtn" onclick="switchView('regexBuilder')" class="nav-item" title="Gerador de regex: monte padrões com auxílio de pré-definidos e teste em tempo real">
+        <i data-lucide="braces"></i><span>Gerador Regex</span>
+      </button>
 
       <div class="nav-label">Outros</div>
 
@@ -290,11 +296,11 @@
       <button onclick="openClientPresentationModal()" class="nav-item" title="Gerar e apresentar relatório executivo formatado para o cliente">
         <i data-lucide="presentation"></i><span>Relatório do Cliente</span>
       </button>
-      <button onclick="openHelpModal()" class="nav-item" title="Manual rápido: fluxo de uso, exemplos e dicas">
-        <i data-lucide="circle-help"></i><span>Ajuda</span>
-      </button>
       <button onclick="openCollectionGuideModal()" class="nav-item" title="Guia de coleta de PCAP: comandos prontos para o cliente copiar, onde posicionar a coleta e quanto tempo capturar">
         <i data-lucide="clipboard-list"></i><span>Checklist de Coleta</span>
+      </button>
+      <button onclick="openHelpModal()" class="nav-item" title="Guia de uso do PCAP Analyzer: fluxo de análise e como usar os conectores de ameaça via API (Pulsedive, AbuseIPDB, VirusTotal, MANRS, LGView) — de ponta a ponta">
+        <i data-lucide="help-circle"></i><span>Ajuda</span>
       </button>
     </nav>
 
@@ -1647,6 +1653,132 @@
       </div>
     </div>
 
+    <!-- VIEW CONVERSOR DE REGEX -->
+    <div id="viewTranslator" class="hidden flex-1 flex flex-col overflow-y-auto bg-cyber-bg p-4 space-y-4">
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="shuffle" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-white">Conversor de Regex</h2>
+            <p class="text-[11px] text-slate-400">Transforme texto, logs ou padrões em uma expressão regular pronta — com escape automático e pré-visualização.</p>
+          </div>
+        </div>
+        <button onclick="switchView('regexBuilder')" class="text-[11px] text-cyan-400 hover:text-cyan-300">&rarr; Gerador de Regex</button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] text-slate-400 font-semibold uppercase">Entrada (texto / log)</label>
+            <select id="rxConvMode" onchange="rxConvert()" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px]">
+              <option value="escape">Escape (texto → string literal)</option>
+              <option value="hex">Hex → bytes</option>
+              <option value="path">Path/URL → caractere de classe</option>
+            </select>
+          </div>
+          <textarea id="rxConvInput" rows="7" spellcheck="false" placeholder="Cole o texto, log ou padrão a converter..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-cyan-500"></textarea>
+          <div class="flex items-center gap-2">
+            <button onclick="rxConvert()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg font-semibold text-xs flex items-center space-x-1.5">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5"></i><span>Converter</span>
+            </button>
+            <button onclick="rxConvCopy()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs flex items-center space-x-1.5">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar</span>
+            </button>
+            <button onclick="rxConvUseInBuilder()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs">Usar no Gerador</button>
+          </div>
+          <div id="rxConvHint" class="text-[11px] text-slate-500 bg-cyan-500/5 border border-cyan-500/10 rounded-lg p-2.5">
+            <strong class="text-cyan-300">Modo Escape:</strong> transforma cada caractere especial do texto em <span class="font-mono">\.</span> <span class="font-mono">\*</span> <span class="font-mono">\+</span> etc., para que a regex casa exatamente o texto como uma string literal. Ideal para logs e mensagens de erro.
+          </div>
+        </div>
+
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-3">
+          <label class="text-[11px] text-slate-400 font-semibold uppercase">Regex gerada</label>
+          <textarea id="rxConvOutput" rows="7" readonly spellcheck="false" class="w-full bg-slate-950/60 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-200 outline-none"></textarea>
+          <div>
+            <label class="text-[11px] text-slate-400 font-semibold uppercase">Testar contra texto</label>
+            <textarea id="rxConvTest" rows="3" spellcheck="false" oninput="rxConvLiveTest()" placeholder="Texto para verificar a correspondência..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-cyan-500"></textarea>
+            <div id="rxConvMatch" class="text-[11px] mt-1.5 font-mono text-cyan-300"></div>
+          </div>
+          <div class="text-[11px] text-slate-500">
+            <strong class="text-cyan-300">Conversão automática:</strong> os caracteres especiais da regex (<span class="font-mono">. [ ] ( ) { } * + ? ^ $ \ |</span>) são escapados automaticamente; selecione o modo acima para tratar hex ou paths.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW GERADOR DE REGEX -->
+    <div id="viewRegexBuilder" class="hidden flex-1 flex flex-col overflow-y-auto bg-cyber-bg p-4 space-y-4">
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 rounded-md bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
+            <i data-lucide="braces" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-white">Gerador de Regex</h2>
+            <p class="text-[11px] text-slate-400">Monte padrões de expressão regular com pré-definidos e teste em tempo real — padrões de texto, IP, portas, hex payloads e mais.</p>
+          </div>
+        </div>
+        <button onclick="switchView('payloadLab')" class="text-[11px] text-fuchsia-400 hover:text-fuchsia-300">&larr; Voltar ao Payload Lab</button>
+      </div>
+
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-3">
+        <label class="text-[11px] text-slate-400 font-semibold uppercase">Expressão regular</label>
+        <div class="flex items-start gap-2">
+          <div class="flex-1">
+            <input id="rxPattern" type="text" spellcheck="false" value="" placeholder="regex aqui..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs font-mono text-fuchsia-200 outline-none focus:border-fuchsia-500">
+            <div class="mt-1.5 text-[11px] text-slate-500"><span class="text-fuchsia-400" id="rxEval"></span></div>
+          </div>
+          <button onclick="rxAddBracket()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs">[ ]</button>
+          <button onclick="rxAddGroup()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs">( )</button>
+          <button onclick="rxAddOr()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs">|</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
+          <div class="text-[11px] font-semibold text-slate-300 uppercase mb-2">Pré-definidos</div>
+          <button onclick="rxInsert('\\d+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">\d+ (dígitos)</button>
+          <button onclick="rxInsert('\\w+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">\w+ (palavra)</button>
+          <button onclick="rxInsert('\\s+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">\s+ (espaço)</button>
+          <button onclick="rxInsert('[^\\x00-\\x7F]+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">não-ASCII</button>
+        </div>
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
+          <div class="text-[11px] font-semibold text-slate-300 uppercase mb-2">IPv4 / Rede</div>
+          <button onclick="rxInsert('(?:\\d{1,3}\\.){3}\\d{1,3}')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">IPv4 simples</button>
+          <button onclick="rxInsert('(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">octeto válido</button>
+          <button onclick="rxInsert('MAC')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">MAC (placeholder)</button>
+          <button onclick="rxInsert('\\d{1,5}')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">porta (1–5 díg)</button>
+        </div>
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
+          <div class="text-[11px] font-semibold text-slate-300 uppercase mb-2">Hex / Payload</div>
+          <button onclick="rxInsert('(?:[0-9A-Fa-f]{2} )+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">bytes hex</button>
+          <button onclick="rxInsert('0x[0-9A-Fa-f]+')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">0x hex</button>
+          <button onclick="rxInsert('\\x[0-9A-Fa-f]{2}')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">\\x HH</button>
+          <button onclick="rxInsert('\\r\\n')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">CRLF</button>
+        </div>
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-3">
+          <div class="text-[11px] font-semibold text-slate-300 uppercase mb-2">Meta</div>
+          <button onclick="rxInsert('^')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">^ início</button>
+          <button onclick="rxInsert('$')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">$ fim</button>
+          <button onclick="rxInsert('(.*)')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">(.*) captura</button>
+          <button onclick="rxInsert('gi')" class="block w-full text-left px-2 py-1.5 bg-slate-800/60 hover:bg-slate-700 rounded text-[11px] font-mono text-slate-200 mb-1">flags gi</button>
+        </div>
+      </div>
+
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-2">
+        <label class="text-[11px] text-slate-400 font-semibold uppercase">Testar contra texto</label>
+        <textarea id="rxTestText" rows="5" spellcheck="false" placeholder="Cole aqui o texto onde aplicar a regex..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-fuchsia-500"></textarea>
+        <div class="flex items-center gap-2">
+          <button onclick="rxRunTest()" class="px-3 py-1.5 bg-fuchsia-600/30 hover:bg-fuchsia-600/50 text-fuchsia-200 border border-fuchsia-500/40 rounded-lg font-semibold text-xs">Testar</button>
+          <button onclick="rxCopyPattern()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs flex items-center space-x-1.5"><i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar regex</span></button>
+          <span id="rxMatches" class="text-[11px] text-fuchsia-300"></span>
+        </div>
+        <pre id="rxResult" class="mt-2 text-[11px] bg-slate-950 border border-slate-800 rounded-lg p-2.5 whitespace-pre-wrap break-words font-mono text-slate-300 max-h-44 overflow-y-auto"></pre>
+      </div>
+    </div>
+
     <!-- VIEW 6: Files Manager View -->
     <div id="viewFilesManager" class="hidden flex-1 flex flex-col overflow-y-auto bg-cyber-bg p-4 space-y-4">
       <div class="bg-cyber-card border border-cyber-border rounded-md p-4 flex items-center justify-between">
@@ -1989,10 +2121,10 @@
     <div class="bg-cyber-card border border-cyber-border rounded-2xl w-[780px] max-w-full max-h-[88vh] overflow-y-auto">
       <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between sticky top-0 bg-cyber-card z-10">
         <div class="flex items-center space-x-2.5">
-          <i data-lucide="circle-help" class="w-5 h-5 text-cyan-300"></i>
+          <i data-lucide="help-circle" class="w-5 h-5 text-cyan-300"></i>
           <div>
-            <div class="text-sm font-semibold text-white">Como usar — manual rápido</div>
-            <div class="text-[11px] text-slate-400">Do PCAP ao relatório em 6 passos</div>
+            <div class="text-sm font-semibold text-white">Como usar — guia completo</div>
+            <div class="text-[11px] text-slate-400">Do PCAP ao relatório, com os conectores de ameaça</div>
           </div>
         </div>
         <button onclick="closeHelpModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -5273,7 +5405,9 @@
     function openHelpModal() {
       const box = document.getElementById('helpBody');
       box.innerHTML = `
+        <div class="space-y-4">
         <div class="p-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-[11px]">Seus arquivos <strong>não saem do navegador</strong>. O fluxo: carregar → Triagem → DDoS (parecer) → Origem do prefixo (onde mitigar) → salvar no Histórico → relatório.</div>
+        <div class="text-[12px] font-bold text-white uppercase tracking-wide pt-1">Passo a passo</div>
         ${HELP_STEPS.map(st => `
           <div class="flex gap-3">
             <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold flex-shrink-0 text-[13px]" style="background:linear-gradient(90deg,#a78bfa,#8b5cf6);color:#ffffff">${st.n}</div>
@@ -5281,6 +5415,27 @@
           </div>`).join('')}
         <div class="pt-2 border-t border-cyber-border text-[11px] text-slate-400">
           <strong class="text-slate-200">Dicas rápidas:</strong> a análise funciona offline (só enriquecimento usa internet, e é cacheado — repetir a consulta não gera chamada nova). Captura "parecida com ataque" pode ser artefato de coleta: compare com um baseline do mesmo ponto. Aba Pacotes vazia? Carregue um PCAP ou use a demo.
+        </div>
+        <div class="pt-2 border-t border-cyber-border text-[11px] text-slate-400">
+          <strong class="text-slate-200">Logout / sessão:</strong> o painel exige login. O cookie de sessão dura 7 dias (HttpOnly + Secure). Para sair, use o ícone no rodapé da barra lateral. O admin gerencia os analistas pelo ícone de usuários (painel de contas).
+        </div>
+        <div class="pt-2 border-t border-cyber-border text-[11px] text-slate-400">
+          <strong class="text-slate-200">Conectores de ameaça (via API).</strong> O enriquecimento de IPs/domínios consulta serviços externos através do proxy do site — cada um tem um papel:
+          <ul class="list-disc pl-4 mt-1 space-y-1">
+            <li><strong class="text-slate-200">Pulsedive</strong> — pontuação de risco e Inteligência ativa (Risk Score). Exige <em>API key</em> (confirmar via Status APIs).</li>
+            <li><strong class="text-slate-200">AbuseIPDB</strong> — denúncias e abuso de IP (vejo histórico de reportes). Exige <em>API key</em>.</li>
+            <li><strong class="text-slate-200">VirusTotal</strong> — detecção e reputação multivendor por IP/host. Exige <em>API key</em>.</li>
+            <li><strong class="text-slate-200">MANRS/ROA</strong> — validação de RPKI (se o prefixo e o ASN são legítimos), roteamento e spoofing. Exibe o estado da validação diretamente no painel.</li>
+            <li><strong class="text-slate-200">RIPE (stat.ripe.net)</strong> — estado BGP do prefixo e dados de rota (usado na aba de Origem do prefixo).</li>
+            <li><strong class="text-slate-200">LGView / Looking Glass</strong> — diagnóstico de roteamento na visão de um roteador externo (quando o dado de RIPE não basta).</li>
+            <li><strong class="text-slate-200">RDAP / LACNIC</strong> — dados WHOIS estruturados (responsável, país, ASN).</li>
+          </ul>
+          <div class="mt-1 text-slate-500">Para as APIs que exigem chave, o proxy usa <em>secrets do servidor</em> (dashboard &rarr; Settings &rarr; Functions &rarr; env vars) — o navegador <strong>nunca</strong> guarda a chave. Se o Status APIs apontar "falha de autenticação", é porque o secret não foi configurado.</div>
+          <div class="mt-1"><strong class="text-slate-200">Status APIs (barra lateral)</strong> testa cada conector isoladamente: mostra latência, se a chave foi aceita e o status HTTP. Use antes de confiar num resultado.</div>
+        </div>
+        <div class="pt-2 border-t border-cyber-border text-[11px] text-slate-400">
+          <strong class="text-slate-200">Segurança dos dados.</strong> Senhas PBKDF2; cookie HttpOnly/Secure; histórico por conta; as chamadas de enriquecimento passam por <em>allow-list</em> (só hosts conhecidos) e são cacheadas (sem chamada duplicada à API). Permissões-Policy restringem câmera/mic/geolocalização.
+        </div>
         </div>`;
       document.getElementById('helpModal').classList.remove('hidden');
       lucide.createIcons();
@@ -5786,6 +5941,8 @@
         { id: 'Ioc', view: 'viewIoc', btn: 'tabIocBtn' },
         { id: 'Triage', view: 'viewTriage', btn: 'tabTriageBtn' },
         { id: 'PayloadLab', view: 'viewPayloadLab', btn: 'tabPayloadLabBtn' },
+        { id: 'RegexConverter', view: 'viewTranslator', btn: 'tabTranslatorBtn' },
+        { id: 'RegexBuilder', view: 'viewRegexBuilder', btn: 'tabRegexBtn' },
         { id: 'Stats', view: 'viewStats', btn: 'tabStatsBtn' },
         { id: 'FilesManager', view: 'viewFilesManager', btn: 'tabFilesManagerBtn' }, // fora do menu (acesso: cabeçalho)
 
@@ -12882,6 +13039,143 @@ ${analystNotes}`;
       if (!s) return "";
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
+
+    // =========================================================================================
+    // CONVERSOR DE REGEX — transforme texto/log/padrão em expressão regular com escape
+    // =========================================================================================
+    // Lista de caracteres que precisam de escape em uma string literal de regex
+    const RX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
+    function rxEscapeLiteral(s) {
+      return s.replace(RX_SPECIAL, '\\$&');
+    }
+    // Converte uma string hex ("41 42" ou "0x41 0x42") em padrão de bytes "\\x41\\x42"
+    function rxHexToBytes(s) {
+      const hexes = s.match(/(?:0x)?([0-9A-Fa-f]{2})/g);
+      if (!hexes) return rxEscapeLiteral(s);
+      return hexes.map(h => '\\x' + h.replace(/^0x/i, '')).join('');
+    }
+    // Converte um path/URL em classe de caracteres com o diretório escapado
+    function rxPathToClass(s) {
+      const clean = s.trim().replace(/[./\\]+$/g, '');
+      if (!clean) return '';
+      const segments = clean.split(/[\\/]/).filter(Boolean);
+      if (segments.length === 0) return rxEscapeLiteral(clean);
+      const head = segments.slice(0, -1).join('/');
+      const tail = segments[segments.length - 1];
+      const headEsc = rxEscapeLiteral(head);
+      const tailClass = rxEscapeLiteral(tail);
+      return (head ? headEsc + '/' : '') + '(?:' + tailClass + '|.)';
+    }
+    function rxConvert() {
+      const inputEl = document.getElementById('rxConvInput');
+      const outEl = document.getElementById('rxConvOutput');
+      const mode = document.getElementById('rxConvMode').value;
+      const hint = document.getElementById('rxConvHint');
+      const src = inputEl.value || '';
+      let result = '';
+      if (mode === 'escape') {
+        result = rxEscapeLiteral(src);
+        hint.innerHTML = '<strong class="text-cyan-300">Modo Escape:</strong> caracteres especiais convertidos em <span class="font-mono">\\.</span> <span class="font-mono">\\*</span> <span class="font-mono">\\+</span> etc. — a regex casa exatamente o texto como string literal.';
+      } else if (mode === 'hex') {
+        result = rxHexToBytes(src);
+        hint.innerHTML = '<strong class="text-cyan-300">Modo Hex:</strong> bytes hex convertidos em <span class="font-mono">\\xHH</span> — útil para payloads e assinaturas de byte.';
+      } else {
+        result = rxPathToClass(src);
+        hint.innerHTML = '<strong class="text-cyan-300">Modo Path/URL:</strong> converte o caminho, escapando o diretório-base e permitindo variação do último segmento.';
+      }
+      outEl.value = result;
+      rxConvLiveTest();
+    }
+    function rxConvLiveTest() {
+      const outEl = document.getElementById('rxConvOutput');
+      const testEl = document.getElementById('rxConvTest');
+      const matchEl = document.getElementById('rxConvMatch');
+      if (!outEl || !testEl || !matchEl) return;
+      const pattern = outEl.value;
+      const text = testEl.value;
+      if (!pattern) { matchEl.textContent = ''; return; }
+      try {
+        const re = new RegExp(pattern, 'g');
+        const m = text.match(re);
+        if (m && m.length) matchEl.textContent = '✓ ' + m.length + ' correspondência(s): ' + m.slice(0,5).map(x => JSON.stringify(x.length>40?x.slice(0,40)+'…':x)).join(', ');
+        else matchEl.textContent = '✗ nenhuma correspondência';
+      } catch (e) {
+        matchEl.textContent = 'regex inválida: ' + e.message;
+      }
+    }
+    function rxConvCopy() {
+      const v = document.getElementById('rxConvOutput').value;
+      if (!v) return;
+      navigator.clipboard && navigator.clipboard.writeText(v).then(() => showSocToast && showSocToast('Regex copiada.', 'success'));
+    }
+    function rxConvUseInBuilder() {
+      const v = document.getElementById('rxConvOutput').value;
+      if (!v) return;
+      switchView('regexBuilder');
+      setTimeout(() => {
+        const p2 = rxPatternEl();
+        if (p2) { p2.value = v; p2.focus(); }
+        rxUpdateEval(); rxRunTest(true);
+      }, 50);
+    }
+  </script>
+
+    // =========================================================================================
+    // GERADOR DE REGEX — monte padrões com pré-definidos e teste em tempo real
+    // =========================================================================================
+    function rxPatternEl() { return document.getElementById('rxPattern'); }
+    function rxEvalEl() { return document.getElementById('rxEval'); }
+    function rxUpdateEval() {
+      const el = rxEvalEl(); if (!el) return;
+      const p = rxPatternEl().value;
+      try { new RegExp(p); el.textContent = '✓ regex válida'; el.style.color = '#4ade80'; }
+      catch (e) { el.textContent = '✗ ' + e.message; el.style.color = '#f87171'; }
+    }
+    function rxInsert(seg) {
+      rxAppend(seg, 0);
+      rxRunTest(true);
+    }
+    function rxAddBracket() { rxAppend('[ ]', 1); }
+    function rxAppend(segment, moveIn) {
+      const el = rxPatternEl(); const pos = el.selectionStart ?? el.value.length;
+      const after = moveIn ? 1 : 0;
+      el.value = el.value.slice(0, pos) + segment + el.value.slice(pos);
+      el.setSelectionRange(pos + after, pos + after);
+      el.focus(); rxUpdateEval();
+    }
+    function rxAddGroup() { rxAppend('( )', 1); }
+    function rxAddOr() { rxAppend('|', 0); }
+    function rxRunTest(auto) {
+      const p = rxPatternEl().value;
+      const text = document.getElementById('rxTestText').value;
+      const box = document.getElementById('rxResult');
+      const matchEl = document.getElementById('rxMatches');
+      rxUpdateEval();
+      if (!p) { if (matchEl) matchEl.textContent = ''; return; }
+      let re;
+      try { re = new RegExp(p, 'g'); }
+      catch (e) { if (matchEl) matchEl.textContent = 'regex inválida'; box.textContent = ''; return; }
+      let m, count = 0;
+      const lines = [];
+      const matches = [];
+      while ((m = re.exec(text)) !== null) { matches.push(m[0]); if (m[0] === '') re.lastIndex++; count++; }
+      if (count === 0) { box.textContent = 'Sem correspondências.'; }
+      else {
+        lines.push(`${count} correspondência(s):`);
+        lines.push(...matches.slice(0, 60).map(x => '  ' + JSON.stringify(x.length > 120 ? x.slice(0, 120) + '…' : x)));
+        if (matches.length > 60) lines.push(`  … e mais ${matches.length - 60}`);
+      }
+      box.textContent = lines.join('\n');
+      if (matchEl) matchEl.textContent = count ? `${count} encontrados` : '';
+    }
+    function rxCopyPattern() {
+      const v = document.getElementById('rxPattern').value;
+      if (!v) return;
+      navigator.clipboard && navigator.clipboard.writeText(v).then(() => showSocToast && showSocToast('Regex copiada.', 'success'));
+    }
+    document.addEventListener('input', (e) => {
+      if (e.target && (e.target.id === 'rxPattern' || e.target.id === 'rxTestText')) { rxUpdateEval(); rxRunTest(true); }
+    });
   </script>
 </body>
 </html>
