@@ -247,6 +247,9 @@
         <i data-lucide="network"></i><span>BGP & Mitigação</span>
         <span id="bgpAlertBadge" class="hidden px-1.5 text-[10px] bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold">OK</span>
       </button>
+      <button id="tabPrefixSplitterBtn" onclick="switchView('prefixSplitter')" class="nav-item" title="Quebre um bloco IP (ex.: /16) em vários /25 — ideal para criar rotas mais específicas na mitigação">
+        <i data-lucide="split"></i><span>Quebrador de Bloco</span>
+      </button>
 
       <div class="nav-label">Análise</div>
 
@@ -1649,6 +1652,59 @@
             <span id="plRegexError" class="text-red-400 font-mono"></span>
           </div>
           <div id="plBacktest" class="text-[11px]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: QUEBRADOR DE BLOCO (split de prefixo) -->
+    <div id="viewPrefixSplitter" class="hidden flex-1 flex flex-col overflow-y-auto bg-cyber-bg p-4 space-y-4">
+      <div class="bg-cyber-card border border-cyber-border rounded-md p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="split" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-white">Quebrador de Bloco</h2>
+            <p class="text-[11px] text-slate-400">Quebre um prefixo IP em sub-redes menores — gera as rotas mais específicas necessárias para mitigar (ex.: /16 → vários /25).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-3">
+          <label class="text-[11px] text-slate-400 font-semibold uppercase">Prefixo a quebrar</label>
+          <input id="psInput" value="200.220.0.0/16" spellcheck="false" placeholder="Ex.: 200.220.0.0/16" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-cyan-200 outline-none focus:border-cyan-500">
+          <div class="flex items-center gap-2">
+            <label class="text-[11px] text-slate-400">Quebrar em&nbsp;/</label>
+            <select id="psSubnet" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px] font-mono">
+              <option value="25">/25 (128 IPs)</option>
+              <option value="24">/24 (256 IPs)</option>
+              <option value="26">/26 (64 IPs)</option>
+              <option value="27">/27 (32 IPs)</option>
+              <option value="28">/28 (16 IPs)</option>
+              <option value="29">/29 (8 IPs)</option>
+              <option value="30">/30 (4 IPs)</option>
+              <option value="32">/32 (1 IP)</option>
+            </select>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="psSplit()" class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 rounded-lg font-semibold text-xs flex items-center space-x-1.5">
+              <i data-lucide="split" class="w-3.5 h-3.5"></i><span>Quebrar</span>
+            </button>
+            <button onclick="psCopyAll()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs flex items-center space-x-1.5">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar lista</span>
+            </button>
+            <button onclick="psExpandCollapse()" id="psToggleBtn" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs">Expandir</button>
+          </div>
+          <div id="psInfo" class="text-[11px] text-slate-400"></div>
+        </div>
+
+        <div class="bg-cyber-card border border-cyber-border rounded-md p-4 space-y-2">
+          <label class="text-[11px] text-slate-400 font-semibold uppercase">Resultado (sub-redes)</label>
+          <div id="psResult" class="text-[11px] font-mono text-cyan-300 bg-slate-950/60 border border-slate-700/60 rounded-lg p-2 min-h-[180px] max-h-[300px] overflow-y-auto whitespace-pre-wrap"></div>
+          <div class="text-[11px] text-slate-500 bg-cyan-500/5 border border-cyan-500/10 rounded-lg p-2.5">
+            <strong class="text-cyan-300">Como usar na mitigação:</strong> cada linha é uma rota mais específica. Para RTBH/blackhole ou FlowSpec, aplique o conjunto de rotas que cobre o alvo sem derrubar o restante do bloco.
+          </div>
         </div>
       </div>
     </div>
@@ -5974,6 +6030,7 @@
         { id: 'PayloadLab', view: 'viewPayloadLab', btn: 'tabPayloadLabBtn' },
         { id: 'RegexConverter', view: 'viewRegexConverter', btn: 'tabRegexConverterBtn' },
         { id: 'RegexBuilder', view: 'viewRegexBuilder', btn: 'tabRegexBuilderBtn' },
+        { id: 'PrefixSplitter', view: 'viewPrefixSplitter', btn: 'tabPrefixSplitterBtn' },
         { id: 'Stats', view: 'viewStats', btn: 'tabStatsBtn' },
         { id: 'FilesManager', view: 'viewFilesManager', btn: 'tabFilesManagerBtn' }, // fora do menu (acesso: cabeçalho)
 
@@ -13166,6 +13223,63 @@ ${analystNotes}`;
     function rxCopyPattern() {
       const v = rxPatternVal(); if (!v) return;
       navigator.clipboard && navigator.clipboard.writeText(v).then(() => showSocToast && showSocToast('Regex copiada.', 'success'));
+    }
+
+    // =========================================================================================
+    // QUEBRADOR DE BLOCO — divide um prefixo IP em sub-redes menores (rotas mais específicas)
+    // =========================================================================================
+    let psState = { lines: [], collapsed: true };
+    function ipToInt(ip) { return ip.split('.').reduce((a, o) => (a << 8) + (+o), 0) >>> 0; }
+    function intToIp(n) { return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.'); }
+    function psParse(value) {
+      const m = String(value).trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\s*\/\s*(\d{1,2})$/);
+      if (!m) return null;
+      const a = m[1].split('.').map(Number);
+      if (a.some(x => x < 0 || x > 255)) return null;
+      const bits = +m[2];
+      if (bits < 1 || bits > 32) return null;
+      return { base: ipToInt(m[1]), mask: bits };
+    }
+    function psSplit() {
+      const inp = document.getElementById('psInput');
+      const target = +document.getElementById('psSubnet').value;
+      const res = document.getElementById('psResult');
+      const info = document.getElementById('psInfo');
+      const parsed = psParse(inp.value);
+      if (!parsed) { res.textContent = 'Prefixo inválido. Use o formato CIDR (ex.: 200.220.0.0/16) — IPv4 apenas.'; info.textContent = ''; psState.lines = []; return; }
+      if (target <= parsed.mask) { res.textContent = 'A máscara de destino deve ser maior que a do bloco (ex.: /25 > /16).'; info.textContent = ''; psState.lines = []; return; }
+      const total = Math.pow(2, target - parsed.mask);
+      const blockSize = Math.pow(2, 32 - target);
+      const start = parsed.base >>> (32 - parsed.mask); // aponta para o |início do bloco
+      const hostCount = Math.pow(2, 32 - target) - 2;
+      const lines = [];
+      for (let i = 0; i < total; i++) {
+        // calcula o endereço de início da sub-rede
+        const sub = parsed.base + i * blockSize;
+        lines.push(intToIp(sub >>> 0) + '/' + target);
+      }
+      psState.lines = lines;
+      psState.collapsed = lines.length > 27;
+      document.getElementById('psToggleBtn').textContent = psState.collapsed ? 'Expandir' : 'Recolher';
+      psRender();
+      info.innerHTML = 'Bloco: <strong>' + inp.value.trim() + '</strong> → <strong>' + lines.length + 'x /' + target + '</strong> (' + hostCount.toLocaleString('pt-BR') + ' IPs utilizáveis por rota). Preenche todo o bloco original sem lacunas.';
+    }
+    function psRender() {
+      const res = document.getElementById('psResult');
+      const showAll = psState.lines.length && !psState.collapsed;
+      const visible = showAll ? psState.lines : psState.lines.slice(0, 64);
+      res.textContent = visible.join('\n') + (psState.lines.length > visible.length ? '\n… +' + (psState.lines.length - visible.length) + ' linhas' : '');
+      psState.expanded = showAll;
+    }
+    function psExpandCollapse() {
+      psState.collapsed = !psState.collapsed;
+      document.getElementById('psToggleBtn').textContent = psState.collapsed ? 'Expandir' : 'Recolher';
+      psRender();
+    }
+    function psCopyAll() {
+      const v = psState.lines.join('\n');
+      if (!v) return;
+      navigator.clipboard && navigator.clipboard.writeText(v).then(() => showSocToast && showSocToast(psState.lines.length + ' rotas copiadas.', 'success'));
     }
   </script>
 </body>
